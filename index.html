@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -16,20 +16,38 @@
       --surface-soft: #11161d;
       --border: #30363d;
       --border-soft: #21262d;
-      --text: #c9d1d9;
+      --text: #d0d7de;
       --text-strong: #f0f6fc;
-      --text-muted: #8b949e;
-      --text-faint: #6e7681;
+      --text-muted: #9aa4af;
+      --text-faint: #7d8590;
       --accent: #58a6ff;
       --accent-soft: rgba(88, 166, 255, 0.1);
       --accent-border: rgba(88, 166, 255, 0.22);
       --success: #3fb950;
-      --warning: #d29922;
-      --purple: #bc8cff;
       --radius: 12px;
       --radius-sm: 8px;
       --shadow: 0 16px 40px rgba(0, 0, 0, 0.22);
       --max-width: 920px;
+      color-scheme: dark;
+    }
+
+    html[data-theme="light"] {
+      --bg: #f6f8fb;
+      --surface: #ffffff;
+      --surface-hover: #f3f6fa;
+      --surface-soft: #edf2f7;
+      --border: #d8e0ea;
+      --border-soft: #e7edf3;
+      --text: #2b3440;
+      --text-strong: #0f172a;
+      --text-muted: #5f6c7b;
+      --text-faint: #7a8794;
+      --accent: #2563eb;
+      --accent-soft: rgba(37, 99, 235, 0.08);
+      --accent-border: rgba(37, 99, 235, 0.18);
+      --success: #15803d;
+      --shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
+      color-scheme: light;
     }
 
     *,
@@ -47,11 +65,12 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       background:
         radial-gradient(circle at top left, rgba(88, 166, 255, 0.08), transparent 26%),
-        linear-gradient(180deg, #0d1117 0%, #0d1117 100%);
+        linear-gradient(180deg, var(--bg) 0%, var(--bg) 100%);
       color: var(--text);
-      line-height: 1.7;
+      line-height: 1.75;
       -webkit-font-smoothing: antialiased;
       text-rendering: optimizeLegibility;
+      transition: background 0.2s ease, color 0.2s ease;
     }
 
     a {
@@ -59,10 +78,47 @@
       text-decoration: none;
     }
 
-    a:focus-visible {
+    a:focus-visible,
+    button:focus-visible {
       outline: 2px solid var(--accent);
       outline-offset: 3px;
       border-radius: 10px;
+    }
+
+    .theme-toggle {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 20;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      min-height: 42px;
+      padding: 0.65rem 0.95rem;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: rgba(22, 27, 34, 0.9);
+      color: var(--text-strong);
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease, color 0.15s ease;
+      backdrop-filter: blur(8px);
+    }
+
+    html[data-theme="light"] .theme-toggle {
+      background: rgba(255, 255, 255, 0.92);
+    }
+
+    .theme-toggle:hover {
+      transform: translateY(-1px);
+      border-color: var(--accent-border);
+      background: var(--surface-hover);
+    }
+
+    .theme-toggle:active {
+      transform: translateY(0);
     }
 
     .container {
@@ -78,6 +134,11 @@
       box-shadow: var(--shadow);
       overflow: hidden;
       backdrop-filter: blur(8px);
+      transition: background-color 0.2s ease, border-color 0.2s ease;
+    }
+
+    html[data-theme="light"] .page-shell {
+      background: rgba(255, 255, 255, 0.76);
     }
 
     .page-inner {
@@ -94,7 +155,7 @@
       display: inline-flex;
       align-items: center;
       gap: 0.55rem;
-      font-size: 0.72rem;
+      font-size: 0.76rem;
       font-weight: 700;
       letter-spacing: 0.14em;
       text-transform: uppercase;
@@ -113,7 +174,7 @@
     }
 
     .header h1 {
-      font-size: clamp(2.1rem, 4.5vw, 3.25rem);
+      font-size: clamp(2.2rem, 4.5vw, 3.35rem);
       font-weight: 800;
       color: var(--text-strong);
       letter-spacing: -0.03em;
@@ -124,28 +185,28 @@
 
     .header-sub {
       max-width: 58ch;
-      font-size: 1.02rem;
+      font-size: 1.08rem;
       color: var(--text-muted);
       font-style: italic;
       padding: 0.95rem 1rem;
       border-left: 3px solid var(--accent);
       border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
       background: var(--accent-soft);
-      line-height: 1.65;
+      line-height: 1.7;
     }
 
     h2 {
       display: flex;
       align-items: center;
       gap: 0.65rem;
-      font-size: 0.74rem;
+      font-size: 0.78rem;
       font-weight: 800;
       letter-spacing: 0.16em;
       text-transform: uppercase;
       color: var(--text-muted);
       border-bottom: 1px solid var(--border);
       padding-bottom: 0.75rem;
-      margin: 0 0 1.2rem;
+      margin: 0 0 1.35rem;
     }
 
     h2::before {
@@ -167,12 +228,17 @@
       border: 1px solid var(--border);
       border-radius: var(--radius);
       padding: 1.5rem 1.6rem;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+
+    html[data-theme="light"] .about-card {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96));
     }
 
     .about-text p {
-      font-size: 0.97rem;
+      font-size: 1.02rem;
       color: var(--text);
-      line-height: 1.8;
+      line-height: 1.82;
       margin-bottom: 0.85em;
       max-width: 72ch;
     }
@@ -200,7 +266,7 @@
 
     .toc-item {
       background: var(--surface);
-      padding: 1.2rem 1.3rem;
+      padding: 1.28rem 1.35rem;
       display: grid;
       grid-template-columns: auto 1fr auto;
       gap: 1rem;
@@ -218,10 +284,10 @@
 
     .toc-num {
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size: 0.72rem;
+      font-size: 0.76rem;
       font-weight: 800;
       color: var(--text-faint);
-      padding-top: 0.22rem;
+      padding-top: 0.24rem;
       min-width: 2rem;
     }
 
@@ -230,11 +296,11 @@
     }
 
     .toc-title {
-      font-size: 1rem;
+      font-size: 1.08rem;
       font-weight: 700;
       color: var(--accent);
       line-height: 1.4;
-      margin-bottom: 0.3rem;
+      margin-bottom: 0.34rem;
     }
 
     a.toc-item:hover .toc-title {
@@ -243,9 +309,9 @@
     }
 
     .toc-desc {
-      font-size: 0.88rem;
+      font-size: 0.96rem;
       color: var(--text-muted);
-      line-height: 1.55;
+      line-height: 1.62;
       max-width: 62ch;
     }
 
@@ -259,11 +325,11 @@
     }
 
     .toc-tag {
-      font-size: 0.62rem;
+      font-size: 0.64rem;
       font-weight: 800;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      padding: 0.26em 0.62em;
+      padding: 0.28em 0.68em;
       border-radius: 999px;
       border: 1px solid;
       white-space: nowrap;
@@ -282,27 +348,8 @@
       background: rgba(139, 148, 158, 0.08);
     }
 
-    .tag-field {
-      color: var(--warning);
-      border-color: rgba(210, 153, 34, 0.38);
-      background: rgba(210, 153, 34, 0.08);
-    }
-
-    .tag-craft {
-      color: var(--purple);
-      border-color: rgba(188, 140, 255, 0.38);
-      background: rgba(188, 140, 255, 0.08);
-    }
-
-    .toc-date {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size: 0.67rem;
-      color: var(--text-faint);
-      white-space: nowrap;
-    }
-
     .toc-item.placeholder {
-      opacity: 0.58;
+      opacity: 0.62;
       cursor: default;
       user-select: none;
     }
@@ -320,7 +367,7 @@
       margin-top: 4rem;
       padding-top: 1.5rem;
       border-top: 1px solid var(--border);
-      font-size: 0.8rem;
+      font-size: 0.86rem;
       color: var(--text-faint);
       display: flex;
       justify-content: space-between;
@@ -352,6 +399,16 @@
         padding: 18px;
       }
 
+      .theme-toggle {
+        top: 12px;
+        right: 12px;
+        padding: 0.6rem 0.8rem;
+      }
+
+      .theme-toggle-text {
+        display: none;
+      }
+
       .about-card {
         padding: 1.2rem;
       }
@@ -366,7 +423,7 @@
       }
 
       .header-sub {
-        font-size: 0.96rem;
+        font-size: 1rem;
       }
 
       .toc-item {
@@ -375,12 +432,12 @@
       }
 
       .toc-title {
-        font-size: 0.96rem;
+        font-size: 1rem;
       }
 
       .toc-desc,
       .about-text p {
-        font-size: 0.92rem;
+        font-size: 0.98rem;
       }
 
       .footer {
@@ -402,14 +459,19 @@
   </style>
 </head>
 <body>
+  <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode">
+    <span id="themeToggleIcon" aria-hidden="true"></span>
+    <span class="theme-toggle-text" id="themeToggleText">Light mode</span>
+  </button>
+
   <div class="container">
     <main class="page-shell">
       <div class="page-inner">
         <header class="header">
-          <div class="eyebrow">Field Notes from a Pentester</div>
+          <div class="eyebrow">Notes from a Pentester</div>
           <h1>The Blog</h1>
           <p class="header-sub">
-            Real engagements. Hard lessons. Written in the margins of offensive security work.
+            Real engagements. Hard lessons.
           </p>
         </header>
 
@@ -419,11 +481,11 @@
             <div class="about-text">
               <p>
                 I’m a penetration tester specializing in external, internal and assumed breach assessments, focused on
-                <strong>Active Directory compromise, lateral movement and real-world attack simulations.</strong>
+                <strong>Active Directory compromise, lateral movement and real world attack simulations.</strong>
               </p>
               <p>
                 Before going fully offensive, I worked in IT and as a blue teamer. That background shapes how I test today.
-                This blog is where I document the lessons—the wins, the defeats and everything in between.
+                This blog is where I document the lessons, the wins, the defeats and everything in between.
               </p>
             </div>
           </div>
@@ -443,8 +505,6 @@
               </div>
               <div class="toc-meta">
                 <span class="toc-tag tag-live">Published</span>
-                <span class="toc-tag tag-craft">Profile</span>
-                <span class="toc-date">2025</span>
               </div>
             </a>
 
@@ -458,8 +518,6 @@
               </div>
               <div class="toc-meta">
                 <span class="toc-tag tag-live">Published</span>
-                <span class="toc-tag tag-field">Field Notes</span>
-                <span class="toc-date">Jun 2025</span>
               </div>
             </a>
 
@@ -473,7 +531,6 @@
               </div>
               <div class="toc-meta">
                 <span class="toc-tag tag-soon">Coming Soon</span>
-                <span class="toc-tag tag-field">Field Notes</span>
               </div>
             </div>
 
@@ -487,7 +544,6 @@
               </div>
               <div class="toc-meta">
                 <span class="toc-tag tag-soon">Coming Soon</span>
-                <span class="toc-tag tag-craft">Methodology</span>
               </div>
             </div>
 
@@ -501,7 +557,6 @@
               </div>
               <div class="toc-meta">
                 <span class="toc-tag tag-soon">Coming Soon</span>
-                <span class="toc-tag tag-craft">Technical</span>
               </div>
             </div>
 
@@ -515,7 +570,19 @@
               </div>
               <div class="toc-meta">
                 <span class="toc-tag tag-soon">Coming Soon</span>
-                <span class="toc-tag tag-craft">Craft</span>
+              </div>
+            </div>
+
+                        <div class="toc-item placeholder" aria-disabled="true">
+              <div class="toc-num">07</div>
+              <div class="toc-body">
+                <div class="toc-title">The Unknown</div>
+                <div class="toc-desc">
+                  What's next?
+                </div>
+              </div>
+              <div class="toc-meta">
+                <span class="toc-tag tag-soon">Coming Soon</span>
               </div>
             </div>
 
@@ -523,11 +590,39 @@
         </section>
 
         <footer class="footer">
-          <span>Field Notes from a Pentester</span>
-          <span>offensive security · red team · AD exploitation</span>
+          <span>Notes from a Pentester</span>
+          <span>offensive security · AD exploitation</span>
         </footer>
       </div>
     </main>
   </div>
+
+  <script>
+    (function () {
+      const root = document.documentElement;
+      const toggle = document.getElementById("themeToggle");
+      const toggleIcon = document.getElementById("themeToggleIcon");
+      const toggleText = document.getElementById("themeToggleText");
+      const storageKey = "field-notes-theme";
+
+      function applyTheme(theme) {
+        root.setAttribute("data-theme", theme);
+        const isLight = theme === "light";
+        toggleIcon.textContent = isLight ? "" : "";
+        toggleText.textContent = isLight ? "Dark mode" : "Light mode";
+        toggle.setAttribute("aria-label", isLight ? "Switch to dark mode" : "Switch to light mode");
+      }
+
+      const savedTheme = localStorage.getItem(storageKey);
+      applyTheme(savedTheme === "light" ? "light" : "dark");
+
+      toggle.addEventListener("click", function () {
+        const current = root.getAttribute("data-theme") === "light" ? "light" : "dark";
+        const next = current === "light" ? "dark" : "light";
+        localStorage.setItem(storageKey, next);
+        applyTheme(next);
+      });
+    })();
+  </script>
 </body>
 </html>
