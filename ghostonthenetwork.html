@@ -68,7 +68,7 @@ animation: fadeSlideDown 0.6s ease both;
 
 .hero h1 {
 font-family: ‘Playfair Display’, Georgia, serif;
-font-size: clamp(2.6rem, 6vw, 4.2rem);
+font-size: clamp(2.4rem, 5.5vw, 4rem);
 line-height: 1.1;
 font-weight: 700;
 letter-spacing: -0.02em;
@@ -81,7 +81,7 @@ margin-bottom: 0.5rem;
 .hero-subtitle {
 font-family: ‘Playfair Display’, serif;
 font-style: italic;
-font-size: 1.25rem;
+font-size: 1.2rem;
 color: var(–muted);
 margin-bottom: 2rem;
 animation: fadeSlideDown 0.6s ease 0.2s both;
@@ -129,6 +129,7 @@ margin: 0.05em 0.08em 0 0;
 color: var(–rust);
 }
 
+/* Section headings */
 h2 {
 font-family: ‘Playfair Display’, serif;
 font-size: 1.9rem;
@@ -150,10 +151,11 @@ letter-spacing: 0.1em;
 
 h3 {
 font-family: ‘Playfair Display’, serif;
-font-size: 1.35rem;
+font-size: 1.3rem;
 font-weight: 700;
-margin-top: 2rem !important;
+margin-top: 2.2rem !important;
 line-height: 1.3;
+color: var(–ink);
 }
 
 /* Pull quote */
@@ -176,40 +178,18 @@ margin: 0;
 .pull-quote p::before { content: ‘\201C’; }
 .pull-quote p::after  { content: ‘\201D’; }
 
-/* Callout box */
-.callout {
-background: var(–highlight);
-border-top: 2px solid var(–ink);
-border-bottom: 2px solid var(–ink);
-padding: 1.2rem 1.5rem;
-margin: 2.5rem 0 !important;
-}
-
-.callout-label {
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 0.65rem;
-letter-spacing: 0.18em;
-text-transform: uppercase;
-color: var(–rust);
-display: block;
-margin-bottom: 0.5em;
-font-weight: 500;
-}
-
-.callout p { font-size: 0.97rem; color: var(–steel); margin: 0; }
-
 /* Key statement */
 .key-statement {
 border-left: 4px solid var(–ink);
-padding: 0.8rem 1.4rem;
+padding: 0.9rem 1.5rem;
 margin: 2rem 0 !important;
 background: var(–aged);
 }
 
 .key-statement p {
 font-family: ‘IBM Plex Mono’, monospace;
-font-size: 0.92rem;
-line-height: 1.6;
+font-size: 0.9rem;
+line-height: 1.7;
 color: var(–ink);
 margin: 0;
 }
@@ -219,17 +199,16 @@ margin: 0;
 list-style: none;
 padding: 0;
 margin: 1rem 0 !important;
+border-top: 1px solid var(–aged);
 }
 
 .checklist li {
 font-size: 1rem;
 color: var(–steel);
-padding: 0.3rem 0 0.3rem 1.8rem;
+padding: 0.45rem 0 0.45rem 1.8rem;
 position: relative;
-border-bottom: 1px dashed var(–aged);
+border-bottom: 1px solid var(–aged);
 }
-
-.checklist li:last-child { border-bottom: none; }
 
 .checklist li::before {
 content: ‘→’;
@@ -238,9 +217,10 @@ color: var(–rust);
 position: absolute;
 left: 0;
 font-size: 0.85rem;
+top: 0.5rem;
 }
 
-/* Meme / gif placeholder */
+/* Meme slot */
 .meme-slot {
 margin: 2.5rem 0 !important;
 display: flex;
@@ -251,103 +231,58 @@ gap: 0.6rem;
 
 .meme-frame {
 width: 100%;
-max-width: 480px;
+max-width: 460px;
 aspect-ratio: 16/9;
 border: 2px dashed var(–muted);
-border-radius: 4px;
+border-radius: 3px;
 background: var(–aged);
 display: flex;
 flex-direction: column;
 align-items: center;
 justify-content: center;
-gap: 0.5rem;
-padding: 1rem;
+gap: 0.6rem;
+padding: 1.2rem;
 text-align: center;
 }
 
-.meme-icon {
-font-size: 2rem;
-opacity: 0.5;
-}
+.meme-icon { font-size: 2rem; opacity: 0.45; }
 
 .meme-suggestion {
 font-family: ‘IBM Plex Mono’, monospace;
-font-size: 0.7rem;
+font-size: 0.68rem;
 letter-spacing: 0.1em;
 text-transform: uppercase;
 color: var(–muted);
-line-height: 1.5;
+line-height: 1.6;
 }
 
 .meme-caption {
 font-family: ‘IBM Plex Mono’, monospace;
-font-size: 0.68rem;
+font-size: 0.67rem;
 color: var(–muted);
 font-style: italic;
-opacity: 0.7;
+opacity: 0.75;
 }
 
 /* Section divider */
 hr.section-break {
 border: none;
 border-top: 1px solid var(–aged);
-margin: 2.5rem 0;
+margin: 2.8rem 0;
 }
 
-em { color: var(–steel); }
-strong { color: var(–ink); }
+em { color: var(–steel); font-style: italic; }
+strong { color: var(–ink); font-weight: 700; }
 
-/* Takeaway cards */
-.takeaways { margin: 2rem 0 !important; }
-
-.takeaways-header {
+/* Sign-off */
+.sign-off {
+text-align: center;
+margin-top: 3rem !important;
 font-family: ‘IBM Plex Mono’, monospace;
-font-size: 0.7rem;
-letter-spacing: 0.2em;
-text-transform: uppercase;
-color: var(–muted);
-margin-bottom: 1rem;
-display: block;
-}
-
-.card-grid {
-display: grid;
-gap: 1px;
-background: var(–ink);
-border: 1px solid var(–ink);
-}
-
-.card {
-background: var(–paper);
-padding: 1.2rem 1.5rem;
-display: grid;
-grid-template-columns: 2.5rem 1fr;
-gap: 1rem;
-align-items: start;
-transition: background 0.2s;
-}
-
-.card:hover { background: var(–aged); }
-
-.card-num {
-font-family: ‘Playfair Display’, serif;
-font-size: 2rem;
-font-weight: 700;
+font-size: 0.9rem;
 color: var(–rust);
-line-height: 1;
-opacity: 0.35;
+letter-spacing: 0.12em;
 }
-
-.card-body strong {
-display: block;
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 0.78rem;
-letter-spacing: 0.06em;
-text-transform: uppercase;
-margin-bottom: 0.3em;
-}
-
-.card-body p { font-size: 0.93rem; color: var(–steel); margin: 0; line-height: 1.6; }
 
 /* Next post */
 .next-post {
@@ -358,6 +293,7 @@ display: grid;
 grid-template-columns: 1fr auto;
 align-items: end;
 gap: 1rem;
+cursor: default;
 }
 
 .next-label {
@@ -372,7 +308,7 @@ margin-bottom: 0.4rem;
 
 .next-title {
 font-family: ‘Playfair Display’, serif;
-font-size: 1.4rem;
+font-size: 1.35rem;
 font-style: italic;
 color: var(–rust);
 line-height: 1.2;
@@ -382,25 +318,18 @@ line-height: 1.2;
 font-size: 2rem;
 color: var(–rust);
 transition: transform 0.2s;
+line-height: 1;
 }
 
-.next-post:hover .next-arrow { transform: translateX(4px); }
+.next-post:hover .next-arrow { transform: translateX(5px); }
 
-.sign-off {
-text-align: center;
-margin-top: 3rem !important;
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 0.85rem;
-color: var(–rust);
-letter-spacing: 0.1em;
-}
-
+/* Footer */
 .byline-footer {
 text-align: center;
-padding: 3rem 0 1rem;
+padding: 3rem 0 1.5rem;
 font-family: ‘IBM Plex Mono’, monospace;
-font-size: 0.7rem;
-letter-spacing: 0.12em;
+font-size: 0.68rem;
+letter-spacing: 0.14em;
 color: var(–muted);
 text-transform: uppercase;
 }
@@ -420,7 +349,7 @@ to   { opacity: 1; transform: translateY(0); }
 .content > *:nth-child(n+6){ animation-delay: 0.70s; }
 
 @media (max-width: 600px) {
-.hero h1 { font-size: 2.2rem; }
+.hero h1 { font-size: 2.1rem; }
 .content { padding: 2rem 1.2rem 4rem; }
 .next-post { grid-template-columns: 1fr; }
 .next-arrow { display: none; }
@@ -439,13 +368,13 @@ to   { opacity: 1; transform: translateY(0); }
     <div class="hero-inner">
       <span class="series-tag">Field Notes &nbsp;·&nbsp; Entry 001</span>
       <h1>A Quiet <em>Network</em>,<br>A Loud Lesson.</h1>
-      <p class="hero-subtitle">My first penetration test and everything I thought I knew about being ready</p>
+      <p class="hero-subtitle">My first penetration test — and everything I thought I knew about being ready</p>
       <div class="meta-row">
-        <span>June 2021</span>
+        <span>June</span>
         <span class="dot"></span>
         <span>Remote Assessment</span>
         <span class="dot"></span>
-        <span>Private School</span>
+        <span>Private K–12 School</span>
         <span class="dot"></span>
         <span>8 min read</span>
       </div>
@@ -457,69 +386,74 @@ to   { opacity: 1; transform: translateY(0); }
   <main class="content">
 
 ```
-<p class="drop-cap">It was June. The kind of June where everything slows down, especially at a school. No students. No teachers. I was at my desk, staring at a terminal, hands on keyboard and a scope document that suddenly felt very real. Somewhere on the other side of that connection was a private school’s network, quiet and waiting.
-</p>
+<p class="drop-cap">It was June. The kind of June where everything slows down, especially at a school. No students. No teachers. I was at my desk, staring at a terminal, hands on keyboard and a scope document that suddenly felt very real. Somewhere on the other side of that connection was a private school's network, quiet and waiting.</p>
 
-<p>This was my first real penetration test. Not a lab. Not a CTF. Not a practice range with intentionally vulnerable machines. A real client. A real scope. A real responsibility. Horror and excitement rolled into one feeling..</p>
+<p>This was my first real penetration test. Not a lab. Not a CTF. Not a practice range with intentionally vulnerable machines. A real client. A real scope. A real responsibility. Horror and excitement rolled into one feeling.</p>
 
-<!-- MEME 1 -->
+<!-- MEME 1: "This is fine" dog / sweating guy -->
 <div class="meme-slot">
   <div class="meme-frame">
     <div class="meme-icon">🔥</div>
-    <div class="meme-suggestion">Insert gif/meme here<br>"sweating guy</div>
+    <div class="meme-suggestion">gif / meme here<br>"this is fine" dog &nbsp;·&nbsp; sweating guy</div>
   </div>
   <span class="meme-caption">the vibe entering my first real engagement</span>
 </div>
+
+<hr class="section-break" />
 
 <h2>The Engagement</h2>
 
 <p>The client was a private school and they wanted to understand their exposure. A reasonable ask. However, June meant staff and students were off for summer break, meaning reduced network activity. The assessment was fully remote, just me, my tools, and whatever I could reach across the wire.</p>
 
-<p>From the start, something felt off. This wasn’t your typical Windows heavy environment. It was predominantly macOS.</p>
+<p>From the start, something felt off. This wasn't your typical Windows-heavy environment. It was predominantly macOS.</p>
 
-<p>That shifted how I had to think because my “experience” mostly centered around Windows and Active Directory. Different controls. Different assumptions. Just like the life, it doesn’t let you stay comfortable. You adapt or you miss things.</p>
+<p>That shifted how I had to think because my "experience" mostly centered around Windows and Active Directory. Different controls. Different assumptions. Just like life, it doesn't let you stay comfortable. You adapt or you miss things.</p>
 
-<!-- MEME 2 -->
+<!-- MEME 2: Surprised Pikachu / "well that's new" -->
 <div class="meme-slot">
   <div class="meme-frame">
     <div class="meme-icon">😳</div>
-    <div class="meme-suggestion">Insert gif/meme here<br>"surprised image</div>
+    <div class="meme-suggestion">gif / meme here<br>surprised pikachu &nbsp;·&nbsp; "well that's new"</div>
   </div>
   <span class="meme-caption">me realizing this isn't the environment I prepared for</span>
 </div>
 
+<hr class="section-break" />
+
 <h2>What I Didn't Have</h2>
 
-<p>I had no real world testing methodology. I was familiar with frameworks like PTES and OWASP. But there was a gap between labs, CTFs and actually executing a IRL assessment under pressure, time boxed, with a real client waiting for a deliverable.</p>
+<p>I had no real-world testing methodology. I was familiar with frameworks like PTES and OWASP. But there was a gap between labs, CTFs and actually executing a real-world assessment under pressure, time-boxed, with a real client waiting for a deliverable.</p>
 
-<p>I remember being nervous. <em>What if I don't find anything?</em> I didn’t have a reliable cheat sheet. I didn’t have a personal runbook. I was stitching together commands from memory and half remembered blog posts and that cost me time and confidence. Just fragments of knowledge, lab experience and the expectation that I should be able to perform.</p>
+<p>I remember being nervous. <em>What if I don't find anything?</em> I didn't have a reliable cheat sheet. I didn't have a personal runbook. I was stitching together commands from memory and half-remembered blog posts and that cost me time and confidence. Just fragments of knowledge, lab experience and the expectation that I should be able to perform.</p>
 
 <p>What I <em>did</em> have was access, a scope, and enough professional obligation to keep going even when my internal monologue was telling me I had no business being there.</p>
 
-<p>So I started testing. Carefully. Slowly. Second guessing everything.</p>
+<p>So I started testing. Carefully. Slowly. Second-guessing everything.</p>
+
+<hr class="section-break" />
 
 <h2>The Findings — Or the Lack Thereof</h2>
 
-<p>I came back with very little. A handful of observations. Some network hygiene issues. Nothing dramatic. No critical vulnerabilities that would make a good war story.</p>
+<p>I came back with very little. A handful of observations. Nothing dramatic. No critical vulnerabilities that would make a good war story.</p>
 
 <p>And then it hit me — I had very little to show for it. No major findings. No big wins. Nothing that felt like it justified me being there.</p>
 
 <p>That was the moment the imposter syndrome kicked in. I remember thinking <em>maybe I'm not cut out for this.</em></p>
 
-<!-- MEME 3 -->
+<!-- MEME 3: walking away from explosion / math lady -->
 <div class="meme-slot">
   <div class="meme-frame">
     <div class="meme-icon">🚶</div>
-    <div class="meme-suggestion">Insert gif/meme here<br>Distracted boyfriend · math lady · walking away from explosion · your pick</div>
+    <div class="meme-suggestion">gif / meme here<br>walking away from explosion &nbsp;·&nbsp; math lady</div>
   </div>
   <span class="meme-caption">me and my self-confidence after the first scan came back clean</span>
 </div>
 
-<p>There's a peculiar kind of loneliness to working a remote engagement — just you, a terminal, and a blinking cursor — quietly wondering if everyone who hired you made a mistake. At least on-site, you're moving. Remotely, the doubt just sits with you.</p>
+<p>There was a loneliness about it all — just you, a terminal and a blinking cursor, quietly wondering if the org who hired you made a mistake.</p>
 
-<p>I didn't spiral into paralysis — I kept working — but that internal voice was loud. <em>You don't know enough. You should have found more. A real pentester would've had this wrapped up by noon.</em></p>
+<p>I didn't spiral — I kept working — but that internal voice was loud. <em>You don't know enough. You should have found more. A real pentester would've had this wrapped up by noon.</em></p>
 
-<p>None of that was useful. Most of it wasn't even accurate. But it was there.</p>
+<p>None of that was helpful. Most of it wasn't even accurate. But it was there.</p>
 
 <p>Here's the part I didn't understand at the time:</p>
 
@@ -527,13 +461,13 @@ to   { opacity: 1; transform: translateY(0); }
   <p>A penetration test is not measured by how many vulnerabilities you find. It's measured by how accurately you assess risk within scope, using a structured, safe approach.</p>
 </div>
 
-<p>A low-finding report doesn't mean you failed. It might mean the organization is doing something right. Your job is to look honestly — not to manufacture drama. Schools, especially small private ones, often have limited security budgets and they're trying to do the right thing with what they have. That deserves honesty, not inflation.</p>
+<p>A low-finding report doesn't mean you failed. It might mean the organization is doing something right. Your job is to look honestly, not to manufacture drama. Each environment is different. Some organizations have limited security budgets or limited resources and they're trying to do the right thing with what they have. That deserves honesty.</p>
 
-<!-- MEME 4 -->
+<!-- MEME 4: light bulb / nod of approval -->
 <div class="meme-slot">
   <div class="meme-frame">
     <div class="meme-icon">💡</div>
-    <div class="meme-suggestion">Insert gif/meme here<br>Light bulb moment · nod of approval · your pick</div>
+    <div class="meme-suggestion">gif / meme here<br>light bulb moment &nbsp;·&nbsp; nod of approval</div>
   </div>
   <span class="meme-caption">the reframe that changed everything</span>
 </div>
@@ -542,44 +476,15 @@ to   { opacity: 1; transform: translateY(0); }
   <p>I didn't fail that engagement. I just didn't have a system yet.</p>
 </div>
 
+<hr class="section-break" />
+
 <h2>What That Experience Gave Me</h2>
 
-<div class="takeaways">
-  <span class="takeaways-header">Three things this engagement gave me</span>
-  <div class="card-grid">
+<h3>1. My First Cheat Sheet (The One That Changed Everything)</h3>
 
-    <div class="card">
-      <div class="card-num">01</div>
-      <div class="card-body">
-        <strong>My First Cheat Sheet</strong>
-        <p>After that assessment, I built something I wish I had from day one. Not just commands. Not just tools. A structured way to think.</p>
-      </div>
-    </div>
+<p>After that assessment, I built something I wish I had from day one — a cheat sheet.</p>
 
-    <div class="card">
-      <div class="card-num">02</div>
-      <div class="card-body">
-        <strong>The "Try Harder" Trap</strong>
-        <p>I left with an obsession that was as toxic as it was motivating. The drive to never feel underprepared again pushed me hard — sometimes in the right direction, sometimes straight into burnout.</p>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-num">03</div>
-      <div class="card-body">
-        <strong>A Healthier Relationship with Defeat</strong>
-        <p>You won't "win" every pentest. Organizations pursuing testing are trying to do the right thing. That's a good thing — and it's exactly how it should be.</p>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<h3>On the Cheat Sheet</h3>
-
-<p>That document became my anchor. The friction of not having it forced me to build it. And over time, it grew into a living methodology — added to after every engagement, refined with each new environment — something far more valuable than any single finding.</p>
-
-<p>It's never finished. That's the point.</p>
+<p>Not just commands. Not just tools. A structured way to think:</p>
 
 <ul class="checklist">
   <li>What do I check first?</li>
@@ -587,35 +492,47 @@ to   { opacity: 1; transform: translateY(0); }
   <li>What am I likely to forget under pressure?</li>
 </ul>
 
+<p>That document became my anchor. And over time, it grew into a living methodology — added to after every engagement, refined with each new environment — something more valuable than any single finding.</p>
+
+<p>It's never finished. That's the point.</p>
+
 <p>Because consistency is what separates guessing from testing.</p>
 
-<h3>On "Try Harder"</h3>
+<h3>2. The "Try Harder" Trap</h3>
+
+<p><em>You just need to try harder.</em></p>
+
+<p>At first, it felt motivating. Push more. Do more. Never miss anything again. But that mindset can go sideways fast and it did. That mindset eventually became the seed for another story: <em>"All Bark, No Bite."</em></p>
 
 <p>Good penetration testing isn't about brute force effort or flooding a network with traffic. It's about disciplined, scoped, and methodical work. You don't win by throwing everything at a network or exhausting yourself — you win by thinking clearly and following a process.</p>
 
-<p>That mindset eventually became the seed for another story.</p>
+<p>I left that engagement with a "try harder" obsession that, in hindsight, was toxic. The drive to never feel underprepared again pushed me hard.</p>
 
-<h3>On Winning</h3>
+<h3>3. Redefining What "Winning" Means</h3>
 
-<p>You're not there to "break things" — RCEs and popping shells. You're there to tell the truth about risk. Some environments are well secured. Some organizations are doing the right things. And when that happens, fewer findings doesn't mean failure — it means the organization has reached a level of maturity. That's a good thing.</p>
+<p>That first test felt like a loss but over time, I learned something important.</p>
 
-<h2>Looking Back</h2>
+<p>You're not there to "break things" with RCEs and popping shells. You're there to tell the truth about risk. Some environments are well secured. Some organizations are doing the right things. And when that happens, fewer findings doesn't mean failure — it means the organization has reached a level of maturity. That's a good thing.</p>
 
-<p>I'm grateful for that engagement. Not in spite of feeling defeated, but because of it. That feeling was information. It told me to build better systems, to be more honest about my gaps, and to stop measuring success by the drama of my findings.</p>
-
-<p>I never wanted to feel that defeated again — and I won't pretend I haven't felt it since, because I have. Many times. But now, it's different. Now I understand that every assessment is part of a larger process. For me. For clients.</p>
-
-<p>Every organization that hires a pentester is extending a form of trust. They're saying: <em>look at us honestly and tell us what you see.</em> That obligation doesn't get smaller when the findings are thin. That quiet network in June didn't give me a highlight moment. It gave me something better — a foundation.</p>
+<p>I've lost plenty of assessments since this one. Environments that were hardened, scopes that yielded little, engagements where the org was genuinely doing well. I've made peace with that. Organizations pursuing penetration testing are trying to do the right thing. You can't win every assessment and winning was never really the point.</p>
 
 <hr class="section-break" />
 
-<p>And if you're early in your career, feeling the same way I did — uncertain, underprepared, questioning yourself — understand this:</p>
+<h2>Looking Back</h2>
+
+<p>I'm grateful for that engagement. Not in spite of feeling defeated but because of it. That feeling was information. It told me to build better systems.</p>
+
+<p>I never wanted to feel that defeated again and I won't pretend I haven't felt it since because I have. Many times. But now, it's different. Now I understand that every assessment is part of a larger process. For me. For clients.</p>
+
+<p>Every organization that hires a pentester is extending a form of trust. They're saying: <em>look at us honestly and tell us what you see.</em> That obligation doesn't get smaller when the findings are thin. That quiet network in June didn't give me a highlight moment. It gave me something better — a foundation.</p>
+
+<p>If you're early in your career, feeling the same way I did — uncertain, underprepared, questioning yourself — then understand this:</p>
 
 <div class="pull-quote">
   <p>You're not behind. You're building. And that first uncomfortable experience? That's where it all starts.</p>
 </div>
 
-<p class="sign-off">Happy hacking.</p>
+<p class="sign-off">Happy hacking!</p>
 
 <div class="next-post">
   <div>
