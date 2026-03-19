@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>About — Penetration Tester</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg:        #0d0f0e;
+    --surface:   #131614;
+    --border:    #1f2420;
+    --border-hi: #2e3530;
+    --amber:     #e8a830;
+    --amber-dim: #a37520;
+    --amber-glow:#e8a83018;
+    --green:     #3ecf6a;
+    --red:       #e85030;
+    --text:      #c8cfc8;
+    --text-dim:  #6a756a;
+    --text-hi:   #eef2ee;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'Syne', sans-serif;
+  }
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+background: var(–bg);
+color: var(–text);
+font-family: var(–mono);
+font-size: 14px;
+line-height: 1.75;
+min-height: 100vh;
+overflow-x: hidden;
+cursor: default;
+}
+
+/* Scanline overlay */
+body::after {
+content: ‘’;
+position: fixed;
+inset: 0;
+background: repeating-linear-gradient(
+0deg,
+transparent,
+transparent 2px,
+rgba(0,0,0,0.07) 2px,
+rgba(0,0,0,0.07) 4px
+);
+pointer-events: none;
+z-index: 999;
+}
+
+/* Noise texture */
+body::before {
+content: ‘’;
+position: fixed;
+inset: 0;
+background-image: url(“data:image/svg+xml,%3Csvg viewBox=‘0 0 200 200’ xmlns=‘http://www.w3.org/2000/svg’%3E%3Cfilter id=‘n’%3E%3CfeTurbulence type=‘fractalNoise’ baseFrequency=‘0.85’ numOctaves=‘4’ stitchTiles=‘stitch’/%3E%3C/filter%3E%3Crect width=‘100%25’ height=‘100%25’ filter=‘url(%23n)’ opacity=‘0.035’/%3E%3C/svg%3E”);
+pointer-events: none;
+z-index: 998;
+opacity: 0.6;
+}
+
+/* Layout */
+.page {
+max-width: 900px;
+margin: 0 auto;
+padding: 0 2rem;
+}
+
+/* TOP BAR */
+.topbar {
+border-bottom: 1px solid var(–border);
+padding: 1rem 0;
+display: flex;
+justify-content: space-between;
+align-items: center;
+font-size: 0.68rem;
+letter-spacing: 0.15em;
+text-transform: uppercase;
+color: var(–text-dim);
+animation: fadeIn 0.4s ease both;
+}
+
+.topbar-left { display: flex; gap: 2rem; }
+
+.status-dot {
+display: inline-block;
+width: 6px; height: 6px;
+border-radius: 50%;
+background: var(–green);
+margin-right: 0.5em;
+animation: pulse 2s ease infinite;
+}
+
+@keyframes pulse {
+0%, 100% { opacity: 1; }
+50% { opacity: 0.3; }
+}
+
+/* HERO */
+.hero {
+padding: 5rem 0 3.5rem;
+position: relative;
+}
+
+.hero-label {
+font-size: 0.68rem;
+letter-spacing: 0.25em;
+text-transform: uppercase;
+color: var(–amber);
+margin-bottom: 1.5rem;
+display: block;
+animation: fadeSlideUp 0.5s ease 0.1s both;
+}
+
+.hero-label::before { content: ’> ’; opacity: 0.6; }
+
+.hero h1 {
+font-family: var(–sans);
+font-size: clamp(2.8rem, 7vw, 5.5rem);
+font-weight: 800;
+line-height: 0.95;
+letter-spacing: -0.03em;
+color: var(–text-hi);
+animation: fadeSlideUp 0.5s ease 0.15s both;
+margin-bottom: 1.2rem;
+}
+
+.hero h1 span {
+color: var(–amber);
+position: relative;
+}
+
+.hero-tagline {
+font-size: 0.88rem;
+color: var(–text-dim);
+max-width: 480px;
+line-height: 1.7;
+animation: fadeSlideUp 0.5s ease 0.25s both;
+border-left: 2px solid var(–amber-dim);
+padding-left: 1rem;
+font-style: italic;
+}
+
+/* DIVIDER */
+.divider {
+display: flex;
+align-items: center;
+gap: 1rem;
+margin: 3rem 0;
+color: var(–text-dim);
+font-size: 0.65rem;
+letter-spacing: 0.2em;
+text-transform: uppercase;
+animation: fadeIn 0.5s ease 0.3s both;
+}
+
+.divider::before, .divider::after {
+content: ‘’;
+flex: 1;
+height: 1px;
+background: var(–border);
+}
+
+/* GRID LAYOUT */
+.grid {
+display: grid;
+grid-template-columns: 1fr 300px;
+gap: 3rem;
+align-items: start;
+}
+
+/* SECTION */
+.section { margin-bottom: 3rem; animation: fadeSlideUp 0.5s ease both; }
+.section:nth-child(1) { animation-delay: 0.3s; }
+.section:nth-child(2) { animation-delay: 0.38s; }
+.section:nth-child(3) { animation-delay: 0.46s; }
+.section:nth-child(4) { animation-delay: 0.54s; }
+
+.section-label {
+font-size: 0.63rem;
+letter-spacing: 0.25em;
+text-transform: uppercase;
+color: var(–amber);
+margin-bottom: 1.2rem;
+display: flex;
+align-items: center;
+gap: 0.8rem;
+}
+
+.section-label::after {
+content: ‘’;
+flex: 1;
+height: 1px;
+background: var(–border);
+}
+
+.section p {
+font-size: 0.87rem;
+color: var(–text);
+line-height: 1.8;
+margin-bottom: 1em;
+}
+
+.section p:last-child { margin-bottom: 0; }
+
+/* The core question callout */
+.core-question {
+background: var(–amber-glow);
+border: 1px solid var(–amber-dim);
+border-left: 3px solid var(–amber);
+padding: 1.1rem 1.4rem;
+margin: 1.5rem 0;
+font-size: 0.85rem;
+color: var(–amber);
+font-style: italic;
+line-height: 1.6;
+}
+
+.core-question::before {
+content: ‘// core question’;
+display: block;
+font-style: normal;
+font-size: 0.62rem;
+letter-spacing: 0.15em;
+text-transform: uppercase;
+color: var(–amber-dim);
+margin-bottom: 0.5em;
+}
+
+/* CAPABILITY LIST */
+.cap-list {
+list-style: none;
+margin: 0.5rem 0;
+}
+
+.cap-list li {
+font-size: 0.84rem;
+color: var(–text);
+padding: 0.6rem 0;
+border-bottom: 1px solid var(–border);
+display: grid;
+grid-template-columns: 1.2rem 1fr;
+gap: 0.6rem;
+align-items: baseline;
+transition: color 0.2s;
+}
+
+.cap-list li:first-child { border-top: 1px solid var(–border); }
+.cap-list li:hover { color: var(–text-hi); }
+
+.cap-list li::before {
+content: ‘↳’;
+color: var(–amber-dim);
+font-size: 0.75rem;
+}
+
+/* METHODOLOGY STEPS */
+.method-steps {
+display: grid;
+gap: 1px;
+background: var(–border);
+border: 1px solid var(–border);
+margin-top: 0.8rem;
+}
+
+.method-step {
+background: var(–surface);
+padding: 0.85rem 1.1rem;
+display: grid;
+grid-template-columns: 2rem 1fr;
+gap: 0.8rem;
+align-items: start;
+transition: background 0.15s;
+}
+
+.method-step:hover { background: var(–border); }
+
+.step-num {
+font-size: 0.65rem;
+color: var(–amber-dim);
+letter-spacing: 0.1em;
+padding-top: 0.15rem;
+font-weight: 500;
+}
+
+.step-text {
+font-size: 0.82rem;
+color: var(–text);
+line-height: 1.5;
+}
+
+.step-text strong {
+display: block;
+color: var(–text-hi);
+font-size: 0.78rem;
+letter-spacing: 0.05em;
+margin-bottom: 0.15em;
+font-weight: 500;
+}
+
+/* SIDEBAR */
+.sidebar { animation: fadeSlideUp 0.5s ease 0.4s both; }
+
+/* FOCUS AREAS */
+.focus-card {
+background: var(–surface);
+border: 1px solid var(–border);
+margin-bottom: 1.5rem;
+}
+
+.focus-card-header {
+padding: 0.7rem 1rem;
+border-bottom: 1px solid var(–border);
+font-size: 0.62rem;
+letter-spacing: 0.2em;
+text-transform: uppercase;
+color: var(–amber);
+display: flex;
+align-items: center;
+gap: 0.6rem;
+}
+
+.focus-card-header::before {
+content: ‘’;
+width: 6px; height: 6px;
+background: var(–amber);
+display: inline-block;
+flex-shrink: 0;
+}
+
+.focus-item {
+padding: 0.75rem 1rem;
+border-bottom: 1px solid var(–border);
+font-size: 0.8rem;
+color: var(–text);
+line-height: 1.4;
+transition: background 0.15s, color 0.15s;
+cursor: default;
+}
+
+.focus-item:last-child { border-bottom: none; }
+.focus-item:hover { background: var(–border-hi); color: var(–text-hi); }
+
+/* CREDENTIALS */
+.cred-card {
+background: var(–surface);
+border: 1px solid var(–border);
+margin-bottom: 1.5rem;
+}
+
+.cred-card-header {
+padding: 0.7rem 1rem;
+border-bottom: 1px solid var(–border);
+font-size: 0.62rem;
+letter-spacing: 0.2em;
+text-transform: uppercase;
+color: var(–amber);
+display: flex;
+align-items: center;
+gap: 0.6rem;
+}
+
+.cred-card-header::before {
+content: ‘’;
+width: 6px; height: 6px;
+background: var(–amber);
+display: inline-block;
+flex-shrink: 0;
+}
+
+.cred-section-title {
+padding: 0.5rem 1rem 0.2rem;
+font-size: 0.58rem;
+letter-spacing: 0.18em;
+text-transform: uppercase;
+color: var(–text-dim);
+background: var(–bg);
+border-bottom: 1px solid var(–border);
+}
+
+.cred-item {
+padding: 0.55rem 1rem;
+border-bottom: 1px solid var(–border);
+font-size: 0.78rem;
+color: var(–text);
+display: flex;
+align-items: center;
+gap: 0.6rem;
+transition: background 0.15s;
+}
+
+.cred-item:last-child { border-bottom: none; }
+.cred-item:hover { background: var(–border-hi); }
+
+.cred-badge {
+font-size: 0.6rem;
+font-weight: 500;
+letter-spacing: 0.08em;
+background: var(–amber-glow);
+border: 1px solid var(–amber-dim);
+color: var(–amber);
+padding: 0.1em 0.5em;
+flex-shrink: 0;
+}
+
+.cred-badge.deg {
+background: rgba(62,207,106,0.08);
+border-color: rgba(62,207,106,0.3);
+color: var(–green);
+}
+
+/* CTA */
+.cta-block {
+background: var(–surface);
+border: 1px solid var(–border);
+border-left: 3px solid var(–amber);
+padding: 1.3rem 1.4rem;
+margin-top: 2rem;
+animation: fadeSlideUp 0.5s ease 0.6s both;
+}
+
+.cta-block p {
+font-size: 0.82rem;
+color: var(–text);
+line-height: 1.7;
+margin-bottom: 1rem;
+}
+
+.cta-block p strong { color: var(–text-hi); }
+
+.cta-tag {
+display: inline-block;
+font-size: 0.68rem;
+letter-spacing: 0.15em;
+text-transform: uppercase;
+color: var(–amber);
+border: 1px solid var(–amber-dim);
+padding: 0.3em 0.8em;
+transition: background 0.2s, color 0.2s;
+cursor: pointer;
+}
+
+.cta-tag:hover {
+background: var(–amber);
+color: var(–bg);
+}
+
+/* FOOTER */
+.footer {
+border-top: 1px solid var(–border);
+padding: 1.5rem 0;
+margin-top: 4rem;
+display: flex;
+justify-content: space-between;
+align-items: center;
+font-size: 0.63rem;
+letter-spacing: 0.12em;
+text-transform: uppercase;
+color: var(–text-dim);
+animation: fadeIn 0.5s ease 0.7s both;
+}
+
+/* Animations */
+@keyframes fadeIn {
+from { opacity: 0; }
+to   { opacity: 1; }
+}
+
+@keyframes fadeSlideUp {
+from { opacity: 0; transform: translateY(14px); }
+to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive */
+@media (max-width: 720px) {
+.grid { grid-template-columns: 1fr; gap: 0; }
+.sidebar { margin-top: 1rem; }
+.hero h1 { font-size: 2.6rem; }
+.topbar-left { gap: 1rem; }
+.footer { flex-direction: column; gap: 0.5rem; text-align: center; }
+}
+</style>
+
+</head>
+<body>
+
+<div class="page">
+
+  <!-- TOP BAR -->
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <span><span class="status-dot"></span>available</span>
+      <span>offensive security</span>
+    </div>
+    <span>field notes &nbsp;/&nbsp; about</span>
+  </div>
+
+  <!-- HERO -->
+
+  <section class="hero">
+    <span class="hero-label">whoami</span>
+    <h1>I approach security<br>like an <span>adversary.</span></h1>
+    <p class="hero-tagline">Penetration tester. Former blue teamer. Focused on the one question that matters most.</p>
+  </section>
+
+  <div class="divider">profile</div>
+
+  <!-- MAIN GRID -->
+
+  <div class="grid">
+
+```
+<!-- LEFT COLUMN -->
+<div class="main-col">
+
+  <div class="section">
+    <div class="section-label">Background</div>
+    <p>I'm a penetration tester specializing in external, internal and assumed breach assessments with a focus on Active Directory compromise, lateral movement and real-world attack simulations. I lead engagements that go beyond vulnerability identification — demonstrating how weaknesses translate into business risk through full attack chains.</p>
+
+    <div class="core-question">
+      "If an attacker got in today, how far could they go?"
+    </div>
+
+    <p>Before moving fully into offensive security, I worked in IT and as a blue teamer, monitoring large-scale environments and conducting threat hunting. That background shaped how I test today — I understand both sides of the wire.</p>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Capabilities</div>
+    <p>I bring experience across both offensive and defensive security roles, with a focus on outcomes over optics. I've performed:</p>
+    <ul class="cap-list">
+      <li>External and internal penetration tests with full exploitation paths</li>
+      <li>Assumed breach scenarios targeting domain environments and privilege escalation</li>
+      <li>OSINT-driven reconnaissance and attack surface mapping</li>
+      <li>Narrative-driven reporting that clearly communicates impact to technical and non-technical stakeholders</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Methodology</div>
+    <p>My methodology follows attacker behavior and frameworks such as the Penetration Testing Execution Standard (PTES):</p>
+    <div class="method-steps">
+      <div class="method-step">
+        <div class="step-num">01</div>
+        <div class="step-text">
+          <strong>Reconnaissance &amp; OSINT</strong>
+          Collection and attack surface identification before a single packet is sent.
+        </div>
+      </div>
+      <div class="method-step">
+        <div class="step-num">02</div>
+        <div class="step-text">
+          <strong>Enumeration &amp; Mapping</strong>
+          Systematic discovery of services, misconfigurations and exposure points.
+        </div>
+      </div>
+      <div class="method-step">
+        <div class="step-num">03</div>
+        <div class="step-text">
+          <strong>Exploitation &amp; Post-Exploitation</strong>
+          Controlled, scoped compromise with lateral movement through the environment.
+        </div>
+      </div>
+      <div class="method-step">
+        <div class="step-num">04</div>
+        <div class="step-text">
+          <strong>Impact Validation</strong>
+          Data access and business impact demonstrated through full attack chains.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Knowledge Sharing</div>
+    <p>I contribute to knowledge sharing, improving methodologies and raising the standard of reporting — ensuring clients clearly understand risk and remediation, not just a list of findings.</p>
+  </div>
+
+  <div class="cta-block">
+    <p>If you're looking for someone who <strong>thinks like an attacker</strong>, communicates like a consultant and delivers actionable results — I'm always open to connecting.</p>
+    <span class="cta-tag">→ &nbsp; let's connect</span>
+  </div>
+
+</div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+
+  <div class="focus-card">
+    <div class="focus-card-header">Core Focus Areas</div>
+    <div class="focus-item">Active Directory exploitation</div>
+    <div class="focus-item">Assumed breach &amp; post-exploitation</div>
+    <div class="focus-item">Attack path discovery &amp; lateral movement</div>
+    <div class="focus-item">Security testing mapped to business impact</div>
+  </div>
+
+  <div class="cred-card">
+    <div class="cred-card-header">Education &amp; Credentials</div>
+
+    <div class="cred-section-title">Degrees</div>
+    <div class="cred-item">
+      <span class="cred-badge deg">MS</span>
+      Cybersecurity
+    </div>
+    <div class="cred-item">
+      <span class="cred-badge deg">BS</span>
+      Information Systems
+    </div>
+
+    <div class="cred-section-title">Certifications</div>
+    <div class="cred-item">
+      <span class="cred-badge">CRTE</span>
+      Certified Red Team Expert
+    </div>
+    <div class="cred-item">
+      <span class="cred-badge">PNPT</span>
+      Practical Network Pentest
+    </div>
+    <div class="cred-item">
+      <span class="cred-badge">eCPPT</span>
+      eLearnSecurity CPT
+    </div>
+    <div class="cred-item">
+      <span class="cred-badge">eJPT</span>
+      eLearnSecurity JPT
+    </div>
+    <div class="cred-item">
+      <span class="cred-badge">CEH</span>
+      Certified Ethical Hacker
+    </div>
+    <div class="cred-item">
+      <span class="cred-badge">PT+</span>
+      Pentest+
+    </div>
+    <div class="cred-item">
+      <span class="cred-badge">SEC+</span>
+      Security+
+    </div>
+
+  </div>
+
+</aside>
+```
+
+  </div>
+
+  <!-- FOOTER -->
+
+  <footer class="footer">
+    <span>Field Notes from a Pentester</span>
+    <span>offensive security &nbsp;·&nbsp; red team &nbsp;·&nbsp; AD exploitation</span>
+  </footer>
+
+</div>
+
+</body>
+</html>
