@@ -1,10 +1,352 @@
 <!DOCTYPE html>
-<html>
+
+<html lang="en">
 <head>
-    <title>Trip7 Blog</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Field Notes — A Pentester's Blog</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+```
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background-color: #0d1117;
+        color: #c9d1d9;
+        line-height: 1.7;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 60px 24px 80px;
+    }
+
+    /* ── HEADER ── */
+    .header {
+        border-bottom: 1px solid #30363d;
+        padding-bottom: 2.5rem;
+        margin-bottom: 3rem;
+    }
+
+    .eyebrow {
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: #58a6ff;
+        margin-bottom: 1rem;
+    }
+
+    .header h1 {
+        font-size: clamp(1.9rem, 4vw, 2.8rem);
+        font-weight: 700;
+        color: #f0f6fc;
+        letter-spacing: -0.02em;
+        line-height: 1.15;
+        margin-bottom: 1.2rem;
+    }
+
+    .header-sub {
+        font-size: 1rem;
+        color: #8b949e;
+        font-style: italic;
+        padding-left: 1rem;
+        border-left: 2px solid #58a6ff;
+        line-height: 1.6;
+        max-width: 560px;
+    }
+
+    /* ── SECTION LABELS ── */
+    h2 {
+        font-size: 0.72rem;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: #8b949e;
+        border-bottom: 1px solid #30363d;
+        padding-bottom: 0.6rem;
+        margin-bottom: 1.4rem;
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
+
+    h2::before {
+        content: '';
+        width: 3px;
+        height: 13px;
+        background: #58a6ff;
+        border-radius: 2px;
+        display: inline-block;
+        flex-shrink: 0;
+    }
+
+    /* ── ABOUT SNIPPET ── */
+    .about-section {
+        margin-bottom: 3.5rem;
+    }
+
+    .about-card {
+        background: #161b22;
+        border: 1px solid #30363d;
+        border-radius: 8px;
+        padding: 1.6rem 1.8rem;
+    }
+
+    .about-text p {
+        font-size: 0.95rem;
+        color: #c9d1d9;
+        line-height: 1.75;
+        margin-bottom: 0.8em;
+    }
+
+    .about-text p:last-child { margin-bottom: 0; }
+
+    .about-text strong { color: #f0f6fc; }
+
+
+
+    /* ── TOC ── */
+    .toc-section {
+        margin-bottom: 3rem;
+    }
+
+    .toc-list {
+        display: grid;
+        gap: 1px;
+        background: #30363d;
+        border: 1px solid #30363d;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    /* Live post */
+    .toc-item {
+        background: #161b22;
+        padding: 1.2rem 1.4rem;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 1.1rem;
+        align-items: start;
+        text-decoration: none;
+        transition: background 0.12s;
+    }
+
+    .toc-item:hover { background: #1c2128; }
+
+    .toc-num {
+        font-family: ui-monospace, Menlo, monospace;
+        font-size: 0.68rem;
+        font-weight: 700;
+        color: #484f58;
+        padding-top: 0.2rem;
+        min-width: 1.8rem;
+    }
+
+    .toc-body { min-width: 0; }
+
+    .toc-title {
+        font-size: 0.97rem;
+        font-weight: 600;
+        color: #58a6ff;
+        line-height: 1.4;
+        margin-bottom: 0.3rem;
+    }
+
+    .toc-item:hover .toc-title { text-decoration: underline; }
+
+    .toc-desc {
+        font-size: 0.85rem;
+        color: #8b949e;
+        line-height: 1.5;
+    }
+
+    .toc-meta {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 0.4rem;
+        flex-shrink: 0;
+        padding-top: 0.1rem;
+    }
+
+    .toc-tag {
+        font-size: 0.6rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 0.2em 0.6em;
+        border-radius: 4px;
+        border: 1px solid;
+        white-space: nowrap;
+    }
+
+    .tag-live  { color: #3fb950; border-color: rgba(63,185,80,0.4);  background: rgba(63,185,80,0.1); }
+    .tag-soon  { color: #8b949e; border-color: rgba(139,148,158,0.3); background: rgba(139,148,158,0.07); }
+    .tag-field { color: #d29922; border-color: rgba(210,153,34,0.4);  background: rgba(210,153,34,0.08); }
+    .tag-craft { color: #bc8cff; border-color: rgba(188,140,255,0.4); background: rgba(188,140,255,0.08); }
+
+    .toc-date {
+        font-family: ui-monospace, Menlo, monospace;
+        font-size: 0.65rem;
+        color: #484f58;
+        white-space: nowrap;
+    }
+
+    /* Placeholder post */
+    .toc-item.placeholder {
+        opacity: 0.45;
+        cursor: default;
+        pointer-events: none;
+    }
+
+    .toc-item.placeholder .toc-title {
+        color: #8b949e;
+    }
+
+    /* ── FOOTER ── */
+    .footer {
+        margin-top: 4rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #30363d;
+        font-size: 0.8rem;
+        color: #484f58;
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 620px) {
+        .about-card { padding: 1.2rem; }
+        .toc-item { grid-template-columns: auto 1fr; }
+        .toc-meta { display: none; }
+        .container { padding: 40px 16px 60px; }
+    }
+</style>
+```
+
 </head>
 <body>
-    <h1>Hello world!</h1>
-    <p>TBD.</p>
+<div class="container">
+
+```
+<!-- HEADER -->
+<header class="header">
+    <div class="eyebrow">Field Notes from a Pentester</div>
+    <h1>The Blog</h1>
+    <p class="header-sub">Real engagements. Hard lessons. Written in the margins of offensive security work.</p>
+</header>
+
+<!-- ABOUT SNIPPET -->
+<section class="about-section">
+    <h2>About</h2>
+    <div class="about-card">
+        <div class="about-text">
+            <p>I'm a penetration tester specializing in external, internal and assumed breach assessments — focused on <strong>Active Directory compromise, lateral movement and real-world attack simulations.</strong></p>
+            <p>Before going fully offensive I worked in IT and as a blue teamer. That background shapes how I test today. This blog is where I document the lessons — the wins, the defeats, and everything in between.</p>
+        </div>
+    </div>
+</section>
+
+<!-- TABLE OF CONTENTS -->
+<section class="toc-section">
+    <h2>All Posts</h2>
+    <div class="toc-list">
+
+        <!-- POST 01 — LIVE -->
+        <a class="toc-item" href="777.html">
+            <div class="toc-num">01</div>
+            <div class="toc-body">
+                <div class="toc-title">About Me</div>
+                <div class="toc-desc">Who I am, how I work, and why I approach security like an adversary. Background, methodology, and credentials.</div>
+            </div>
+            <div class="toc-meta">
+                <span class="toc-tag tag-live">Published</span>
+                <span class="toc-tag tag-craft">Profile</span>
+                <span class="toc-date">2025</span>
+            </div>
+        </a>
+
+        <!-- POST 02 — LIVE -->
+        <a class="toc-item" href="ghostonthenetwork.html">
+            <div class="toc-num">02</div>
+            <div class="toc-body">
+                <div class="toc-title">A Quiet Network, A Loud Lesson</div>
+                <div class="toc-desc">My first real penetration test — a remote assessment against a private school in June, and everything I didn't know I didn't have.</div>
+            </div>
+            <div class="toc-meta">
+                <span class="toc-tag tag-live">Published</span>
+                <span class="toc-tag tag-field">Field Notes</span>
+                <span class="toc-date">Jun 2025</span>
+            </div>
+        </a>
+
+        <!-- POST 03 — COMING SOON -->
+        <div class="toc-item placeholder">
+            <div class="toc-num">03</div>
+            <div class="toc-body">
+                <div class="toc-title">All Bark, No Bite — When "Try Harder" Becomes the Problem</div>
+                <div class="toc-desc">The obsession that followed my first engagement, why the "try harder" mindset is toxic, and what it nearly cost me.</div>
+            </div>
+            <div class="toc-meta">
+                <span class="toc-tag tag-soon">Coming Soon</span>
+                <span class="toc-tag tag-field">Field Notes</span>
+            </div>
+        </div>
+
+        <!-- POST 04 — COMING SOON -->
+        <div class="toc-item placeholder">
+            <div class="toc-num">04</div>
+            <div class="toc-body">
+                <div class="toc-title">The Cheat Sheet That Changed Everything</div>
+                <div class="toc-desc">How one document born out of frustration became a living methodology — and why consistency separates guessing from testing.</div>
+            </div>
+            <div class="toc-meta">
+                <span class="toc-tag tag-soon">Coming Soon</span>
+                <span class="toc-tag tag-craft">Methodology</span>
+            </div>
+        </div>
+
+        <!-- POST 05 — COMING SOON -->
+        <div class="toc-item placeholder">
+            <div class="toc-num">05</div>
+            <div class="toc-body">
+                <div class="toc-title">Active Directory: Where Engagements Are Won and Lost</div>
+                <div class="toc-desc">Why AD is still the crown jewel of most internal assessments and what attackers actually look for when they get inside.</div>
+            </div>
+            <div class="toc-meta">
+                <span class="toc-tag tag-soon">Coming Soon</span>
+                <span class="toc-tag tag-craft">Technical</span>
+            </div>
+        </div>
+
+        <!-- POST 06 — COMING SOON -->
+        <div class="toc-item placeholder">
+            <div class="toc-num">06</div>
+            <div class="toc-body">
+                <div class="toc-title">Reporting That Actually Gets Read</div>
+                <div class="toc-desc">Most pentest reports sit in a drawer. How narrative-driven reporting communicates real risk — to executives and engineers alike.</div>
+            </div>
+            <div class="toc-meta">
+                <span class="toc-tag tag-soon">Coming Soon</span>
+                <span class="toc-tag tag-craft">Craft</span>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <span>Field Notes from a Pentester</span>
+    <span>offensive security · red team · AD exploitation</span>
+</footer>
+```
+
+</div>
 </body>
 </html>
