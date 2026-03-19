@@ -4,8 +4,6 @@ It was June. The kind of June where everything slows down, especially at a schoo
 
 This was my first real penetration test. Not a lab. Not a CTF. Not a practice range with intentionally vulnerable machines. A real client. A real scope. A real responsibility. Horror and excitement rolled into one feeling.
 
------
-
 ## The Engagement
 
 The client was a private school and they wanted to understand their exposure. A reasonable ask. However, June meant staff and students were off for summer break, meaning reduced network activity. The assessment was fully remote, just me, my tools, and whatever I could reach across the wire.
