@@ -27,6 +27,25 @@
       --radius-sm: 8px;
       --shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
       --max-width: 900px;
+      color-scheme: dark;
+    }
+
+    html[data-theme="light"] {
+      --bg: #f6f8fb;
+      --surface: #ffffff;
+      --surface-hover: #f3f6fa;
+      --border: #d8dee8;
+      --border-soft: #e7ebf1;
+      --text: #243041;
+      --text-strong: #0f172a;
+      --text-muted: #5f6b7a;
+      --text-faint: #7b8794;
+      --accent: #2563eb;
+      --accent-soft: rgba(37, 99, 235, 0.08);
+      --accent-border: rgba(37, 99, 235, 0.2);
+      --success: #16a34a;
+      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      color-scheme: light;
     }
 
     *,
@@ -44,11 +63,12 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       background:
         radial-gradient(circle at top left, rgba(88, 166, 255, 0.08), transparent 28%),
-        linear-gradient(180deg, #0d1117 0%, #0d1117 100%);
+        linear-gradient(180deg, var(--bg) 0%, var(--bg) 100%);
       color: var(--text);
       line-height: 1.7;
       -webkit-font-smoothing: antialiased;
       text-rendering: optimizeLegibility;
+      transition: background-color 0.2s ease, color 0.2s ease;
     }
 
     a {
@@ -67,6 +87,44 @@
       border-radius: 6px;
     }
 
+    .theme-toggle {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      z-index: 1000;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 44px;
+      min-height: 44px;
+      padding: 0.65rem 0.9rem;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: rgba(22, 27, 34, 0.82);
+      color: var(--text-strong);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+      cursor: pointer;
+      font-size: 0.82rem;
+      font-weight: 700;
+      line-height: 1;
+      transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease, color 0.15s ease;
+    }
+
+    html[data-theme="light"] .theme-toggle {
+      background: rgba(255, 255, 255, 0.92);
+    }
+
+    .theme-toggle:hover {
+      background: var(--surface-hover);
+      border-color: var(--accent-border);
+      transform: translateY(-1px);
+    }
+
+    .theme-toggle:active {
+      transform: translateY(0);
+    }
+
     .page {
       width: min(100% - 2rem, var(--max-width));
       margin: 0 auto;
@@ -80,6 +138,11 @@
       box-shadow: var(--shadow);
       backdrop-filter: blur(8px);
       overflow: hidden;
+      transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    html[data-theme="light"] .panel {
+      background: rgba(255, 255, 255, 0.78);
     }
 
     .content {
@@ -191,6 +254,10 @@
       font-size: 1rem;
       font-style: italic;
       line-height: 1.6;
+    }
+
+    html[data-theme="light"] .core-q {
+      color: #1d4ed8;
     }
 
     .cap-list,
@@ -392,6 +459,10 @@
       background: linear-gradient(180deg, rgba(22, 27, 34, 0.92), rgba(22, 27, 34, 0.82));
     }
 
+    html[data-theme="light"] .cta {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.96));
+    }
+
     .cta p {
       margin: 0;
       min-width: 220px;
@@ -417,6 +488,10 @@
       font-weight: 700;
       white-space: nowrap;
       transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+
+    html[data-theme="light"] .cta-btn {
+      color: #ffffff;
     }
 
     .cta-btn:hover {
@@ -454,6 +529,12 @@
     }
 
     @media (max-width: 560px) {
+      .theme-toggle {
+        top: 12px;
+        right: 12px;
+        padding: 0.6rem 0.8rem;
+      }
+
       .header {
         padding-bottom: 1.75rem;
         margin-bottom: 2rem;
@@ -500,6 +581,10 @@
   </style>
 </head>
 <body>
+  <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to light mode" aria-pressed="false">
+    <span id="theme-toggle-text">Light mode</span>
+  </button>
+
   <main class="page">
     <section class="panel" aria-label="About me">
       <div class="content">
@@ -613,7 +698,6 @@
               <div class="cred-row"><span class="badge b-blue">CRTE</span><span class="cred-name">Certified Red Team Expert</span></div>
               <div class="cred-row"><span class="badge b-blue">PNPT</span><span class="cred-name">Practical Network Penetration Tester</span></div>
               <div class="cred-row"><span class="badge b-blue">eCPPT</span><span class="cred-name">eLearnSecurity Certified Professional Penetration Tester</span></div>
-              <div class="cred-row"><span class="badge b-blue">eJPT</span><span class="cred-name">eLearnSecurity Junior Penetration Tester</span></div>
               <div class="cred-row"><span class="badge b-blue">CEH</span><span class="cred-name">Certified Ethical Hacker</span></div>
               <div class="cred-row"><span class="badge b-blue">PT+</span><span class="cred-name">Pentest+</span></div>
               <div class="cred-row"><span class="badge b-blue">SEC+</span><span class="cred-name">Security+</span></div>
@@ -632,5 +716,37 @@
       </div>
     </section>
   </main>
+
+  <script>
+    (function () {
+      const html = document.documentElement;
+      const toggle = document.getElementById("theme-toggle");
+      const toggleText = document.getElementById("theme-toggle-text");
+      const storageKey = "theme-preference";
+
+      function getPreferredTheme() {
+        const saved = localStorage.getItem(storageKey);
+        if (saved === "light" || saved === "dark") return saved;
+        return "dark";
+      }
+
+      function applyTheme(theme) {
+        html.setAttribute("data-theme", theme);
+        const isLight = theme === "light";
+        toggle.setAttribute("aria-pressed", String(isLight));
+        toggle.setAttribute("aria-label", isLight ? "Switch to dark mode" : "Switch to light mode");
+        toggleText.textContent = isLight ? "Dark mode" : "Light mode";
+      }
+
+      applyTheme(getPreferredTheme());
+
+      toggle.addEventListener("click", function () {
+        const current = html.getAttribute("data-theme") === "light" ? "light" : "dark";
+        const next = current === "light" ? "dark" : "light";
+        localStorage.setItem(storageKey, next);
+        applyTheme(next);
+      });
+    })();
+  </script>
 </body>
 </html>
