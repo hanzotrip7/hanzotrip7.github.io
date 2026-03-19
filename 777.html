@@ -1,449 +1,636 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About Me</title>
-    <style>
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="description"
+    content="About me page for a penetration tester specializing in Active Directory compromise, lateral movement, assumed breach assessments, and business-impact-driven reporting."
+  />
+  <title>About Me</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --surface-hover: #1c2128;
+      --border: #30363d;
+      --border-soft: #21262d;
+      --text: #c9d1d9;
+      --text-strong: #f0f6fc;
+      --text-muted: #8b949e;
+      --text-faint: #6e7681;
+      --accent: #58a6ff;
+      --accent-soft: rgba(88, 166, 255, 0.1);
+      --accent-border: rgba(88, 166, 255, 0.25);
+      --success: #3fb950;
+      --radius: 10px;
+      --radius-sm: 8px;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
+      --max-width: 900px;
+    }
 
-```
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        background-color: #0d1117;
-        color: #c9d1d9;
-        line-height: 1.7;
-        -webkit-font-smoothing: antialiased;
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(88, 166, 255, 0.08), transparent 28%),
+        linear-gradient(180deg, #0d1117 0%, #0d1117 100%);
+      color: var(--text);
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
     }
 
-    .container {
-        max-width: 860px;
-        margin: 0 auto;
-        padding: 60px 24px 80px;
+    a {
+      color: var(--accent);
+      text-decoration: none;
     }
 
-    /* ── HEADER ── */
+    a:hover {
+      text-decoration: underline;
+    }
+
+    a:focus-visible,
+    button:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+
+    .page {
+      width: min(100% - 2rem, var(--max-width));
+      margin: 0 auto;
+      padding: 56px 0 80px;
+    }
+
+    .panel {
+      background: rgba(22, 27, 34, 0.72);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+      overflow: hidden;
+    }
+
+    .content {
+      padding: 32px;
+    }
+
     .header {
-        border-bottom: 1px solid #30363d;
-        padding-bottom: 2.5rem;
-        margin-bottom: 3rem;
+      padding-bottom: 2rem;
+      margin-bottom: 2.5rem;
+      border-bottom: 1px solid var(--border);
     }
 
     .eyebrow {
-        font-size: 0.72rem;
-        font-weight: 600;
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
-        color: #58a6ff;
-        margin-bottom: 1rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 0 4px rgba(88, 166, 255, 0.12);
     }
 
     .header h1 {
-        font-size: clamp(1.9rem, 4vw, 2.8rem);
-        font-weight: 700;
-        color: #f0f6fc;
-        letter-spacing: -0.02em;
-        line-height: 1.15;
-        margin-bottom: 1.2rem;
+      margin: 0 0 1rem;
+      font-size: clamp(2rem, 4vw, 3.1rem);
+      line-height: 1.08;
+      letter-spacing: -0.03em;
+      color: var(--text-strong);
     }
 
     .tagline {
-        font-size: 1rem;
-        color: #8b949e;
-        font-style: italic;
-        padding-left: 1rem;
-        border-left: 2px solid #58a6ff;
-        line-height: 1.6;
+      max-width: 56ch;
+      margin: 0;
+      padding: 0.95rem 1rem;
+      border-left: 3px solid var(--accent);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      background: var(--accent-soft);
+      color: var(--text-muted);
+      font-size: 1rem;
+      font-style: italic;
     }
 
-    /* ── SECTIONS ── */
     .section {
-        margin-bottom: 3rem;
+      margin-bottom: 2.75rem;
+    }
+
+    .section:last-of-type {
+      margin-bottom: 0;
     }
 
     h2 {
-        font-size: 0.72rem;
-        font-weight: 700;
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
-        color: #8b949e;
-        border-bottom: 1px solid #30363d;
-        padding-bottom: 0.6rem;
-        margin-bottom: 1.2rem;
-        display: flex;
-        align-items: center;
-        gap: 0.6rem;
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      margin: 0 0 1rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--text-muted);
     }
 
     h2::before {
-        content: '';
-        width: 3px;
-        height: 13px;
-        background: #58a6ff;
-        border-radius: 2px;
-        display: inline-block;
-        flex-shrink: 0;
+      content: "";
+      width: 4px;
+      height: 14px;
+      border-radius: 999px;
+      background: var(--accent);
+      flex-shrink: 0;
     }
 
     p {
-        font-size: 0.97rem;
-        margin-bottom: 1em;
-        color: #c9d1d9;
-        line-height: 1.75;
+      max-width: 72ch;
+      margin: 0 0 1rem;
+      font-size: 1rem;
+      color: var(--text);
     }
 
-    p:last-child { margin-bottom: 0; }
+    p:last-child {
+      margin-bottom: 0;
+    }
 
-    /* ── CORE QUESTION ── */
+    .lead {
+      font-size: 1.03rem;
+      color: var(--text);
+    }
+
     .core-q {
-        margin: 1.5rem 0;
-        padding: 1.1rem 1.4rem;
-        background: rgba(88,166,255,0.08);
-        border: 1px solid rgba(88,166,255,0.2);
-        border-left: 3px solid #58a6ff;
-        border-radius: 0 6px 6px 0;
-        font-size: 1rem;
-        color: #58a6ff;
-        font-style: italic;
-        line-height: 1.6;
+      margin: 1.5rem 0;
+      padding: 1.15rem 1.3rem;
+      background: linear-gradient(180deg, rgba(88, 166, 255, 0.12), rgba(88, 166, 255, 0.06));
+      border: 1px solid var(--accent-border);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      color: #9ecbff;
+      font-size: 1rem;
+      font-style: italic;
+      line-height: 1.6;
     }
 
-    /* ── CAP LIST ── */
+    .cap-list,
+    .steps,
+    .cred-grid {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: var(--surface);
+    }
+
     .cap-list {
-        list-style: none;
-        border: 1px solid #30363d;
-        border-radius: 6px;
-        overflow: hidden;
-        margin: 0.8rem 0 1.2rem;
+      list-style: none;
+      margin: 1rem 0 1.25rem;
+      padding: 0;
     }
 
     .cap-list li {
-        padding: 0.8rem 1.1rem;
-        border-bottom: 1px solid #21262d;
-        font-size: 0.95rem;
-        color: #c9d1d9;
-        display: flex;
-        align-items: flex-start;
-        gap: 0.7rem;
-        line-height: 1.5;
-        transition: background 0.12s;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.95rem 1.1rem;
+      border-bottom: 1px solid var(--border-soft);
+      font-size: 0.97rem;
+      line-height: 1.55;
+      transition: background-color 0.15s ease;
     }
 
-    .cap-list li:last-child { border-bottom: none; }
-    .cap-list li:hover { background: #161b22; }
+    .cap-list li:last-child {
+      border-bottom: none;
+    }
+
+    .cap-list li:hover {
+      background: var(--surface-hover);
+    }
 
     .cap-list li::before {
-        content: '›';
-        color: #58a6ff;
-        font-size: 1.1rem;
-        font-weight: 700;
-        flex-shrink: 0;
-        line-height: 1.35;
+      content: "›";
+      color: var(--accent);
+      font-size: 1.1rem;
+      font-weight: 700;
+      line-height: 1.35;
+      flex-shrink: 0;
     }
 
-    /* ── METHOD STEPS ── */
     .steps {
-        border: 1px solid #30363d;
-        border-radius: 6px;
-        overflow: hidden;
-        margin: 0.8rem 0;
+      margin-top: 1rem;
     }
 
     .step {
-        background: #161b22;
-        padding: 1rem 1.2rem;
-        border-bottom: 1px solid #21262d;
-        display: grid;
-        grid-template-columns: 2.4rem 1fr;
-        gap: 0.9rem;
-        align-items: start;
-        transition: background 0.12s;
+      display: grid;
+      grid-template-columns: 2.75rem 1fr;
+      gap: 1rem;
+      padding: 1.05rem 1.15rem;
+      border-bottom: 1px solid var(--border-soft);
+      transition: background-color 0.15s ease;
     }
 
-    .step:last-child { border-bottom: none; }
-    .step:hover { background: #1c2128; }
+    .step:last-child {
+      border-bottom: none;
+    }
+
+    .step:hover {
+      background: var(--surface-hover);
+    }
 
     .step-n {
-        font-family: ui-monospace, Menlo, monospace;
-        font-size: 0.68rem;
-        font-weight: 700;
-        color: #484f58;
-        padding-top: 0.2rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.72rem;
+      font-weight: 800;
+      color: var(--text-faint);
+      padding-top: 0.15rem;
     }
 
     .step-title {
-        font-size: 0.95rem;
-        font-weight: 600;
-        color: #f0f6fc;
-        margin-bottom: 0.2rem;
+      margin: 0 0 0.25rem;
+      font-size: 0.98rem;
+      font-weight: 700;
+      color: var(--text-strong);
     }
 
     .step-desc {
-        font-size: 0.85rem;
-        color: #8b949e;
-        line-height: 1.5;
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.55;
     }
 
-    /* ── FOCUS GRID ── */
     .focus-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1px;
-        background: #30363d;
-        border: 1px solid #30363d;
-        border-radius: 6px;
-        overflow: hidden;
-        margin: 0.8rem 0;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1px;
+      margin-top: 1rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: var(--border);
     }
 
     .focus-item {
-        background: #161b22;
-        padding: 0.9rem 1.1rem;
-        font-size: 0.92rem;
-        color: #c9d1d9;
-        display: flex;
-        align-items: flex-start;
-        gap: 0.6rem;
-        line-height: 1.4;
-        transition: background 0.12s;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.65rem;
+      min-height: 100%;
+      padding: 1rem 1.1rem;
+      background: var(--surface);
+      color: var(--text);
+      font-size: 0.95rem;
+      line-height: 1.5;
+      transition: background-color 0.15s ease, color 0.15s ease;
     }
 
-    .focus-item:hover { background: #1c2128; color: #f0f6fc; }
+    .focus-item:hover {
+      background: var(--surface-hover);
+      color: var(--text-strong);
+    }
 
     .focus-item::before {
-        content: '◆';
-        color: #58a6ff;
-        font-size: 0.42rem;
-        flex-shrink: 0;
-        margin-top: 0.42rem;
+      content: "◆";
+      color: var(--accent);
+      font-size: 0.45rem;
+      margin-top: 0.48rem;
+      flex-shrink: 0;
     }
 
-    /* ── CREDENTIALS ── */
-    .cred-block { margin-bottom: 1.4rem; }
+    .cred-block + .cred-block {
+      margin-top: 1.35rem;
+    }
 
     .cred-sublabel {
-        font-size: 0.65rem;
-        font-weight: 700;
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
-        color: #484f58;
-        margin-bottom: 0.5rem;
-        display: block;
+      display: block;
+      margin-bottom: 0.6rem;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-faint);
     }
 
     .cred-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
-        gap: 1px;
-        background: #30363d;
-        border: 1px solid #30363d;
-        border-radius: 6px;
-        overflow: hidden;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1px;
+      background: var(--border);
     }
 
     .cred-row {
-        background: #161b22;
-        padding: 0.65rem 1rem;
-        display: flex;
-        align-items: center;
-        gap: 0.65rem;
-        transition: background 0.12s;
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      padding: 0.8rem 1rem;
+      background: var(--surface);
+      transition: background-color 0.15s ease;
     }
 
-    .cred-row:hover { background: #1c2128; }
+    .cred-row:hover {
+      background: var(--surface-hover);
+    }
 
     .badge {
-        font-family: ui-monospace, Menlo, monospace;
-        font-size: 0.6rem;
-        font-weight: 700;
-        padding: 0.18em 0.55em;
-        border-radius: 4px;
-        border: 1px solid;
-        flex-shrink: 0;
-        line-height: 1.5;
+      flex-shrink: 0;
+      padding: 0.2em 0.58em;
+      border: 1px solid;
+      border-radius: 999px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.65rem;
+      font-weight: 800;
+      line-height: 1.4;
+      letter-spacing: 0.02em;
     }
 
-    .b-blue  { color: #58a6ff; border-color: rgba(88,166,255,0.4);  background: rgba(88,166,255,0.1); }
-    .b-green { color: #3fb950; border-color: rgba(63,185,80,0.4);   background: rgba(63,185,80,0.1); }
+    .b-blue {
+      color: var(--accent);
+      border-color: rgba(88, 166, 255, 0.45);
+      background: rgba(88, 166, 255, 0.12);
+    }
 
-    .cred-name { font-size: 0.9rem; color: #c9d1d9; }
+    .b-green {
+      color: var(--success);
+      border-color: rgba(63, 185, 80, 0.4);
+      background: rgba(63, 185, 80, 0.1);
+    }
 
-    /* ── CTA ── */
+    .cred-name {
+      font-size: 0.94rem;
+      color: var(--text);
+    }
+
     .cta {
-        margin-top: 3rem;
-        padding: 1.5rem 1.8rem;
-        background: #161b22;
-        border: 1px solid #30363d;
-        border-left: 3px solid #58a6ff;
-        border-radius: 0 8px 8px 0;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 2rem;
-        flex-wrap: wrap;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.25rem;
+      margin-top: 3rem;
+      padding: 1.35rem 1.4rem;
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      background: linear-gradient(180deg, rgba(22, 27, 34, 0.92), rgba(22, 27, 34, 0.82));
     }
 
     .cta p {
-        margin: 0;
-        font-size: 0.97rem;
-        color: #c9d1d9;
-        flex: 1;
-        min-width: 200px;
+      margin: 0;
+      min-width: 220px;
+      flex: 1;
+      font-size: 0.98rem;
     }
 
-    .cta p strong { color: #f0f6fc; }
+    .cta strong {
+      color: var(--text-strong);
+    }
 
     .cta-btn {
-        display: inline-block;
-        font-size: 0.8rem;
-        font-weight: 600;
-        color: #0d1117;
-        background: #58a6ff;
-        padding: 0.55em 1.4em;
-        border-radius: 6px;
-        cursor: pointer;
-        white-space: nowrap;
-        text-decoration: none;
-        transition: opacity 0.15s;
-        flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 0.72rem 1.2rem;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      background: var(--accent);
+      color: #0d1117;
+      font-size: 0.88rem;
+      font-weight: 700;
+      white-space: nowrap;
+      transition: transform 0.15s ease, opacity 0.15s ease;
     }
 
-    .cta-btn:hover { opacity: 0.85; text-decoration: none; }
+    .cta-btn:hover {
+      opacity: 0.92;
+      text-decoration: none;
+      transform: translateY(-1px);
+    }
 
-    /* ── RESPONSIVE ── */
+    .cta-btn:active {
+      transform: translateY(0);
+    }
+
+    @media (max-width: 720px) {
+      .page {
+        width: min(100% - 1.25rem, var(--max-width));
+        padding: 36px 0 60px;
+      }
+
+      .content {
+        padding: 22px;
+      }
+
+      .focus-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .cta {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .cta-btn {
+        width: 100%;
+      }
+    }
+
     @media (max-width: 560px) {
-        .focus-grid { grid-template-columns: 1fr; }
-        .cred-grid  { grid-template-columns: 1fr; }
-        .cta { flex-direction: column; gap: 1rem; }
-        .container { padding: 40px 16px 60px; }
-    }
-</style>
-```
+      .header {
+        padding-bottom: 1.75rem;
+        margin-bottom: 2rem;
+      }
 
+      .header h1 {
+        font-size: 2rem;
+      }
+
+      .step {
+        grid-template-columns: 1fr;
+        gap: 0.35rem;
+      }
+
+      .step-n {
+        padding-top: 0;
+      }
+
+      .cred-grid {
+        grid-template-columns: 1fr;
+      }
+
+      p,
+      .lead,
+      .core-q,
+      .cred-name,
+      .focus-item,
+      .cap-list li {
+        font-size: 0.96rem;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html {
+        scroll-behavior: auto;
+      }
+
+      *,
+      *::before,
+      *::after {
+        transition: none !important;
+      }
+    }
+  </style>
 </head>
 <body>
-<div class="container">
+  <main class="page">
+    <section class="panel" aria-label="About me">
+      <div class="content">
+        <header class="header">
+          <div class="eyebrow">whoami</div>
+          <h1>About Me</h1>
+          <p class="tagline">I approach security like an adversary.</p>
+        </header>
 
-```
-<!-- HEADER -->
-<header class="header">
-    <div class="eyebrow">whoami</div>
-    <h1>About Me</h1>
-    <p class="tagline">I approach security like an adversary.</p>
-</header>
+        <section class="section" aria-labelledby="intro-heading">
+          <h2 id="intro-heading">Overview</h2>
+          <p class="lead">
+            I’m a penetration tester specializing in external, internal, and assumed breach assessments, with a focus on Active Directory compromise, lateral movement, and real-world attack simulation. I lead engagements that go beyond vulnerability identification by demonstrating how weaknesses translate into business risk through full attack paths.
+          </p>
 
-<!-- INTRO -->
-<div class="section">
-    <p>
-        I'm a penetration tester specializing in external, internal and assumed breach assessments with a focus on Active Directory compromise, lateral movement and real world attack simulations. I lead engagements that go beyond vulnerability identification, demonstrating how weaknesses translate into business risk through full attack chains.
-    </p>
+          <div class="core-q">
+            “If an attacker got in today, how far could they go?”
+          </div>
 
-    <div class="core-q">
-        "If an attacker got in today, how far could they go?"
-    </div>
+          <p>
+            I bring experience across both offensive and defensive security roles, which helps me focus on outcomes rather than isolated technical findings. My work includes:
+          </p>
 
-    <p>
-        I bring experience across both offensive and defensive security roles, which allows me to focus on outcomes. I've performed:
-    </p>
+          <ul class="cap-list">
+            <li>External and internal penetration tests with validated exploitation paths</li>
+            <li>Assumed breach scenarios targeting domain environments and privilege escalation</li>
+            <li>OSINT-driven reconnaissance and attack surface mapping</li>
+            <li>Reporting that clearly communicates technical impact to both technical and non-technical stakeholders</li>
+          </ul>
 
-    <ul class="cap-list">
-        <li>External and internal penetration tests with full exploitation paths</li>
-        <li>Assumed breach scenarios targeting domain environments and privilege escalation</li>
-        <li>OSINT driven reconnaissance and attack surface mapping</li>
-        <li>Narrative driven reporting that clearly communicates impact to technical and non-technical stakeholders</li>
-    </ul>
+          <p>
+            Before moving fully into offensive security, I worked in IT and defensive security, where I monitored large-scale environments and conducted threat hunting. That background shaped how I test, validate impact, and communicate risk.
+          </p>
+        </section>
 
-    <p>
-        Before moving fully into offensive security, I worked in IT and as a blue teamer, monitoring large-scale environments and conducting threat hunting. That background shaped how I test today.
-    </p>
-</div>
+        <section class="section" aria-labelledby="methodology-heading">
+          <h2 id="methodology-heading">Methodology</h2>
+          <p>
+            My methodology follows attacker behavior and aligns with structured frameworks such as PTES. Each engagement focuses on disciplined, scoped testing that produces actionable results:
+          </p>
 
-<!-- METHODOLOGY -->
-<div class="section">
-    <h2>Methodology</h2>
-    <p>
-        My methodology follows attacker behavior and frameworks such as the Penetration Testing Execution Standard (PTES), covering:
-    </p>
-    <div class="steps">
-        <div class="step">
-            <div class="step-n">01</div>
-            <div>
-                <div class="step-title">Reconnaissance and OSINT collection</div>
-                <div class="step-desc">Passive and active intelligence gathering before a single packet touches the target.</div>
+          <div class="steps">
+            <div class="step">
+              <div class="step-n">01</div>
+              <div>
+                <p class="step-title">Reconnaissance and OSINT collection</p>
+                <p class="step-desc">Passive and active intelligence gathering before a single packet touches the target.</p>
+              </div>
             </div>
-        </div>
-        <div class="step">
-            <div class="step-n">02</div>
-            <div>
-                <div class="step-title">Enumeration and attack surface mapping</div>
-                <div class="step-desc">Systematic discovery of services, misconfigurations and exposure points.</div>
+
+            <div class="step">
+              <div class="step-n">02</div>
+              <div>
+                <p class="step-title">Enumeration and attack surface mapping</p>
+                <p class="step-desc">Systematic identification of services, exposures, trust boundaries, and misconfigurations.</p>
+              </div>
             </div>
-        </div>
-        <div class="step">
-            <div class="step-n">03</div>
-            <div>
-                <div class="step-title">Exploitation, post-exploitation and lateral movement</div>
-                <div class="step-desc">Controlled, scoped compromise following real attacker behavior through the environment.</div>
+
+            <div class="step">
+              <div class="step-n">03</div>
+              <div>
+                <p class="step-title">Exploitation, post-exploitation, and lateral movement</p>
+                <p class="step-desc">Controlled compromise activities that reflect realistic attacker behavior while remaining within scope.</p>
+              </div>
             </div>
-        </div>
-        <div class="step">
-            <div class="step-n">04</div>
-            <div>
-                <div class="step-title">Data access and business impact validation</div>
-                <div class="step-desc">Full attack chains mapped to real business risk and clearly communicated to stakeholders.</div>
+
+            <div class="step">
+              <div class="step-n">04</div>
+              <div>
+                <p class="step-title">Business impact validation</p>
+                <p class="step-desc">End-to-end attack chains mapped to material risk, sensitive access, and practical remediation priorities.</p>
+              </div>
             </div>
-        </div>
-    </div>
-    <p style="margin-top:1.2rem;">
-        I also contribute to knowledge sharing, improving methodologies and raising the standard of reporting to ensure clients clearly understand risk and remediation.
-    </p>
-</div>
+          </div>
 
-<!-- CORE FOCUS -->
-<div class="section">
-    <h2>Core Focus Areas</h2>
-    <div class="focus-grid">
-        <div class="focus-item">Active Directory exploitation</div>
-        <div class="focus-item">Assumed breach and post-exploitation</div>
-        <div class="focus-item">Attack path discovery and lateral movement</div>
-        <div class="focus-item">Security testing that maps directly to business impact</div>
-    </div>
-</div>
+          <p style="margin-top: 1.2rem;">
+            I also contribute to knowledge sharing, methodology improvement, and reporting standards so clients receive clear, defensible, and useful outcomes from every engagement.
+          </p>
+        </section>
 
-<!-- EDUCATION & CERTS -->
-<div class="section">
-    <h2>Education &amp; Certifications</h2>
+        <section class="section" aria-labelledby="focus-heading">
+          <h2 id="focus-heading">Core Focus Areas</h2>
+          <div class="focus-grid">
+            <div class="focus-item">Active Directory exploitation</div>
+            <div class="focus-item">Assumed breach and post-exploitation</div>
+            <div class="focus-item">Attack path discovery and lateral movement</div>
+            <div class="focus-item">Security testing mapped directly to business impact</div>
+          </div>
+        </section>
 
-    <div class="cred-block">
-        <span class="cred-sublabel">Degrees</span>
-        <div class="cred-grid">
-            <div class="cred-row"><span class="badge b-green">MS</span><span class="cred-name">Cybersecurity</span></div>
-            <div class="cred-row"><span class="badge b-green">BS</span><span class="cred-name">Information Systems</span></div>
-        </div>
-    </div>
+        <section class="section" aria-labelledby="credentials-heading">
+          <h2 id="credentials-heading">Education &amp; Certifications</h2>
 
-    <div class="cred-block">
-        <span class="cred-sublabel">Certifications</span>
-        <div class="cred-grid">
-            <div class="cred-row"><span class="badge b-blue">CRTE</span><span class="cred-name">Certified Red Team Expert</span></div>
-            <div class="cred-row"><span class="badge b-blue">PNPT</span><span class="cred-name">Practical Network Pentest</span></div>
-            <div class="cred-row"><span class="badge b-blue">eCPPT</span><span class="cred-name">eLearnSecurity CPT</span></div>
-            <div class="cred-row"><span class="badge b-blue">eJPT</span><span class="cred-name">eLearnSecurity JPT</span></div>
-            <div class="cred-row"><span class="badge b-blue">CEH</span><span class="cred-name">Certified Ethical Hacker</span></div>
-            <div class="cred-row"><span class="badge b-blue">PT+</span><span class="cred-name">Pentest+</span></div>
-            <div class="cred-row"><span class="badge b-blue">SEC+</span><span class="cred-name">Security+</span></div>
-        </div>
-    </div>
-</div>
+          <div class="cred-block">
+            <span class="cred-sublabel">Degrees</span>
+            <div class="cred-grid">
+              <div class="cred-row">
+                <span class="badge b-green">MS</span>
+                <span class="cred-name">Cybersecurity</span>
+              </div>
+              <div class="cred-row">
+                <span class="badge b-green">BS</span>
+                <span class="cred-name">Information Systems</span>
+              </div>
+            </div>
+          </div>
 
-<!-- CTA -->
-<div class="cta">
-    <p>If you are looking for someone who <strong>thinks like an attacker</strong>, communicates like a consultant and delivers actionable results, I'm always open to connecting.</p>
-    <a class="cta-btn" href="mailto:">Let's connect</a>
-</div>
-```
+          <div class="cred-block">
+            <span class="cred-sublabel">Certifications</span>
+            <div class="cred-grid">
+              <div class="cred-row"><span class="badge b-blue">CRTE</span><span class="cred-name">Certified Red Team Expert</span></div>
+              <div class="cred-row"><span class="badge b-blue">PNPT</span><span class="cred-name">Practical Network Penetration Tester</span></div>
+              <div class="cred-row"><span class="badge b-blue">eCPPT</span><span class="cred-name">eLearnSecurity Certified Professional Penetration Tester</span></div>
+              <div class="cred-row"><span class="badge b-blue">eJPT</span><span class="cred-name">eLearnSecurity Junior Penetration Tester</span></div>
+              <div class="cred-row"><span class="badge b-blue">CEH</span><span class="cred-name">Certified Ethical Hacker</span></div>
+              <div class="cred-row"><span class="badge b-blue">PT+</span><span class="cred-name">Pentest+</span></div>
+              <div class="cred-row"><span class="badge b-blue">SEC+</span><span class="cred-name">Security+</span></div>
+            </div>
+          </div>
+        </section>
 
-</div>
+        <section class="cta" aria-label="Contact call to action">
+          <p>
+            If you are looking for someone who <strong>thinks like an attacker</strong>, communicates like a consultant, and delivers actionable results, I’m always open to connecting.
+          </p>
+          <a class="cta-btn" href="mailto:your@email.com" aria-label="Email to connect">
+            Let’s connect
+          </a>
+        </section>
+      </div>
+    </section>
+  </main>
 </body>
 </html>
