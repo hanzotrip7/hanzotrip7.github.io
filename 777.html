@@ -1,569 +1,161 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>About — Field Notes from a Pentester</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;1,8..60,300;1,8..60,400&display=swap" rel="stylesheet" />
-<style>
-  :root {
-    --ink:       #1a1612;
-    --paper:     #f5f0e8;
-    --aged:      #e8dfc8;
-    --rust:      #b5451b;
-    --steel:     #4a5568;
-    --muted:     #7c6f5e;
-    --highlight: #fff3cd;
-  }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Me</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #0d1117;
+            color: #c9d1d9;
+            line-height: 1.6;
+        }
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
+        .container {
+            max-width: 900px;
+            margin: 60px auto;
+            padding: 0 20px;
+        }
 
-body {
-background-color: var(–paper);
-color: var(–ink);
-font-family: ‘Source Serif 4’, Georgia, serif;
-font-size: 18px;
-line-height: 1.8;
-min-height: 100vh;
-overflow-x: hidden;
-position: relative;
-}
+        h1, h2 {
+            color: #58a6ff;
+            border-bottom: 1px solid #30363d;
+            padding-bottom: 5px;
+        }
 
-/* Grain */
-body::before {
-content: ‘’;
-position: fixed;
-inset: 0;
-background-image: url(“data:image/svg+xml,%3Csvg viewBox=‘0 0 256 256’ xmlns=‘http://www.w3.org/2000/svg’%3E%3Cfilter id=‘noise’%3E%3CfeTurbulence type=‘fractalNoise’ baseFrequency=‘0.9’ numOctaves=‘4’ stitchTiles=‘stitch’/%3E%3C/filter%3E%3Crect width=‘100%25’ height=‘100%25’ filter=‘url(%23noise)’ opacity=‘0.04’/%3E%3C/svg%3E”);
-pointer-events: none;
-z-index: 1000;
-opacity: 0.4;
-}
+        p {
+            margin: 15px 0;
+        }
 
-/* ── HERO ── */
-.hero {
-border-bottom: 3px double var(–ink);
-padding: 3rem 0 0;
-}
+        ul {
+            margin: 10px 0 20px 20px;
+        }
 
-.hero-inner {
-max-width: 780px;
-margin: 0 auto;
-padding: 0 2rem;
-}
+        li {
+            margin-bottom: 8px;
+        }
 
-.series-tag {
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 0.7rem;
-letter-spacing: 0.2em;
-text-transform: uppercase;
-color: var(–rust);
-border: 1px solid var(–rust);
-display: inline-block;
-padding: 0.2em 0.7em;
-margin-bottom: 1.5rem;
-animation: fadeSlideDown 0.6s ease both;
-}
+        .highlight {
+            color: #8b949e;
+            font-style: italic;
+        }
 
-.hero h1 {
-font-family: ‘Playfair Display’, Georgia, serif;
-font-size: clamp(2.6rem, 6vw, 4.2rem);
-line-height: 1.1;
-font-weight: 700;
-letter-spacing: -0.02em;
-animation: fadeSlideDown 0.6s ease 0.1s both;
-margin-bottom: 0.5rem;
-}
+        .section {
+            margin-bottom: 40px;
+        }
 
-.hero h1 em { font-style: italic; color: var(–rust); }
+        .card {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
 
-.hero-subtitle {
-font-family: ‘Playfair Display’, serif;
-font-style: italic;
-font-size: 1.25rem;
-color: var(–muted);
-margin-bottom: 2rem;
-animation: fadeSlideDown 0.6s ease 0.2s both;
-}
+        .footer {
+            margin-top: 50px;
+            font-size: 0.95em;
+            color: #8b949e;
+        }
 
-.meta-row {
-display: flex;
-align-items: center;
-gap: 1.5rem;
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 0.72rem;
-color: var(–muted);
-letter-spacing: 0.05em;
-padding-bottom: 2rem;
-border-bottom: 1px solid var(–aged);
-animation: fadeSlideDown 0.6s ease 0.3s both;
-flex-wrap: wrap;
-}
+        a {
+            color: #58a6ff;
+            text-decoration: none;
+        }
 
-.dot {
-width: 3px; height: 3px;
-border-radius: 50%;
-background: var(–muted);
-display: inline-block;
-}
-
-.online-dot {
-width: 7px; height: 7px;
-border-radius: 50%;
-background: #4a7c59;
-display: inline-block;
-margin-right: 0.3em;
-animation: pulse 2.5s ease infinite;
-}
-
-@keyframes pulse {
-0%, 100% { opacity: 1; }
-50%       { opacity: 0.3; }
-}
-
-/* ── CONTENT ── */
-.content {
-max-width: 780px;
-margin: 0 auto;
-padding: 3rem 2rem 5rem;
-}
-
-.content > * + * { margin-top: 1.6em; }
-
-p { font-size: 1.05rem; color: var(–ink); }
-
-/* Section headings — same §  style as blog */
-h2 {
-font-family: ‘Playfair Display’, serif;
-font-size: 1.9rem;
-font-weight: 700;
-margin-top: 3rem !important;
-margin-bottom: -0.4em;
-line-height: 1.2;
-}
-
-h2::before {
-content: ‘§’;
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 0.8rem;
-color: var(–rust);
-display: block;
-margin-bottom: 0.3em;
-letter-spacing: 0.1em;
-}
-
-/* Pull quote */
-.pull-quote {
-border-left: 4px solid var(–rust);
-background: var(–aged);
-padding: 1.4rem 1.8rem;
-margin: 2.5rem 0 !important;
-}
-
-.pull-quote p {
-font-family: ‘Playfair Display’, serif;
-font-style: italic;
-font-size: 1.2rem;
-line-height: 1.5;
-color: var(–ink);
-margin: 0;
-}
-
-.pull-quote p::before { content: ‘\201C’; }
-.pull-quote p::after  { content: ‘\201D’; }
-
-/* Callout — same as blog */
-.callout {
-background: var(–highlight);
-border-top: 2px solid var(–ink);
-border-bottom: 2px solid var(–ink);
-padding: 1.2rem 1.5rem;
-margin: 2.5rem 0 !important;
-}
-
-.callout-label {
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 0.65rem;
-letter-spacing: 0.18em;
-text-transform: uppercase;
-color: var(–rust);
-display: block;
-margin-bottom: 0.5em;
-font-weight: 500;
-}
-
-.callout p { font-size: 0.97rem; color: var(–steel); margin: 0; }
-
-/* Key statement */
-.key-statement {
-border-left: 4px solid var(–ink);
-padding: 0.9rem 1.5rem;
-margin: 2rem 0 !important;
-background: var(–aged);
-}
-
-.key-statement p {
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 0.92rem;
-line-height: 1.7;
-color: var(–ink);
-margin: 0;
-}
-
-/* Checklist */
-.checklist {
-list-style: none;
-padding: 0;
-margin: 1rem 0 !important;
-}
-
-.checklist li {
-font-size: 1rem;
-color: var(–steel);
-padding: 0.45rem 0 0.45rem 1.8rem;
-position: relative;
-border-bottom: 1px dashed var(–aged);
-line-height: 1.6;
-}
-
-.checklist li:last-child { border-bottom: none; }
-
-.checklist li::before {
-content: ‘→’;
-font-family: ‘IBM Plex Mono’, monospace;
-color: var(–rust);
-position: absolute;
-left: 0;
-font-size: 0.85rem;
-top: 0.5rem;
-}
-
-/* Methodology steps — card-grid style from blog */
-.steps-header {
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 0.7rem;
-letter-spacing: 0.2em;
-text-transform: uppercase;
-color: var(–muted);
-margin-bottom: 1rem;
-display: block;
-}
-
-.steps-grid {
-display: grid;
-gap: 1px;
-background: var(–ink);
-border: 1px solid var(–ink);
-margin: 1rem 0 !important;
-}
-
-.step {
-background: var(–paper);
-padding: 1.1rem 1.4rem;
-display: grid;
-grid-template-columns: 2.8rem 1fr;
-gap: 1rem;
-align-items: start;
-transition: background 0.2s;
-}
-
-.step:hover { background: var(–aged); }
-
-.step-num {
-font-family: ‘Playfair Display’, serif;
-font-size: 1.8rem;
-font-weight: 700;
-color: var(–rust);
-line-height: 1;
-opacity: 0.3;
-}
-
-.step-body strong {
-display: block;
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 0.78rem;
-letter-spacing: 0.06em;
-text-transform: uppercase;
-margin-bottom: 0.3em;
-color: var(–ink);
-font-weight: 500;
-}
-
-.step-body p { font-size: 0.93rem; color: var(–steel); margin: 0; line-height: 1.6; }
-
-/* Focus areas — same card-grid */
-.focus-grid {
-display: grid;
-gap: 1px;
-background: var(–ink);
-border: 1px solid var(–ink);
-margin: 1rem 0 !important;
-}
-
-.focus-item {
-background: var(–paper);
-padding: 0.9rem 1.4rem;
-font-size: 1rem;
-color: var(–steel);
-display: flex;
-align-items: center;
-gap: 0.8rem;
-transition: background 0.2s;
-line-height: 1.4;
-}
-
-.focus-item:hover { background: var(–aged); }
-
-.focus-item::before {
-content: ‘→’;
-font-family: ‘IBM Plex Mono’, monospace;
-color: var(–rust);
-font-size: 0.8rem;
-flex-shrink: 0;
-}
-
-/* Credentials */
-.cred-group-label {
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 0.65rem;
-letter-spacing: 0.18em;
-text-transform: uppercase;
-color: var(–muted);
-margin: 2rem 0 0.8rem !important;
-display: block;
-padding-bottom: 0.4rem;
-border-bottom: 1px solid var(–aged);
-}
-
-.cred-grid {
-display: grid;
-gap: 1px;
-background: var(–ink);
-border: 1px solid var(–ink);
-margin: 0 !important;
-}
-
-.cred-row {
-background: var(–paper);
-padding: 0.75rem 1.2rem;
-display: flex;
-align-items: center;
-gap: 0.9rem;
-transition: background 0.2s;
-}
-
-.cred-row:hover { background: var(–aged); }
-
-.badge {
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 0.62rem;
-font-weight: 500;
-letter-spacing: 0.06em;
-padding: 0.2em 0.6em;
-border: 1px solid;
-flex-shrink: 0;
-line-height: 1.5;
-}
-
-.badge-rust  { border-color: var(–rust);  color: var(–rust);  background: rgba(181,69,27,0.07); }
-.badge-green { border-color: #4a7c59;       color: #4a7c59;      background: rgba(74,124,89,0.07); }
-
-.cred-name { font-size: 0.97rem; color: var(–ink); }
-
-/* HR */
-hr.section-break {
-border: none;
-border-top: 1px solid var(–aged);
-margin: 2.5rem 0;
-}
-
-/* CTA block */
-.cta-block {
-border-top: 3px double var(–ink);
-padding-top: 2.5rem;
-margin-top: 4rem !important;
-}
-
-.cta-block p { margin-bottom: 1.2em; }
-
-.cta-tag {
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 0.7rem;
-letter-spacing: 0.2em;
-text-transform: uppercase;
-color: var(–rust);
-border: 1px solid var(–rust);
-display: inline-block;
-padding: 0.4em 1em;
-cursor: pointer;
-transition: background 0.18s, color 0.18s;
-}
-
-.cta-tag:hover { background: var(–rust); color: var(–paper); }
-
-/* Footer */
-.byline-footer {
-text-align: center;
-padding: 3rem 0 1.5rem;
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 0.68rem;
-letter-spacing: 0.14em;
-color: var(–muted);
-text-transform: uppercase;
-}
-
-em { color: var(–steel); }
-strong { color: var(–ink); }
-
-/* Animations */
-@keyframes fadeSlideDown {
-from { opacity: 0; transform: translateY(-12px); }
-to   { opacity: 1; transform: translateY(0); }
-}
-
-.content > * { animation: fadeSlideDown 0.5s ease both; }
-.content > *:nth-child(1)  { animation-delay: 0.35s; }
-.content > *:nth-child(2)  { animation-delay: 0.42s; }
-.content > *:nth-child(3)  { animation-delay: 0.49s; }
-.content > *:nth-child(4)  { animation-delay: 0.56s; }
-.content > *:nth-child(n+5){ animation-delay: 0.63s; }
-
-@media (max-width: 600px) {
-.hero h1 { font-size: 2.2rem; }
-.content { padding: 2rem 1.2rem 4rem; }
-}
-</style>
-
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <h1>About Me</h1>
 
-<article>
+        <p class="highlight">I approach security like an adversary.</p>
 
-  <!-- HERO -->
+        <div class="section">
+            <p>
+                I'm a penetration tester specializing in external, internal and assumed breach assessments with a focus on Active Directory compromise, lateral movement and real world attack simulations. I lead engagements that go beyond vulnerability identification, demonstrating how weaknesses translate into business risk through full attack chains.
+            </p>
 
-  <header class="hero">
-    <div class="hero-inner">
-      <span class="series-tag">Field Notes &nbsp;·&nbsp; About</span>
-      <h1>I approach security<br>like an <em>adversary.</em></h1>
-      <p class="hero-subtitle">Penetration tester. Former blue teamer. Focused on the one question that matters most.</p>
-      <div class="meta-row">
-        <span><span class="online-dot"></span>Available</span>
-        <span class="dot"></span>
-        <span>Offensive Security</span>
-        <span class="dot"></span>
-        <span>Red Team &nbsp;·&nbsp; AD Exploitation</span>
-      </div>
+            <p>
+                My work centers on answering one question:
+                <strong>“If an attacker got in today, how far could they go?”</strong>
+            </p>
+
+            <p>
+                I bring experience across both offensive and defensive security roles, which allows me to focus on outcomes. I've performed:
+            </p>
+
+            <ul>
+                <li>External and internal penetration tests with full exploitation paths</li>
+                <li>Assumed breach scenarios targeting domain environments and privilege escalation</li>
+                <li>OSINT driven reconnaissance and attack surface mapping</li>
+                <li>Narrative driven reporting that clearly communicates impact to technical and non-technical stakeholders</li>
+            </ul>
+
+            <p>
+                Before moving fully into offensive security, I worked in IT and as a blue teamer, monitoring large-scale environments and conducting threat hunting. That background shaped how I test today.
+            </p>
+        </div>
+
+        <div class="section">
+            <h2>Methodology</h2>
+            <p>
+                My methodology follows attacker behavior and frameworks such as the Penetration Testing Execution Standard (PTES), covering:
+            </p>
+
+            <div class="card">
+                <ul>
+                    <li>Reconnaissance and OSINT collection</li>
+                    <li>Enumeration and attack surface mapping</li>
+                    <li>Exploitation, post-exploitation and lateral movement</li>
+                    <li>Data access and business impact validation</li>
+                </ul>
+            </div>
+
+            <p>
+                I also contribute to knowledge sharing, improving methodologies and raising the standard of reporting to ensure clients clearly understand risk and remediation.
+            </p>
+        </div>
+
+        <div class="section">
+            <h2>Core Focus Areas</h2>
+            <div class="card">
+                <ul>
+                    <li>Active Directory exploitation</li>
+                    <li>Assumed breach and post-exploitation</li>
+                    <li>Attack path discovery and lateral movement</li>
+                    <li>Security testing that maps directly to business impact</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Education & Certifications</h2>
+            <div class="card">
+                <ul>
+                    <li>MS Cybersecurity</li>
+                    <li>BS Information Systems</li>
+                    <li>CRTE</li>
+                    <li>PNPT</li>
+                    <li>eCPPT</li>
+                    <li>eJPT</li>
+                    <li>CEH</li>
+                    <li>Pentest+</li>
+                    <li>Security+</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>
+                If you are looking for someone who thinks like an attacker, communicates like a consultant and delivers actionable results, I'm always open to connecting.
+            </p>
+        </div>
     </div>
-  </header>
-
-  <!-- CONTENT -->
-
-  <main class="content">
-
-```
-<h2>Background</h2>
-
-<p>I'm a penetration tester specializing in external, internal and assumed breach assessments with a focus on Active Directory compromise, lateral movement and real-world attack simulations. I lead engagements that go beyond vulnerability identification — demonstrating how weaknesses translate into business risk through full attack chains.</p>
-
-<div class="pull-quote">
-  <p>If an attacker got in today, how far could they go?</p>
-</div>
-
-<p>Before moving fully into offensive security, I worked in IT and as a blue teamer, monitoring large-scale environments and conducting threat hunting. That background shaped how I test today — I understand both sides of the wire.</p>
-
-<h2>Capabilities</h2>
-
-<p>I bring experience across both offensive and defensive security roles, with a focus on outcomes over optics. I've performed:</p>
-
-<ul class="checklist">
-  <li>External and internal penetration tests with full exploitation paths</li>
-  <li>Assumed breach scenarios targeting domain environments and privilege escalation</li>
-  <li>OSINT-driven reconnaissance and attack surface mapping</li>
-  <li>Narrative-driven reporting that communicates impact to technical and non-technical stakeholders</li>
-</ul>
-
-<h2>Methodology</h2>
-
-<p>My methodology follows attacker behavior and frameworks such as the Penetration Testing Execution Standard (PTES):</p>
-
-<div class="steps-grid">
-  <div class="step">
-    <div class="step-num">01</div>
-    <div class="step-body">
-      <strong>Reconnaissance &amp; OSINT</strong>
-      <p>Collection and attack surface identification before a single packet is sent.</p>
-    </div>
-  </div>
-  <div class="step">
-    <div class="step-num">02</div>
-    <div class="step-body">
-      <strong>Enumeration &amp; Mapping</strong>
-      <p>Systematic discovery of services, misconfigurations and exposure points.</p>
-    </div>
-  </div>
-  <div class="step">
-    <div class="step-num">03</div>
-    <div class="step-body">
-      <strong>Exploitation &amp; Post-Exploitation</strong>
-      <p>Controlled, scoped compromise with lateral movement through the environment.</p>
-    </div>
-  </div>
-  <div class="step">
-    <div class="step-num">04</div>
-    <div class="step-body">
-      <strong>Impact Validation</strong>
-      <p>Data access and business impact demonstrated through full attack chains.</p>
-    </div>
-  </div>
-</div>
-
-<h2>Core Focus Areas</h2>
-
-<div class="focus-grid">
-  <div class="focus-item">Active Directory exploitation</div>
-  <div class="focus-item">Assumed breach &amp; post-exploitation</div>
-  <div class="focus-item">Attack path discovery &amp; lateral movement</div>
-  <div class="focus-item">Security testing mapped to business impact</div>
-</div>
-
-<h2>Knowledge Sharing</h2>
-
-<p>I contribute to knowledge sharing, improving methodologies and raising the standard of reporting — ensuring clients clearly understand risk and remediation, not just a list of findings.</p>
-
-<h2>Education &amp; Credentials</h2>
-
-<span class="cred-group-label">Degrees</span>
-<div class="cred-grid">
-  <div class="cred-row"><span class="badge badge-green">MS</span><span class="cred-name">Cybersecurity</span></div>
-  <div class="cred-row"><span class="badge badge-green">BS</span><span class="cred-name">Information Systems</span></div>
-</div>
-
-<span class="cred-group-label">Certifications</span>
-<div class="cred-grid">
-  <div class="cred-row"><span class="badge badge-rust">CRTE</span><span class="cred-name">Certified Red Team Expert</span></div>
-  <div class="cred-row"><span class="badge badge-rust">PNPT</span><span class="cred-name">Practical Network Pentest</span></div>
-  <div class="cred-row"><span class="badge badge-rust">eCPPT</span><span class="cred-name">eLearnSecurity CPT</span></div>
-  <div class="cred-row"><span class="badge badge-rust">eJPT</span><span class="cred-name">eLearnSecurity JPT</span></div>
-  <div class="cred-row"><span class="badge badge-rust">CEH</span><span class="cred-name">Certified Ethical Hacker</span></div>
-  <div class="cred-row"><span class="badge badge-rust">PT+</span><span class="cred-name">Pentest+</span></div>
-  <div class="cred-row"><span class="badge badge-rust">SEC+</span><span class="cred-name">Security+</span></div>
-</div>
-
-<div class="cta-block">
-  <p>If you're looking for someone who <strong>thinks like an attacker</strong>, communicates like a consultant and delivers actionable results — I'm always open to connecting.</p>
-  <span class="cta-tag">→ &nbsp; Let's connect</span>
-</div>
-```
-
-  </main>
-
-  <footer class="byline-footer">
-    Field Notes from a Pentester &nbsp;·&nbsp; Written in the margins of real engagements
-  </footer>
-
-</article>
-
 </body>
 </html>
