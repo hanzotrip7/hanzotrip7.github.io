@@ -4,545 +4,467 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>About — Penetration Tester</title>
+<title>About Me — Penetration Tester</title>
 <style>
-  /* ── RESET ── */
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* ── TOKENS ── */
-:root {
-–bg:       #0f1110;
-–surface:  #161a17;
-–surface2: #1c211e;
-–line:     #263028;
-–line2:    #2e3830;
-–amber:    #d4962a;
-–amber-lo: rgba(212,150,42,0.12);
-–green:    #45c46a;
-–red:      #c45545;
-–txt:      #b8c4b8;
-–txt-lo:   #556055;
-–txt-hi:   #e8ede8;
-
-```
-/* System font stacks — zero external deps */
---sans: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
---mono: 'Cascadia Code', 'Fira Code', 'Consolas', 'Menlo', 'Monaco', monospace;
-```
-
-}
-
-html { scroll-behavior: smooth; }
+- { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-background: var(–bg);
-color: var(–txt);
-font-family: var(–sans);
+background: #ffffff;
+color: #1a1a1a;
+font-family: -apple-system, BlinkMacSystemFont, ‘Segoe UI’, Helvetica, Arial, sans-serif;
 font-size: 16px;
 line-height: 1.7;
-min-height: 100vh;
--webkit-font-smoothing: antialiased;
 }
 
-/* ── PAGE SHELL ── */
-.page {
-max-width: 1080px;
-margin: 0 auto;
-padding: 0 2.5rem;
-}
+a { color: inherit; text-decoration: none; }
 
-/* ── TOP BAR ── */
-.topbar {
-border-bottom: 1px solid var(–line);
-padding: 1rem 0;
+/* ── NAV ── */
+.nav {
+border-bottom: 1px solid #e5e5e5;
+padding: 0 2rem;
 display: flex;
 justify-content: space-between;
 align-items: center;
-font-family: var(–mono);
-font-size: 0.7rem;
-letter-spacing: 0.12em;
+height: 56px;
+}
+
+.nav-brand {
+font-size: 0.78rem;
+font-weight: 600;
+letter-spacing: 0.08em;
 text-transform: uppercase;
-color: var(–txt-lo);
+color: #1a1a1a;
 }
 
-.topbar-left { display: flex; align-items: center; gap: 2rem; }
-
-.online {
+.nav-links {
 display: flex;
-align-items: center;
-gap: 0.45rem;
-color: var(–green);
+gap: 2rem;
+font-size: 0.82rem;
+color: #888;
+letter-spacing: 0.04em;
 }
 
-.dot {
-width: 6px; height: 6px;
-border-radius: 50%;
-background: var(–green);
-animation: blink 2.5s ease infinite;
-}
-
-@keyframes blink {
-0%, 100% { opacity: 1; }
-50%       { opacity: 0.25; }
-}
+.nav-links span { cursor: pointer; }
+.nav-links span:hover { color: #1a1a1a; }
+.nav-links .active { color: #1a1a1a; font-weight: 500; }
 
 /* ── HERO ── */
 .hero {
-padding: 5.5rem 0 3.5rem;
-border-bottom: 1px solid var(–line);
+max-width: 860px;
+margin: 0 auto;
+padding: 5rem 2rem 4rem;
+border-bottom: 1px solid #e5e5e5;
 }
 
-.hero-tag {
-font-family: var(–mono);
-font-size: 0.7rem;
-letter-spacing: 0.22em;
+.hero-label {
+font-size: 0.75rem;
+font-weight: 600;
+letter-spacing: 0.14em;
 text-transform: uppercase;
-color: var(–amber);
-margin-bottom: 1.6rem;
-display: block;
+color: #c17f24;
+margin-bottom: 1.4rem;
 }
-
-.hero-tag::before { content: ’> ’; opacity: 0.55; }
 
 .hero h1 {
-font-size: clamp(2.6rem, 4vw, 4.2rem);
+font-size: clamp(2.2rem, 4vw, 3.8rem);
 font-weight: 700;
 line-height: 1.1;
 letter-spacing: -0.025em;
-color: var(–txt-hi);
-margin-bottom: 1.8rem;
+color: #111;
+margin-bottom: 1.6rem;
 }
 
-.hero h1 .hi { color: var(–amber); }
-
-.hero-sub {
-font-size: 1.05rem;
-color: var(–txt-lo);
-font-style: italic;
-padding-left: 1.1rem;
-border-left: 2px solid var(–amber);
-line-height: 1.6;
-max-width: 460px;
+.hero h1 em {
+font-style: normal;
+color: #c17f24;
 }
 
-/* ── BODY LAYOUT ── */
-.body {
+.hero-intro {
+font-size: 1.1rem;
+color: #444;
+max-width: 620px;
+line-height: 1.75;
+}
+
+/* ── MAIN CONTENT ── */
+.main {
+max-width: 860px;
+margin: 0 auto;
+padding: 4rem 2rem 6rem;
 display: grid;
-grid-template-columns: 1fr 320px;
+grid-template-columns: 1fr 260px;
 gap: 5rem;
-padding: 4rem 0 5rem;
 align-items: start;
 }
 
-/* ── LEFT COLUMN ── */
-.col-main > * + * { margin-top: 3rem; }
+/* ── LEFT ── */
+.left > * + * { margin-top: 3rem; }
 
-.section-head {
-font-family: var(–mono);
-font-size: 0.68rem;
-letter-spacing: 0.22em;
+.section-title {
+font-size: 0.72rem;
+font-weight: 700;
+letter-spacing: 0.14em;
 text-transform: uppercase;
-color: var(–amber);
-margin-bottom: 1.3rem;
+color: #999;
+margin-bottom: 1.2rem;
 padding-bottom: 0.6rem;
-border-bottom: 1px solid var(–line2);
+border-bottom: 1px solid #e5e5e5;
 }
 
-.col-main p {
+.left p {
 font-size: 0.97rem;
-color: var(–txt);
+color: #333;
 line-height: 1.8;
 margin-bottom: 1em;
 }
 
-.col-main p:last-child { margin-bottom: 0; }
+.left p:last-child { margin-bottom: 0; }
 
 /* Core question */
-.cq {
-margin: 1.6rem 0;
-padding: 1.2rem 1.5rem;
-background: var(–amber-lo);
-border: 1px solid rgba(212,150,42,0.25);
-border-left: 3px solid var(–amber);
-font-size: 1rem;
-color: var(–amber);
+.pull {
+margin: 1.8rem 0;
+padding: 1.3rem 1.6rem;
+background: #fffbf4;
+border-left: 3px solid #c17f24;
+font-size: 1.05rem;
+color: #c17f24;
 font-style: italic;
 line-height: 1.6;
 }
 
-.cq-label {
-display: block;
-font-family: var(–mono);
-font-style: normal;
-font-size: 0.62rem;
-letter-spacing: 0.18em;
-text-transform: uppercase;
-color: rgba(212,150,42,0.45);
-margin-bottom: 0.5em;
-}
-
 /* Cap list */
-.cap-list { list-style: none; margin-top: 0.5rem; }
+.caps { list-style: none; margin-top: 0.5rem; }
 
-.cap-list li {
+.caps li {
 font-size: 0.95rem;
-color: var(–txt);
-padding: 0.75rem 0 0.75rem 1.4rem;
-border-bottom: 1px solid var(–line);
+color: #333;
+padding: 0.8rem 0 0.8rem 1.2rem;
+border-bottom: 1px solid #f0f0f0;
 position: relative;
 line-height: 1.5;
 }
 
-.cap-list li:first-child { border-top: 1px solid var(–line); }
+.caps li:first-child { border-top: 1px solid #f0f0f0; }
 
-.cap-list li::before {
-content: ‘›’;
-font-size: 1rem;
-color: var(–amber);
+.caps li::before {
+content: ‘→’;
+color: #c17f24;
 position: absolute;
 left: 0;
-top: 0.72rem;
+top: 0.82rem;
+font-size: 0.8rem;
 }
 
-/* Methodology steps */
-.steps { margin-top: 0.8rem; }
+/* Steps */
+.steps { margin-top: 0.6rem; }
 
 .step {
 display: grid;
-grid-template-columns: 3rem 1fr;
+grid-template-columns: 2.8rem 1fr;
 gap: 1rem;
 padding: 1.1rem 0;
-border-bottom: 1px solid var(–line);
+border-bottom: 1px solid #f0f0f0;
 align-items: start;
 }
 
-.step:first-child { border-top: 1px solid var(–line); }
+.step:first-child { border-top: 1px solid #f0f0f0; }
 
-.step-n {
-font-family: var(–mono);
-font-size: 0.68rem;
-color: var(–txt-lo);
-letter-spacing: 0.08em;
-padding-top: 0.15rem;
+.step-num {
+font-size: 0.7rem;
+font-weight: 700;
+color: #ccc;
+letter-spacing: 0.06em;
+padding-top: 0.2rem;
 }
 
-.step-title {
-font-size: 0.96rem;
+.step-name {
+font-size: 0.95rem;
 font-weight: 600;
-color: var(–txt-hi);
+color: #111;
 margin-bottom: 0.25rem;
 }
 
 .step-desc {
 font-size: 0.88rem;
-color: var(–txt-lo);
+color: #777;
 line-height: 1.55;
 }
 
 /* CTA */
 .cta {
-padding: 1.6rem 1.8rem;
-background: var(–surface);
-border: 1px solid var(–line2);
-border-left: 3px solid var(–amber);
+padding: 1.8rem 2rem;
+background: #f9f9f9;
+border: 1px solid #e5e5e5;
+border-left: 3px solid #c17f24;
 margin-top: 3rem;
 }
 
 .cta p {
 font-size: 0.97rem;
-color: var(–txt);
+color: #333;
 line-height: 1.75;
 margin-bottom: 1.2rem;
 }
 
-.cta p strong { color: var(–txt-hi); }
+.cta p strong { color: #111; }
 
-.cta-link {
+.cta-btn {
 display: inline-block;
-font-family: var(–mono);
-font-size: 0.7rem;
-letter-spacing: 0.14em;
+font-size: 0.78rem;
+font-weight: 600;
+letter-spacing: 0.1em;
 text-transform: uppercase;
-color: var(–amber);
-border: 1px solid rgba(212,150,42,0.4);
-padding: 0.55em 1.2em;
-text-decoration: none;
-transition: background 0.18s, color 0.18s;
+color: #fff;
+background: #c17f24;
+padding: 0.65em 1.4em;
+border: none;
+cursor: pointer;
+transition: background 0.18s;
 }
 
-.cta-link:hover { background: var(–amber); color: var(–bg); }
+.cta-btn:hover { background: #a36a1a; }
 
 /* ── RIGHT SIDEBAR ── */
-.col-side {
+.right {
 position: sticky;
 top: 2rem;
 }
 
-.col-side > * + * { margin-top: 1.5rem; }
+.right > * + * { margin-top: 1.5rem; }
 
 .card {
-background: var(–surface);
-border: 1px solid var(–line);
+border: 1px solid #e5e5e5;
 overflow: hidden;
 }
 
-.card-head {
-padding: 0.8rem 1.2rem;
-background: var(–surface2);
-border-bottom: 1px solid var(–line);
-font-family: var(–mono);
-font-size: 0.65rem;
-letter-spacing: 0.2em;
+.card-title {
+padding: 0.75rem 1.1rem;
+background: #f9f9f9;
+border-bottom: 1px solid #e5e5e5;
+font-size: 0.68rem;
+font-weight: 700;
+letter-spacing: 0.14em;
 text-transform: uppercase;
-color: var(–amber);
-display: flex;
-align-items: center;
-gap: 0.6rem;
+color: #888;
 }
 
-.card-head::before {
-content: ‘’;
-width: 6px; height: 6px;
-background: var(–amber);
-flex-shrink: 0;
-}
-
-/* Focus items */
 .focus-row {
-padding: 0.85rem 1.2rem;
-border-bottom: 1px solid var(–line);
+padding: 0.8rem 1.1rem;
+border-bottom: 1px solid #f5f5f5;
 font-size: 0.88rem;
-color: var(–txt);
-display: flex;
-align-items: flex-start;
-gap: 0.65rem;
+color: #333;
 line-height: 1.4;
-transition: background 0.15s;
+display: flex;
+gap: 0.6rem;
+align-items: flex-start;
+transition: background 0.12s;
 }
 
 .focus-row:last-child { border-bottom: none; }
-.focus-row:hover { background: var(–surface2); color: var(–txt-hi); }
+.focus-row:hover { background: #fafafa; }
+.focus-row::before { content: ‘·’; color: #c17f24; font-weight: 700; flex-shrink: 0; }
 
-.focus-row::before {
-content: ‘—’;
-font-family: var(–mono);
-font-size: 0.7rem;
-color: var(–txt-lo);
-flex-shrink: 0;
-margin-top: 0.1rem;
-}
-
-/* Cred sub-section */
-.cred-sub {
-padding: 0.45rem 1.2rem;
-font-family: var(–mono);
-font-size: 0.6rem;
-letter-spacing: 0.18em;
+.cred-group {
+padding: 0.45rem 1.1rem;
+font-size: 0.62rem;
+font-weight: 700;
+letter-spacing: 0.14em;
 text-transform: uppercase;
-color: var(–txt-lo);
-background: var(–bg);
-border-bottom: 1px solid var(–line);
+color: #bbb;
+background: #fafafa;
+border-bottom: 1px solid #f0f0f0;
 }
 
 .cred-row {
-padding: 0.72rem 1.2rem;
-border-bottom: 1px solid var(–line);
+padding: 0.7rem 1.1rem;
+border-bottom: 1px solid #f5f5f5;
 font-size: 0.88rem;
-color: var(–txt);
+color: #333;
 display: flex;
 align-items: center;
-gap: 0.75rem;
-transition: background 0.15s;
+gap: 0.7rem;
+transition: background 0.12s;
 }
 
 .cred-row:last-child { border-bottom: none; }
-.cred-row:hover { background: var(–surface2); }
+.cred-row:hover { background: #fafafa; }
 
 .badge {
-font-family: var(–mono);
 font-size: 0.6rem;
-font-weight: 600;
-letter-spacing: 0.04em;
+font-weight: 700;
+letter-spacing: 0.05em;
 padding: 0.2em 0.55em;
-border: 1px solid;
+border-radius: 2px;
 flex-shrink: 0;
-line-height: 1.4;
+line-height: 1.5;
 }
 
-.b-amber { border-color: rgba(212,150,42,0.4); color: var(–amber); background: var(–amber-lo); }
-.b-green { border-color: rgba(69,196,106,0.35); color: var(–green); background: rgba(69,196,106,0.07); }
+.b-gold  { background: #fef3e0; color: #a06818; }
+.b-green { background: #eaf7ef; color: #2a7a46; }
 
 /* ── FOOTER ── */
 .footer {
-border-top: 1px solid var(–line);
-padding: 1.5rem 0;
+border-top: 1px solid #e5e5e5;
+padding: 1.4rem 2rem;
 display: flex;
 justify-content: space-between;
 align-items: center;
-font-family: var(–mono);
-font-size: 0.65rem;
-letter-spacing: 0.12em;
-text-transform: uppercase;
-color: var(–txt-lo);
+font-size: 0.75rem;
+color: #bbb;
+letter-spacing: 0.06em;
 }
 
 /* ── RESPONSIVE ── */
-@media (max-width: 860px) {
-.page { padding: 0 1.5rem; }
-.body { grid-template-columns: 1fr; gap: 3rem; }
-.col-side { position: static; }
-.hero { padding: 3.5rem 0 2.5rem; }
-.hero h1 { font-size: 2.5rem; }
-.footer { flex-direction: column; gap: 0.4rem; text-align: center; }
+@media (max-width: 780px) {
+.main { grid-template-columns: 1fr; gap: 2.5rem; }
+.right { position: static; }
+.hero { padding: 3rem 1.5rem 2.5rem; }
+.main { padding: 2.5rem 1.5rem 4rem; }
+.hero h1 { font-size: 2.2rem; }
+.footer { flex-direction: column; gap: 0.4rem; }
+.nav { padding: 0 1.5rem; }
+.nav-links { gap: 1.2rem; }
 }
 
-@media (max-width: 520px) {
-.page { padding: 0 1rem; }
-.hero h1 { font-size: 2rem; }
-.hero { padding: 2.5rem 0 2rem; }
-}
 </style>
-
 </head>
 <body>
 
-<div class="page">
+<!-- NAV -->
 
-  <!-- TOP BAR -->
+<nav class="nav">
+  <span class="nav-brand">Field Notes</span>
+  <div class="nav-links">
+    <span>Blog</span>
+    <span class="active">About</span>
+  </div>
+</nav>
 
-  <nav class="topbar">
-    <div class="topbar-left">
-      <span class="online"><span class="dot"></span>available</span>
-      <span>offensive security</span>
-    </div>
-    <span>field notes / about</span>
-  </nav>
+<!-- HERO -->
 
-  <!-- HERO -->
+<header class="hero">
+  <div class="hero-label">whoami</div>
+  <h1>I approach security<br>like an <em>adversary.</em></h1>
+  <p class="hero-intro">Penetration tester. Former blue teamer. Focused on the one question that matters most.</p>
+</header>
 
-  <header class="hero">
-    <span class="hero-tag">whoami</span>
-    <h1>I approach security<br>like an <span class="hi">adversary.</span></h1>
-    <p class="hero-sub">Penetration tester. Former blue teamer.<br>Focused on the one question that matters most.</p>
-  </header>
+<!-- MAIN -->
 
-  <!-- BODY -->
+<div class="main">
 
-  <div class="body">
+  <!-- LEFT COLUMN -->
+
+  <main class="left">
 
 ```
-<!-- LEFT -->
-<main class="col-main">
+<section>
+  <div class="section-title">Background</div>
+  <p>I'm a penetration tester specializing in external, internal and assumed breach assessments with a focus on Active Directory compromise, lateral movement and real-world attack simulations. I lead engagements that go beyond vulnerability identification — demonstrating how weaknesses translate into business risk through full attack chains.</p>
+  <div class="pull">"If an attacker got in today, how far could they go?"</div>
+  <p>Before moving fully into offensive security, I worked in IT and as a blue teamer, monitoring large-scale environments and conducting threat hunting. That background shaped how I test today — I understand both sides of the wire.</p>
+</section>
 
-  <section>
-    <div class="section-head">Background</div>
-    <p>I'm a penetration tester specializing in external, internal and assumed breach assessments with a focus on Active Directory compromise, lateral movement and real-world attack simulations. I lead engagements that go beyond vulnerability identification — demonstrating how weaknesses translate into business risk through full attack chains.</p>
-    <div class="cq">
-      <span class="cq-label">// core question</span>
-      "If an attacker got in today, how far could they go?"
-    </div>
-    <p>Before moving fully into offensive security, I worked in IT and as a blue teamer, monitoring large-scale environments and conducting threat hunting. That background shaped how I test today — I understand both sides of the wire.</p>
-  </section>
+<section>
+  <div class="section-title">Capabilities</div>
+  <p>I bring experience across both offensive and defensive security roles, with a focus on outcomes over optics. I've performed:</p>
+  <ul class="caps">
+    <li>External and internal penetration tests with full exploitation paths</li>
+    <li>Assumed breach scenarios targeting domain environments and privilege escalation</li>
+    <li>OSINT-driven reconnaissance and attack surface mapping</li>
+    <li>Narrative-driven reporting that clearly communicates impact to technical and non-technical stakeholders</li>
+  </ul>
+</section>
 
-  <section>
-    <div class="section-head">Capabilities</div>
-    <p>I bring experience across both offensive and defensive security roles, with a focus on outcomes over optics. I've performed:</p>
-    <ul class="cap-list">
-      <li>External and internal penetration tests with full exploitation paths</li>
-      <li>Assumed breach scenarios targeting domain environments and privilege escalation</li>
-      <li>OSINT-driven reconnaissance and attack surface mapping</li>
-      <li>Narrative-driven reporting that clearly communicates impact to technical and non-technical stakeholders</li>
-    </ul>
-  </section>
-
-  <section>
-    <div class="section-head">Methodology</div>
-    <p>My methodology follows attacker behavior and frameworks such as the Penetration Testing Execution Standard (PTES):</p>
-    <div class="steps">
-      <div class="step">
-        <div class="step-n">01</div>
-        <div>
-          <div class="step-title">Reconnaissance &amp; OSINT</div>
-          <div class="step-desc">Collection and attack surface identification before a single packet is sent.</div>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-n">02</div>
-        <div>
-          <div class="step-title">Enumeration &amp; Mapping</div>
-          <div class="step-desc">Systematic discovery of services, misconfigurations and exposure points.</div>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-n">03</div>
-        <div>
-          <div class="step-title">Exploitation &amp; Post-Exploitation</div>
-          <div class="step-desc">Controlled, scoped compromise with lateral movement through the environment.</div>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-n">04</div>
-        <div>
-          <div class="step-title">Impact Validation</div>
-          <div class="step-desc">Data access and business impact demonstrated through full attack chains.</div>
-        </div>
+<section>
+  <div class="section-title">Methodology</div>
+  <p>My methodology follows attacker behavior and frameworks such as the Penetration Testing Execution Standard (PTES):</p>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">01</div>
+      <div>
+        <div class="step-name">Reconnaissance &amp; OSINT</div>
+        <div class="step-desc">Collection and attack surface identification before a single packet is sent.</div>
       </div>
     </div>
-  </section>
-
-  <section>
-    <div class="section-head">Knowledge Sharing</div>
-    <p>I contribute to knowledge sharing, improving methodologies and raising the standard of reporting — ensuring clients clearly understand risk and remediation, not just a list of findings.</p>
-  </section>
-
-  <div class="cta">
-    <p>If you're looking for someone who <strong>thinks like an attacker</strong>, communicates like a consultant and delivers actionable results — I'm always open to connecting.</p>
-    <a class="cta-link" href="mailto:">→ &nbsp; let's connect</a>
+    <div class="step">
+      <div class="step-num">02</div>
+      <div>
+        <div class="step-name">Enumeration &amp; Mapping</div>
+        <div class="step-desc">Systematic discovery of services, misconfigurations and exposure points.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <div>
+        <div class="step-name">Exploitation &amp; Post-Exploitation</div>
+        <div class="step-desc">Controlled, scoped compromise with lateral movement through the environment.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">04</div>
+      <div>
+        <div class="step-name">Impact Validation</div>
+        <div class="step-desc">Data access and business impact demonstrated through full attack chains.</div>
+      </div>
+    </div>
   </div>
+</section>
 
-</main>
+<section>
+  <div class="section-title">Knowledge Sharing</div>
+  <p>I contribute to knowledge sharing, improving methodologies and raising the standard of reporting — ensuring clients clearly understand risk and remediation, not just a list of findings.</p>
+</section>
 
-<!-- RIGHT SIDEBAR -->
-<aside class="col-side">
-
-  <div class="card">
-    <div class="card-head">Core Focus Areas</div>
-    <div class="focus-row">Active Directory exploitation</div>
-    <div class="focus-row">Assumed breach &amp; post-exploitation</div>
-    <div class="focus-row">Attack path discovery &amp; lateral movement</div>
-    <div class="focus-row">Security testing mapped to business impact</div>
-  </div>
-
-  <div class="card">
-    <div class="card-head">Education &amp; Credentials</div>
-
-    <div class="cred-sub">Degrees</div>
-    <div class="cred-row"><span class="badge b-green">MS</span>Cybersecurity</div>
-    <div class="cred-row"><span class="badge b-green">BS</span>Information Systems</div>
-
-    <div class="cred-sub">Certifications</div>
-    <div class="cred-row"><span class="badge b-amber">CRTE</span>Certified Red Team Expert</div>
-    <div class="cred-row"><span class="badge b-amber">PNPT</span>Practical Network Pentest</div>
-    <div class="cred-row"><span class="badge b-amber">eCPPT</span>eLearnSecurity CPT</div>
-    <div class="cred-row"><span class="badge b-amber">eJPT</span>eLearnSecurity JPT</div>
-    <div class="cred-row"><span class="badge b-amber">CEH</span>Certified Ethical Hacker</div>
-    <div class="cred-row"><span class="badge b-amber">PT+</span>Pentest+</div>
-    <div class="cred-row"><span class="badge b-amber">SEC+</span>Security+</div>
-  </div>
-
-</aside>
+<div class="cta">
+  <p>If you're looking for someone who <strong>thinks like an attacker</strong>, communicates like a consultant and delivers actionable results — I'm always open to connecting.</p>
+  <span class="cta-btn">Let's connect</span>
+</div>
 ```
 
-  </div>
+  </main>
 
-  <!-- FOOTER -->
+  <!-- RIGHT SIDEBAR -->
 
-  <footer class="footer">
-    <span>Field Notes from a Pentester</span>
-    <span>offensive security · red team · AD exploitation</span>
-  </footer>
+  <aside class="right">
+
+```
+<div class="card">
+  <div class="card-title">Core Focus Areas</div>
+  <div class="focus-row">Active Directory exploitation</div>
+  <div class="focus-row">Assumed breach &amp; post-exploitation</div>
+  <div class="focus-row">Attack path discovery &amp; lateral movement</div>
+  <div class="focus-row">Security testing mapped to business impact</div>
+</div>
+
+<div class="card">
+  <div class="card-title">Education &amp; Credentials</div>
+
+  <div class="cred-group">Degrees</div>
+  <div class="cred-row"><span class="badge b-green">MS</span> Cybersecurity</div>
+  <div class="cred-row"><span class="badge b-green">BS</span> Information Systems</div>
+
+  <div class="cred-group">Certifications</div>
+  <div class="cred-row"><span class="badge b-gold">CRTE</span> Certified Red Team Expert</div>
+  <div class="cred-row"><span class="badge b-gold">PNPT</span> Practical Network Pentest</div>
+  <div class="cred-row"><span class="badge b-gold">eCPPT</span> eLearnSecurity CPT</div>
+  <div class="cred-row"><span class="badge b-gold">eJPT</span> eLearnSecurity JPT</div>
+  <div class="cred-row"><span class="badge b-gold">CEH</span> Certified Ethical Hacker</div>
+  <div class="cred-row"><span class="badge b-gold">PT+</span> Pentest+</div>
+  <div class="cred-row"><span class="badge b-gold">SEC+</span> Security+</div>
+</div>
+```
+
+  </aside>
 
 </div>
+
+<!-- FOOTER -->
+
+<footer class="footer">
+  <span>Field Notes from a Pentester</span>
+  <span>offensive security · red team · AD exploitation</span>
+</footer>
 
 </body>
 </html>
