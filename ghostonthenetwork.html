@@ -1,11 +1,3 @@
-<!DOCTYPE html>
-
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>My First Penetration Test: A Quiet Network, A Loud Lesson</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;1,8..60,300;1,8..60,400&display=swap" rel="stylesheet" />
 <style>
   :root {
     --ink: #1a1612;
@@ -15,536 +7,213 @@
     --steel: #4a5568;
     --muted: #7c6f5e;
     --highlight: #fff3cd;
+
+    --content-width: 72ch;
+    --page-pad: clamp(1rem, 3vw, 2rem);
   }
 
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
 
-body {
-background-color: var(–paper);
-color: var(–ink);
-font-family: ‘Source Serif 4’, Georgia, serif;
-font-size: 18px;
-line-height: 1.8;
-min-height: 100vh;
-overflow-x: hidden;
-position: relative;
-}
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
 
-body::before {
-content: ‘’;
-position: fixed;
-inset: 0;
-background-image: url(“data:image/svg+xml,%3Csvg viewBox=‘0 0 256 256’ xmlns=‘http://www.w3.org/2000/svg’%3E%3Cfilter id=‘noise’%3E%3CfeTurbulence type=‘fractalNoise’ baseFrequency=‘0.9’ numOctaves=‘4’ stitchTiles=‘stitch’/%3E%3C/filter%3E%3Crect width=‘100%25’ height=‘100%25’ filter=‘url(%23noise)’ opacity=‘0.04’/%3E%3C/svg%3E”);
-pointer-events: none;
-z-index: 1000;
-opacity: 0.4;
-}
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: clamp(1rem, 0.95rem + 0.3vw, 1.125rem);
+    line-height: 1.75;
+    overflow-x: hidden;
+  }
 
-/* HERO */
-.hero {
-border-bottom: 3px double var(–ink);
-padding: 3rem 0 0;
-}
+  img, video, svg {
+    max-width: 100%;
+    height: auto;
+  }
 
-.hero-inner {
-max-width: 780px;
-margin: 0 auto;
-padding: 0 2rem;
-}
+  article {
+    width: min(var(--content-width), calc(100% - 2 * var(--page-pad)));
+    margin-inline: auto;
+  }
 
-.series-tag {
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 0.7rem;
-letter-spacing: 0.2em;
-text-transform: uppercase;
-color: var(–rust);
-border: 1px solid var(–rust);
-display: inline-block;
-padding: 0.2em 0.7em;
-margin-bottom: 1.5rem;
-animation: fadeSlideDown 0.6s ease both;
-}
+  .hero,
+  .content {
+    padding-inline: 0;
+  }
 
-.hero h1 {
-font-family: ‘Playfair Display’, Georgia, serif;
-font-size: clamp(2.4rem, 5.5vw, 4rem);
-line-height: 1.1;
-font-weight: 700;
-letter-spacing: -0.02em;
-animation: fadeSlideDown 0.6s ease 0.1s both;
-margin-bottom: 0.5rem;
-}
+  .hero {
+    padding-top: clamp(2rem, 5vw, 4rem);
+    border-bottom: 3px double var(--ink);
+  }
 
-.hero h1 em { font-style: italic; color: var(–rust); }
+  .hero-inner,
+  .content {
+    max-width: var(--content-width);
+    margin-inline: auto;
+  }
 
-.hero-subtitle {
-font-family: ‘Playfair Display’, serif;
-font-style: italic;
-font-size: 1.2rem;
-color: var(–muted);
-margin-bottom: 2rem;
-animation: fadeSlideDown 0.6s ease 0.2s both;
-}
+  .hero-inner,
+  .content {
+    padding-inline: var(--page-pad);
+  }
 
-.meta-row {
-display: flex;
-align-items: center;
-gap: 1.5rem;
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 0.72rem;
-color: var(–muted);
-letter-spacing: 0.05em;
-padding-bottom: 2rem;
-border-bottom: 1px solid var(–aged);
-animation: fadeSlideDown 0.6s ease 0.3s both;
-flex-wrap: wrap;
-}
+  .hero h1 {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: clamp(2.2rem, 4vw, 4.5rem);
+    line-height: 1.05;
+    margin: 0 0 0.5rem;
+    overflow-wrap: anywhere;
+  }
 
-.dot {
-width: 3px; height: 3px;
-border-radius: 50%;
-background: var(–muted);
-display: inline-block;
-}
+  .hero-subtitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: clamp(1.05rem, 0.95rem + 0.6vw, 1.35rem);
+    font-style: italic;
+    color: var(--muted);
+    margin: 0 0 1.5rem;
+  }
 
-/* CONTENT */
-.content {
-max-width: 780px;
-margin: 0 auto;
-padding: 3rem 2rem 5rem;
-}
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1rem;
+    align-items: center;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--aged);
+  }
 
-.content > * + * { margin-top: 1.6em; }
+  .content {
+    padding-top: clamp(1.75rem, 4vw, 3rem);
+    padding-bottom: clamp(3rem, 6vw, 5rem);
+  }
 
-p { font-size: 1.05rem; color: var(–ink); }
+  .content > * + * {
+    margin-top: 1.25rem;
+  }
 
-.drop-cap::first-letter {
-font-family: ‘Playfair Display’, serif;
-font-size: 4.5em;
-font-weight: 700;
-float: left;
-line-height: 0.75;
-margin: 0.05em 0.08em 0 0;
-color: var(–rust);
-}
+  p {
+    margin: 0;
+    max-width: 70ch;
+  }
 
-/* Section headings */
-h2 {
-font-family: ‘Playfair Display’, serif;
-font-size: 1.9rem;
-font-weight: 700;
-margin-top: 3rem !important;
-margin-bottom: -0.4em;
-line-height: 1.2;
-}
+  h2 {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: clamp(1.6rem, 1.2rem + 1.5vw, 2.25rem);
+    line-height: 1.15;
+    margin-top: 3rem;
+    margin-bottom: 0.25rem;
+    overflow-wrap: anywhere;
+  }
 
-h2::before {
-content: ‘§’;
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 0.8rem;
-color: var(–rust);
-display: block;
-margin-bottom: 0.3em;
-letter-spacing: 0.1em;
-}
+  h3 {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: clamp(1.2rem, 1rem + 0.6vw, 1.5rem);
+    line-height: 1.25;
+    margin-top: 2rem;
+    margin-bottom: 0.25rem;
+  }
 
-h3 {
-font-family: ‘Playfair Display’, serif;
-font-size: 1.3rem;
-font-weight: 700;
-margin-top: 2.2rem !important;
-line-height: 1.3;
-color: var(–ink);
-}
+  .drop-cap::first-letter {
+    float: left;
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 4rem;
+    line-height: 0.8;
+    margin: 0.05em 0.08em 0 0;
+    color: var(--rust);
+  }
 
-/* Pull quote */
-.pull-quote {
-border-left: 4px solid var(–rust);
-background: var(–aged);
-padding: 1.4rem 1.8rem;
-margin: 2.5rem 0 !important;
-}
+  .pull-quote,
+  .key-statement {
+    margin: 2rem 0;
+    padding: 1rem 1.25rem;
+    border-left: 4px solid var(--rust);
+    background: var(--aged);
+  }
 
-.pull-quote p {
-font-family: ‘Playfair Display’, serif;
-font-style: italic;
-font-size: 1.2rem;
-line-height: 1.5;
-color: var(–ink);
-margin: 0;
-}
+  .pull-quote p,
+  .key-statement p {
+    margin: 0;
+  }
 
-.pull-quote p::before { content: ‘\201C’; }
-.pull-quote p::after  { content: ‘\201D’; }
+  .checklist {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0;
+    border-top: 1px solid var(--aged);
+  }
 
-/* Key statement */
-.key-statement {
-border-left: 4px solid var(–ink);
-padding: 0.9rem 1.5rem;
-margin: 2rem 0 !important;
-background: var(–aged);
-}
+  .checklist li {
+    padding: 0.6rem 0 0.6rem 1.6rem;
+    border-bottom: 1px solid var(--aged);
+    position: relative;
+  }
 
-.key-statement p {
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 0.9rem;
-line-height: 1.7;
-color: var(–ink);
-margin: 0;
-}
+  .checklist li::before {
+    content: "→";
+    position: absolute;
+    left: 0;
+    color: var(--rust);
+  }
 
-/* Checklist */
-.checklist {
-list-style: none;
-padding: 0;
-margin: 1rem 0 !important;
-border-top: 1px solid var(–aged);
-}
+  .meme-frame {
+    width: 100%;
+    max-width: 460px;
+    aspect-ratio: 16 / 9;
+    border: 2px dashed var(--muted);
+    border-radius: 6px;
+    background: var(--aged);
+    display: grid;
+    place-items: center;
+    text-align: center;
+    padding: 1rem;
+  }
 
-.checklist li {
-font-size: 1rem;
-color: var(–steel);
-padding: 0.45rem 0 0.45rem 1.8rem;
-position: relative;
-border-bottom: 1px solid var(–aged);
-}
+  .next-post {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1rem;
+    align-items: end;
+    border-top: 3px double var(--ink);
+    padding-top: 2rem;
+    margin-top: 3rem;
+  }
 
-.checklist li::before {
-content: ‘→’;
-font-family: ‘IBM Plex Mono’, monospace;
-color: var(–rust);
-position: absolute;
-left: 0;
-font-size: 0.85rem;
-top: 0.5rem;
-}
+  @media (max-width: 600px) {
+    .next-post {
+      grid-template-columns: 1fr;
+    }
 
-/* Meme slot */
-.meme-slot {
-margin: 2.5rem 0 !important;
-display: flex;
-flex-direction: column;
-align-items: center;
-gap: 0.6rem;
-}
+    .next-arrow {
+      display: none;
+    }
 
-.meme-frame {
-width: 100%;
-max-width: 460px;
-aspect-ratio: 16/9;
-border: 2px dashed var(–muted);
-border-radius: 3px;
-background: var(–aged);
-display: flex;
-flex-direction: column;
-align-items: center;
-justify-content: center;
-gap: 0.6rem;
-padding: 1.2rem;
-text-align: center;
-}
+    .drop-cap::first-letter {
+      font-size: 3.3rem;
+    }
+  }
 
-.meme-icon { font-size: 2rem; opacity: 0.45; }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
 
-.meme-suggestion {
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 0.68rem;
-letter-spacing: 0.1em;
-text-transform: uppercase;
-color: var(–muted);
-line-height: 1.6;
-}
-
-.meme-caption {
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 0.67rem;
-color: var(–muted);
-font-style: italic;
-opacity: 0.75;
-}
-
-/* Section divider */
-hr.section-break {
-border: none;
-border-top: 1px solid var(–aged);
-margin: 2.8rem 0;
-}
-
-em { color: var(–steel); font-style: italic; }
-strong { color: var(–ink); font-weight: 700; }
-
-/* Sign-off */
-.sign-off {
-text-align: center;
-margin-top: 3rem !important;
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 0.9rem;
-color: var(–rust);
-letter-spacing: 0.12em;
-}
-
-/* Next post */
-.next-post {
-border-top: 3px double var(–ink);
-padding-top: 2.5rem;
-margin-top: 4rem !important;
-display: grid;
-grid-template-columns: 1fr auto;
-align-items: end;
-gap: 1rem;
-cursor: default;
-}
-
-.next-label {
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 0.65rem;
-letter-spacing: 0.2em;
-text-transform: uppercase;
-color: var(–muted);
-display: block;
-margin-bottom: 0.4rem;
-}
-
-.next-title {
-font-family: ‘Playfair Display’, serif;
-font-size: 1.35rem;
-font-style: italic;
-color: var(–rust);
-line-height: 1.2;
-}
-
-.next-arrow {
-font-size: 2rem;
-color: var(–rust);
-transition: transform 0.2s;
-line-height: 1;
-}
-
-.next-post:hover .next-arrow { transform: translateX(5px); }
-
-/* Footer */
-.byline-footer {
-text-align: center;
-padding: 3rem 0 1.5rem;
-font-family: ‘IBM Plex Mono’, monospace;
-font-size: 0.68rem;
-letter-spacing: 0.14em;
-color: var(–muted);
-text-transform: uppercase;
-}
-
-/* Animations */
-@keyframes fadeSlideDown {
-from { opacity: 0; transform: translateY(-12px); }
-to   { opacity: 1; transform: translateY(0); }
-}
-
-.content > * { animation: fadeSlideDown 0.5s ease both; }
-.content > *:nth-child(1)  { animation-delay: 0.35s; }
-.content > *:nth-child(2)  { animation-delay: 0.42s; }
-.content > *:nth-child(3)  { animation-delay: 0.49s; }
-.content > *:nth-child(4)  { animation-delay: 0.56s; }
-.content > *:nth-child(5)  { animation-delay: 0.63s; }
-.content > *:nth-child(n+6){ animation-delay: 0.70s; }
-
-@media (max-width: 600px) {
-.hero h1 { font-size: 2.1rem; }
-.content { padding: 2rem 1.2rem 4rem; }
-.next-post { grid-template-columns: 1fr; }
-.next-arrow { display: none; }
-.meme-frame { aspect-ratio: 4/3; }
-}
+    *,
+    *::before,
+    *::after {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
 </style>
-
-</head>
-<body>
-
-<article>
-
-  <!-- HERO -->
-
-  <header class="hero">
-    <div class="hero-inner">
-      <span class="series-tag">Trip7 &nbsp;·&nbsp; Entry 001</span>
-      <h1>A Quiet <em>Network</em>,<br>A Loud Lesson.</h1>
-      <p class="hero-subtitle">My first penetration test and everything I thought I knew about being ready</p>
-      <div class="meta-row">
-        <span>June</span>
-        <span class="dot"></span>
-        <span class="dot"></span>
-        <span>Private School</span>
-        <span class="dot"></span>
-        <span>8 min read</span>
-      </div>
-    </div>
-  </header>
-
-  <!-- CONTENT -->
-
-  <main class="content">
-
-<p class="drop-cap">It was June. The kind of June where everything slows down, especially at a school. No students. No teachers. I was at my desk, staring at a terminal, hands on keyboard and a scope document that suddenly felt very real. Somewhere on the other side of that connection was a private school's network, quiet and waiting.</p>
-
-<p>This was my first real penetration test. Not a lab. Not a CTF. Not a practice range with intentionally vulnerable machines. A real client. A real scope. A real responsibility. Horror and excitement rolled into one feeling.</p>
-<!-- MEME 1: "This is fine" dog / sweating guy -->
-<div class="meme-slot">
-  <div class="meme-frame">
-    <div class="meme-suggestion"> <div class="tenor-gif-embed" data-postid="25431489" data-share-method="host" data-aspect-ratio="1.84971" data-width="100%"><a href="https://tenor.com/view/james-mcavoy-sweating-fanning-yourself-cooling-off-sweat-meme-gif-25431489">James Mcavoy Sweating GIF</a>from <a href="https://tenor.com/search/james+mcavoy-gifs">James Mcavoy GIFs</a></div> <script type="text/javascript" async src="https://tenor.com/embed.js"></script><br>this is fine&nbsp;·&nbsp;no pressure</div>
-  </div>
-  <span class="meme-caption">the vibe entering my first IRL engagement</span>
-</div>
-
-<hr class="section-break" />
-
-<h2>The Engagement</h2>
-
-<p>The client was a private school and they wanted to understand their exposure. A reasonable ask. However, June meant staff and students were off for summer break, meaning reduced network activity. The assessment was fully remote, just me, my tools and whatever I could reach across the wire.</p>
-
-<p>From the start, something felt off. This wasn't your typical Windows heavy environment. It was predominantly macOS.</p>
-
-<p>That shifted how I had to think because my "experience" mostly centered around Windows and Active Directory. Different controls. Different assumptions. Just like life, it doesn't let you stay comfortable. You adapt or you miss things.</p>
-
-<!-- MEME 2: Surprised Pikachu / "well that's new" -->
-<div class="meme-slot">
-  <div class="meme-frame">
-    <div class="meme-icon">😳</div>
-    <div class="meme-suggestion">gif / meme here<br>surprised pikachu &nbsp;·&nbsp; "well that's new"</div>
-  </div>
-  <span class="meme-caption">me realizing this isn't the environment I prepared for</span>
-</div>
-
-<hr class="section-break" />
-
-<h2>What I Didn't Have</h2>
-
-<p>I had no real world testing methodology. I was familiar with frameworks like PTES and OWASP. But there was a gap between labs, CTFs and actually executing a real world assessment under pressure, time-boxed, with a real client waiting for a deliverable.</p>
-
-<p>I remember being nervous. <em>What if I don't find anything?</em> I didn't have a reliable cheat sheet. I didn't have a personal runbook. I was stitching together commands from memory and half remembered blog posts and that cost me time and confidence. Just fragments of knowledge, lab experience and the expectation that I should be able to perform.</p>
-
-<p>What I <em>did</em> have was access, a scope and enough professional obligation to keep going even when my internal monologue was telling me I had no business being there.</p>
-
-<p>So I started testing. Carefully. Slowly. Second guessing everything.</p>
-
-<hr class="section-break" />
-
-<h2>The Findings or the Lack Thereof</h2>
-
-<p>I came back with very little. A handful of observations. Nothing dramatic. No critical vulnerabilities that would make a good war story.</p>
-
-<p>And then it hit me, I had very little to show for it. No major findings. No big wins. Nothing that felt like it justified me being there.</p>
-
-<p>That was the moment the imposter syndrome kicked in. I remember thinking <em>maybe I'm not cut out for this.</em></p>
-
-<!-- MEME 3: walking away from explosion / math lady -->
-<div class="meme-slot">
-  <div class="meme-frame">
-    <div class="meme-icon">🚶</div>
-    <div class="meme-suggestion">gif / meme here<br>walking away from explosion &nbsp;·&nbsp; math lady</div>
-  </div>
-  <span class="meme-caption">me and my self-confidence after the first scan came back clean</span>
-</div>
-
-<p>There was a loneliness about it all, just you, a terminal and a blinking cursor, quietly wondering if the org who hired you made a mistake.</p>
-
-<p>I didn't spiral, I kept working but that internal voice were loud. <em>You don't know enough. You should have found more. A real pentester would've had this wrapped up by noon.</em></p>
-
-<p>None of that was helpful. Most of it wasn't even accurate. But it was there.</p>
-
-<p>Here's the part I didn't understand at the time:</p>
-
-<div class="key-statement">
-  <p>A penetration test is not measured by how many vulnerabilities you find. It's measured by how accurately you assess risk within scope, using a structured, safe approach.</p>
-</div>
-
-<p>A low finding report doesn't mean you failed. It might mean the organization is doing something right. Your job is to look honestly, not to manufacture drama. Each environment is different. Some organizations have limited security budgets or limited resources and they're trying to do the right thing with what they have. That deserves honesty.</p>
-
-<!-- MEME 4: light bulb / nod of approval -->
-<div class="meme-slot">
-  <div class="meme-frame">
-    <div class="meme-icon">💡</div>
-    <div class="meme-suggestion">gif / meme here<br>light bulb moment &nbsp;·&nbsp; nod of approval</div>
-  </div>
-  <span class="meme-caption">the reframe that changed everything</span>
-</div>
-
-<div class="pull-quote">
-  <p>I didn't fail that engagement. I just didn't have a system yet.</p>
-</div>
-
-<hr class="section-break" />
-
-<h2>What That Experience Gave Me</h2>
-
-<h3>1. My First Cheat Sheet (The One That Changed Everything)</h3>
-
-<p>After that assessment, I built something I wish I had from day one, a cheat sheet.</p>
-
-<p>Not just commands. Not just tools. A structured way to think:</p>
-
-<ul class="checklist">
-  <li>What do I check first?</li>
-  <li>What do I validate?</li>
-  <li>What am I likely to forget under pressure?</li>
-</ul>
-
-<p>That document became my anchor. And over time, it grew into a living methodology — added to after every engagement, refined with each new environment — something more valuable than any single finding.</p>
-
-<p>It's never finished. That's the point.</p>
-
-<p>Because consistency is what separates guessing from testing.</p>
-
-<h3>2. The "Try Harder" Trap</h3>
-
-<p><em>You just need to try harder.</em></p>
-
-<p>At first, it felt motivating. Push more. Do more. Never miss anything again. But that mindset can go sideways fast and it did. That mindset eventually became the seed for another story: <em>"All Bark, No Bite."</em></p>
-
-<p>Good penetration testing isn't about brute force effort or flooding a network with traffic. It's about disciplined, scoped and methodical work. You don't win by throwing everything at a network or exhausting yourself, you win by thinking clearly and following a process.</p>
-
-<p>I left that engagement with a "try harder" obsession that, in hindsight, was toxic. The drive to never feel underprepared again pushed me hard.</p>
-
-<h3>3. Redefining What "Winning" Means</h3>
-
-<p>That first test felt like a loss but over time, I learned something important.</p>
-
-<p>You're not there to "break things" with RCEs and popping shells. You're there to tell the truth about risk. Some environments are well secured. Some organizations are doing the right things. And when that happens, fewer findings doesn't mean failure, it means the organization has reached a level of maturity. That's a good thing.</p>
-
-<p>I've "lost" plenty of assessments since this one. Environments that were hardened, scopes that yielded little, engagements where the org was genuinely doing well. I've made peace with that. Organizations pursuing penetration testing are trying to do the right thing. You can't win every assessment and winning was never really the point.</p>
-
-<hr class="section-break" />
-
-<h2>Looking Back</h2>
-
-<p>I'm grateful for that engagement. Not in spite of feeling defeated but because of it. That feeling was information. It told me to build better systems.</p>
-
-<p>I never wanted to feel that defeated again and I won't pretend I haven't felt it since because I have. Many times. But now, it's different. Now I understand that every assessment is part of a larger process. For me. For clients.</p>
-
-<p>Every organization that hires a pentester is extending a form of trust. They're saying: <em>look at us honestly and tell us what you see.</em> That obligation doesn't get smaller when the findings are thin. That quiet network in June didn't give me a highlight moment. It gave me something better, a foundation.</p>
-
-<p>If you're early in your career, feeling the same way I did, uncertain, underprepared, questioning yourself then understand this:</p>
-
-<div class="pull-quote">
-  <p>You're not behind. You're building. And that first uncomfortable experience? That's where it all starts.</p>
-</div>
-
-<p class="sign-off">Happy hacking!</p>
-
-<div class="next-post">
-  <div>
-    <span class="next-label">Next in the series</span>
-    <div class="next-title">"All Bark, No Bite" — When Try Harder Becomes the Problem</div>
-  </div>
-  <div class="next-arrow">→</div>
-</div>
-
-  </main>
-
-  <footer class="byline-footer">
-    Field Notes from a Pentester &nbsp;·&nbsp; Written in the margins of real engagements
-  </footer>
-
-</article>
-
-</body>
-</html>
