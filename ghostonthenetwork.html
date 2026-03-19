@@ -439,13 +439,13 @@ to   { opacity: 1; transform: translateY(0); }
     <div class="hero-inner">
       <span class="series-tag">Field Notes &nbsp;·&nbsp; Entry 001</span>
       <h1>A Quiet <em>Network</em>,<br>A Loud Lesson.</h1>
-      <p class="hero-subtitle">My first penetration test — and everything I thought I knew about being ready</p>
+      <p class="hero-subtitle">My first penetration test and everything I thought I knew about being ready</p>
       <div class="meta-row">
-        <span>June</span>
+        <span>June 2021</span>
         <span class="dot"></span>
         <span>Remote Assessment</span>
         <span class="dot"></span>
-        <span>Private K–12 School</span>
+        <span>Private School</span>
         <span class="dot"></span>
         <span>8 min read</span>
       </div>
@@ -457,50 +457,46 @@ to   { opacity: 1; transform: translateY(0); }
   <main class="content">
 
 ```
-<p class="drop-cap">It was June. The kind of June where everything slows down, especially at a school. No students. No teachers. I was at my desk, staring at a terminal, a letter of authorization saved to my desktop, and a scope document that suddenly felt very real. Somewhere on the other side of a connection was a private school's network, quiet and waiting.</p>
+<p class="drop-cap">It was June. The kind of June where everything slows down, especially at a school. No students. No teachers. I was at my desk, staring at a terminal, hands on keyboard and a scope document that suddenly felt very real. Somewhere on the other side of that connection was a private school’s network, quiet and waiting.
+</p>
 
-<p>This was my first real penetration test. Not a lab. Not a CTF. Not a practice range with intentionally vulnerable machines. A real client. A real scope. A real responsibility. And I was terrified.</p>
+<p>This was my first real penetration test. Not a lab. Not a CTF. Not a practice range with intentionally vulnerable machines. A real client. A real scope. A real responsibility. Horror and excitement rolled into one feeling..</p>
 
 <!-- MEME 1 -->
 <div class="meme-slot">
   <div class="meme-frame">
     <div class="meme-icon">🔥</div>
-    <div class="meme-suggestion">Insert gif/meme here<br>"This is fine" dog · sweating guy · your pick</div>
+    <div class="meme-suggestion">Insert gif/meme here<br>"sweating guy</div>
   </div>
   <span class="meme-caption">the vibe entering my first real engagement</span>
 </div>
 
 <h2>The Engagement</h2>
 
-<p>The client was a private school — a tight-knit community with an IT footprint that, like most schools, had grown organically over decades rather than by design. They wanted to understand their exposure. A reasonable ask. The timing was deliberate: June meant staff and students were off for summer break, which reduced the risk of disruption and meant the network activity I'd generate wouldn't be lost in the noise of a normal school day. The assessment was fully remote — me, my tools, and whatever I could reach across the wire.</p>
+<p>The client was a private school and they wanted to understand their exposure. A reasonable ask. However, June meant staff and students were off for summer break, meaning reduced network activity. The assessment was fully remote, just me, my tools, and whatever I could reach across the wire.</p>
 
-<p>From the start, something felt off. This wasn't your typical Windows-heavy environment. It was predominantly macOS.</p>
+<p>From the start, something felt off. This wasn’t your typical Windows heavy environment. It was predominantly macOS.</p>
 
-<p>That shifted how I had to think, because my "experience" mostly centered around Windows and Active Directory. Different controls. Different assumptions. Just like real-world testing — it doesn't let you stay comfortable. You adapt or you miss things.</p>
+<p>That shifted how I had to think because my “experience” mostly centered around Windows and Active Directory. Different controls. Different assumptions. Just like the life, it doesn’t let you stay comfortable. You adapt or you miss things.</p>
 
 <!-- MEME 2 -->
 <div class="meme-slot">
   <div class="meme-frame">
     <div class="meme-icon">😳</div>
-    <div class="meme-suggestion">Insert gif/meme here<br>"Well that's new" · Surprised Pikachu · your pick</div>
+    <div class="meme-suggestion">Insert gif/meme here<br>"surprised image</div>
   </div>
   <span class="meme-caption">me realizing this isn't the environment I prepared for</span>
 </div>
 
-<div class="callout">
-  <span class="callout-label">Context — Why macOS Changes Things</span>
-  <p>macOS systems have a distinct security posture from Windows. Gatekeeper, System Integrity Protection (SIP), and the frequent absence of Active Directory in smaller deployments all shape what's exposed and what isn't. Tooling that works seamlessly against Windows hosts doesn't always translate directly. Knowing your environment before you start matters.</p>
-</div>
-
 <h2>What I Didn't Have</h2>
 
-<p>I had no real-world testing methodology. I'd studied frameworks — I knew what PTES and OWASP said on paper. I'd read the books. But there is an enormous gap between understanding a methodology conceptually and actually executing it under pressure with a real client waiting for a deliverable.</p>
+<p>I had no real world testing methodology. I was familiar with frameworks like PTES and OWASP. But there was a gap between labs, CTFs and actually executing a IRL assessment under pressure, time boxed, with a real client waiting for a deliverable.</p>
 
-<p>I remember being nervous. <em>What if I don't find anything?</em> I didn't have a reliable cheat sheet. I didn't have a personal runbook. I was stitching together commands from memory and half-remembered blog posts, and that friction cost me time and confidence in equal measure. Just fragments of knowledge, lab experience, and the expectation that I should be able to perform.</p>
+<p>I remember being nervous. <em>What if I don't find anything?</em> I didn’t have a reliable cheat sheet. I didn’t have a personal runbook. I was stitching together commands from memory and half remembered blog posts and that cost me time and confidence. Just fragments of knowledge, lab experience and the expectation that I should be able to perform.</p>
 
 <p>What I <em>did</em> have was access, a scope, and enough professional obligation to keep going even when my internal monologue was telling me I had no business being there.</p>
 
-<p>So I started testing. Carefully. Slowly. Second-guessing everything.</p>
+<p>So I started testing. Carefully. Slowly. Second guessing everything.</p>
 
 <h2>The Findings — Or the Lack Thereof</h2>
 
