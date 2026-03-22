@@ -6,29 +6,27 @@
   <title>whippet — BloodHound Attack Path Synthesizer</title>
   <meta
     name="description"
-    content="whippet is a pure-Python BloodHound attack path synthesizer for ranked paths, blast radius analysis, and self-contained HTML reporting."
+    content="whippet is a pure-Python BloodHound attack path synthesizer for ranked attack paths, blast radius analysis, and self-contained HTML reporting."
   />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link
-    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
     rel="stylesheet"
   />
   <style>
     :root {
       --bg: #06090f;
-      --bg2: #0a1018;
-      --bg3: #0d1521;
-      --bg4: #121d2c;
-      --panel: #0b121b;
-      --panel-2: #0f1825;
-      --panel-3: #101a28;
+      --bg-2: #0a1018;
+      --surface: #0b121b;
+      --surface-2: #0f1825;
+      --surface-3: #111d2b;
       --border: #1b2a3f;
-      --border2: #24364f;
+      --border-soft: #24364f;
 
       --text: #c9d6e5;
-      --text-mid: #8fa0b8;
-      --text-dim: #5f7089;
-      --heading: #f3f7fd;
+      --text-strong: #f3f7fd;
+      --text-muted: #8fa0b8;
+      --text-faint: #61738e;
 
       --green: #00f0a8;
       --cyan: #18d7ff;
@@ -37,42 +35,36 @@
       --orange: #ffab1a;
       --purple: #ad8cff;
 
-      --success-bg: rgba(0, 240, 168, 0.08);
-      --cyan-bg: rgba(24, 215, 255, 0.08);
-      --red-bg: rgba(255, 77, 77, 0.08);
-      --yellow-bg: rgba(255, 216, 78, 0.08);
+      --green-soft: rgba(0, 240, 168, 0.08);
+      --cyan-soft: rgba(24, 215, 255, 0.08);
+      --red-soft: rgba(255, 77, 77, 0.08);
+      --yellow-soft: rgba(255, 216, 78, 0.08);
 
-      --topbar-bg: rgba(6, 9, 15, 0.84);
-      --term-bg: #05080d;
-
-      --shadow: 0 16px 48px rgba(0, 0, 0, 0.34);
+      --shadow: 0 18px 46px rgba(0, 0, 0, 0.34);
       --radius: 14px;
-      --radius-sm: 10px;
-      --max-w: 1220px;
-      --content-w: 860px;
-      --gutter: clamp(16px, 4vw, 42px);
+      --radius-lg: 20px;
+
+      --container: 1080px;
+      --content: 860px;
+      --gutter: clamp(16px, 4vw, 28px);
       --topbar-h: 62px;
 
-      --sans: "DM Sans", sans-serif;
-      --mono: "DM Mono", monospace;
-      --display: "Syne", sans-serif;
+      color-scheme: dark;
     }
 
-    [data-theme="light"] {
+    html[data-theme="light"] {
       --bg: #f4f8fc;
-      --bg2: #ffffff;
-      --bg3: #edf3f9;
-      --bg4: #e5edf6;
-      --panel: #ffffff;
-      --panel-2: #f8fbff;
-      --panel-3: #eef4fa;
+      --bg-2: #ffffff;
+      --surface: #ffffff;
+      --surface-2: #f8fbff;
+      --surface-3: #eef4fa;
       --border: #d8e3ef;
-      --border2: #c8d5e3;
+      --border-soft: #c8d5e3;
 
       --text: #243244;
-      --text-mid: #5f7085;
-      --text-dim: #8190a3;
-      --heading: #08101b;
+      --text-strong: #08101b;
+      --text-muted: #5f7085;
+      --text-faint: #8190a3;
 
       --green: #0aa66c;
       --cyan: #007fa8;
@@ -81,14 +73,14 @@
       --orange: #c97700;
       --purple: #7046c9;
 
-      --success-bg: rgba(10, 166, 108, 0.08);
-      --cyan-bg: rgba(0, 127, 168, 0.08);
-      --red-bg: rgba(211, 54, 54, 0.08);
-      --yellow-bg: rgba(170, 134, 0, 0.08);
+      --green-soft: rgba(10, 166, 108, 0.08);
+      --cyan-soft: rgba(0, 127, 168, 0.08);
+      --red-soft: rgba(211, 54, 54, 0.08);
+      --yellow-soft: rgba(170, 134, 0, 0.08);
 
-      --topbar-bg: rgba(244, 248, 252, 0.9);
-      --term-bg: #0d1220;
       --shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
+
+      color-scheme: light;
     }
 
     * {
@@ -108,13 +100,12 @@
         radial-gradient(circle at top left, rgba(24, 215, 255, 0.05), transparent 22%),
         linear-gradient(180deg, var(--bg) 0%, var(--bg) 100%);
       color: var(--text);
-      font-family: var(--sans);
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       font-size: 15px;
       line-height: 1.75;
       overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
       text-rendering: optimizeLegibility;
-      transition: background 0.25s ease, color 0.25s ease;
     }
 
     body::before {
@@ -122,13 +113,18 @@
       position: fixed;
       inset: 0;
       pointer-events: none;
-      z-index: 0;
-      opacity: 0.18;
+      opacity: 0.14;
       background:
-        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+        linear-gradient(rgba(255,255,255,0.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.018) 1px, transparent 1px);
       background-size: 28px 28px;
-      mask-image: linear-gradient(to bottom, rgba(0,0,0,0.85), transparent 85%);
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent 85%);
+      z-index: 0;
+    }
+
+    .site {
+      position: relative;
+      z-index: 1;
     }
 
     a {
@@ -150,12 +146,7 @@
 
     ::selection {
       background: rgba(0, 240, 168, 0.18);
-      color: var(--heading);
-    }
-
-    .site {
-      position: relative;
-      z-index: 1;
+      color: var(--text-strong);
     }
 
     .topbar {
@@ -163,14 +154,18 @@
       top: 0;
       z-index: 100;
       min-height: var(--topbar-h);
-      background: var(--topbar-bg);
+      background: rgba(6, 9, 15, 0.84);
       border-bottom: 1px solid var(--border);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
     }
 
+    html[data-theme="light"] .topbar {
+      background: rgba(244, 248, 252, 0.9);
+    }
+
     .topbar-inner {
-      max-width: var(--max-w);
+      max-width: var(--container);
       margin: 0 auto;
       padding: 12px var(--gutter);
       display: flex;
@@ -178,7 +173,7 @@
       gap: 16px;
     }
 
-    .topbar-logo {
+    .brand {
       display: inline-flex;
       align-items: center;
       gap: 10px;
@@ -186,21 +181,21 @@
       flex-shrink: 0;
     }
 
-    .logo-mark {
+    .brand-mark {
       color: var(--red);
-      font-size: 22px;
+      font-size: 20px;
       line-height: 1;
     }
 
-    .logo-text {
-      font-family: var(--display);
-      font-size: 18px;
-      font-weight: 800;
-      letter-spacing: -0.03em;
+    .brand-text {
       color: var(--green);
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
     }
 
-    .topbar-nav {
+    .nav {
       display: flex;
       gap: 4px;
       flex: 1;
@@ -208,23 +203,23 @@
       flex-wrap: wrap;
     }
 
-    .topbar-nav a {
-      font-family: var(--mono);
+    .nav a {
+      color: var(--text-faint);
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
       font-size: 11px;
       letter-spacing: 0.06em;
-      color: var(--text-dim);
       text-transform: uppercase;
       padding: 7px 10px;
       border-radius: 8px;
       transition: background 0.15s ease, color 0.15s ease;
     }
 
-    .topbar-nav a:hover {
-      background: var(--bg3);
+    .nav a:hover {
+      background: var(--surface-3);
       color: var(--text);
     }
 
-    .topbar-actions {
+    .actions {
       display: flex;
       align-items: center;
       gap: 10px;
@@ -238,11 +233,10 @@
       min-height: 38px;
       padding: 5px 12px 5px 8px;
       border-radius: 999px;
-      border: 1px solid var(--border2);
-      background: var(--bg3);
-      color: var(--text-mid);
+      border: 1px solid var(--border-soft);
+      background: var(--surface-2);
+      color: var(--text-muted);
       cursor: pointer;
-      transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
       white-space: nowrap;
     }
 
@@ -255,10 +249,9 @@
       width: 28px;
       height: 16px;
       border-radius: 999px;
-      background: var(--border2);
+      background: var(--border-soft);
       position: relative;
       flex-shrink: 0;
-      transition: background 0.2s ease;
     }
 
     .toggle-knob {
@@ -272,18 +265,17 @@
       transition: transform 0.2s ease;
     }
 
-    [data-theme="light"] .toggle-track {
+    html[data-theme="light"] .toggle-track {
       background: var(--green);
     }
 
-    [data-theme="light"] .toggle-knob {
+    html[data-theme="light"] .toggle-knob {
       transform: translateX(12px);
     }
 
     .theme-label {
-      font-family: var(--mono);
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
       font-size: 11px;
-      letter-spacing: 0.04em;
     }
 
     .menu-btn {
@@ -291,8 +283,8 @@
       width: 38px;
       height: 38px;
       border-radius: 10px;
-      border: 1px solid var(--border2);
-      background: var(--bg3);
+      border: 1px solid var(--border-soft);
+      background: var(--surface-2);
       padding: 0;
       cursor: pointer;
       position: relative;
@@ -303,7 +295,7 @@
       left: 10px;
       right: 10px;
       height: 1.5px;
-      background: var(--text-mid);
+      background: var(--text-muted);
       transition: transform 0.2s ease, opacity 0.2s ease;
     }
 
@@ -326,7 +318,7 @@
     .mobile-nav {
       display: none;
       border-bottom: 1px solid var(--border);
-      background: var(--bg2);
+      background: var(--bg-2);
       padding: 8px var(--gutter) 14px;
     }
 
@@ -336,44 +328,40 @@
     }
 
     .mobile-nav a {
-      font-family: var(--mono);
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
       font-size: 12px;
       letter-spacing: 0.05em;
       text-transform: uppercase;
-      color: var(--text-mid);
+      color: var(--text-muted);
       padding: 10px 12px;
       border-radius: 8px;
     }
 
     .mobile-nav a:hover {
-      background: var(--bg3);
+      background: var(--surface-3);
       color: var(--text);
     }
 
     .hero {
-      max-width: var(--max-w);
+      max-width: var(--container);
       margin: 0 auto;
-      padding: clamp(40px, 7vw, 78px) var(--gutter) clamp(28px, 5vw, 46px);
+      padding: clamp(34px, 6vw, 60px) var(--gutter) 24px;
     }
 
     .hero-shell {
-      background: linear-gradient(180deg, rgba(11,18,27,0.92), rgba(10,16,24,0.86));
       border: 1px solid var(--border);
-      border-radius: 24px;
+      border-radius: 22px;
+      background: linear-gradient(180deg, rgba(11,18,27,0.94), rgba(10,16,24,0.88));
       box-shadow: var(--shadow);
       overflow: hidden;
     }
 
-    [data-theme="light"] .hero-shell {
-      background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(248,251,255,0.94));
+    html[data-theme="light"] .hero-shell {
+      background: linear-gradient(180deg, rgba(255,255,255,0.97), rgba(248,251,255,0.94));
     }
 
-    .hero-grid {
-      display: grid;
-      grid-template-columns: minmax(0, 1.4fr) minmax(260px, 360px);
-      gap: 28px;
-      padding: clamp(26px, 4vw, 40px);
-      align-items: center;
+    .hero-inner {
+      padding: clamp(24px, 4vw, 34px);
     }
 
     .eyebrow {
@@ -382,7 +370,7 @@
       gap: 8px;
       margin-bottom: 14px;
       color: var(--green);
-      font-family: var(--mono);
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
       font-size: 11px;
       letter-spacing: 0.18em;
       text-transform: uppercase;
@@ -390,7 +378,7 @@
 
     .eyebrow::before {
       content: "";
-      width: 20px;
+      width: 18px;
       height: 1px;
       background: var(--green);
       opacity: 0.8;
@@ -398,13 +386,11 @@
 
     .hero-title {
       margin: 0;
-      color: var(--heading);
-      font-family: var(--display);
-      font-size: clamp(46px, 10vw, 94px);
+      color: var(--text-strong);
+      font-size: clamp(44px, 8vw, 72px);
       font-weight: 800;
-      line-height: 0.94;
+      line-height: 0.95;
       letter-spacing: -0.05em;
-      max-width: 10ch;
     }
 
     .hero-title .accent {
@@ -412,10 +398,10 @@
     }
 
     .hero-desc {
+      max-width: 60ch;
       margin: 18px 0 0;
-      max-width: 58ch;
-      color: var(--text-mid);
-      font-size: clamp(15px, 2vw, 17px);
+      color: var(--text-muted);
+      font-size: clamp(16px, 2vw, 18px);
       line-height: 1.8;
     }
 
@@ -432,83 +418,84 @@
     }
 
     .pill {
-      border: 1px solid var(--border2);
       border-radius: 999px;
+      border: 1px solid var(--border-soft);
       padding: 5px 10px;
-      font-family: var(--mono);
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
       font-size: 11px;
-      letter-spacing: 0.04em;
       white-space: nowrap;
       background: rgba(255,255,255,0.02);
     }
 
-    .p-green  { color: var(--green);  border-color: rgba(0,240,168,0.22); background: rgba(0,240,168,0.06); }
-    .p-cyan   { color: var(--cyan);   border-color: rgba(24,215,255,0.22); background: rgba(24,215,255,0.06); }
-    .p-red    { color: var(--red);    border-color: rgba(255,77,77,0.22); background: rgba(255,77,77,0.06); }
-    .p-orange { color: var(--orange); border-color: rgba(255,171,26,0.22); background: rgba(255,171,26,0.06); }
-    .p-yellow { color: var(--yellow); border-color: rgba(255,216,78,0.22); background: rgba(255,216,78,0.06); }
-    .p-purple { color: var(--purple); border-color: rgba(173,140,255,0.22); background: rgba(173,140,255,0.06); }
+    .pill.green  { color: var(--green); border-color: rgba(0,240,168,0.22); background: var(--green-soft); }
+    .pill.cyan   { color: var(--cyan); border-color: rgba(24,215,255,0.22); background: var(--cyan-soft); }
+    .pill.red    { color: var(--red); border-color: rgba(255,77,77,0.22); background: var(--red-soft); }
+    .pill.yellow { color: var(--yellow); border-color: rgba(255,216,78,0.22); background: var(--yellow-soft); }
+    .pill.orange { color: var(--orange); border-color: rgba(255,171,26,0.22); background: rgba(255,171,26,0.07); }
+    .pill.purple { color: var(--purple); border-color: rgba(173,140,255,0.22); background: rgba(173,140,255,0.07); }
 
-    .hero-side {
+    .hero-stats {
       display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 1px;
+      margin-top: 26px;
       background: var(--border);
       border: 1px solid var(--border);
-      border-radius: 18px;
+      border-radius: 14px;
       overflow: hidden;
     }
 
-    .metric {
-      background: var(--panel-2);
-      padding: 16px 16px 14px;
+    .stat {
+      background: var(--surface-2);
+      padding: 14px 14px 12px;
     }
 
-    .metric-value {
-      font-family: var(--display);
-      font-size: clamp(24px, 4vw, 30px);
-      font-weight: 800;
+    .stat-value {
+      color: var(--text-strong);
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      font-size: clamp(24px, 3.5vw, 30px);
+      font-weight: 700;
       line-height: 1;
       margin-bottom: 6px;
     }
 
-    .metric-label {
-      color: var(--text-dim);
-      font-family: var(--mono);
+    .stat-value.green { color: var(--green); }
+    .stat-value.cyan { color: var(--cyan); }
+    .stat-value.red { color: var(--red); }
+    .stat-value.yellow { color: var(--yellow); }
+
+    .stat-label {
+      color: var(--text-faint);
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
       font-size: 10px;
       letter-spacing: 0.14em;
       text-transform: uppercase;
     }
 
-    .metric.green .metric-value { color: var(--green); }
-    .metric.cyan .metric-value { color: var(--cyan); }
-    .metric.red .metric-value { color: var(--red); }
-    .metric.orange .metric-value { color: var(--orange); }
-    .metric.yellow .metric-value { color: var(--yellow); }
-
     .main {
-      max-width: var(--content-w);
+      max-width: var(--content);
       margin: 0 auto;
       padding: 0 var(--gutter) 70px;
     }
 
     .section {
-      padding-top: clamp(56px, 7vw, 82px);
+      padding-top: clamp(54px, 7vw, 80px);
     }
 
     .section[id] {
-      scroll-margin-top: calc(var(--topbar-h) + 16px);
+      scroll-margin-top: calc(var(--topbar-h) + 18px);
     }
 
     .section-tag {
       color: var(--green);
-      font-family: var(--mono);
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
       font-size: 11px;
       letter-spacing: 0.18em;
       text-transform: uppercase;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       display: inline-flex;
-      gap: 8px;
       align-items: center;
+      gap: 8px;
     }
 
     .section-tag::before {
@@ -517,23 +504,23 @@
     }
 
     .section-title {
-      margin: 0 0 16px;
-      color: var(--heading);
-      font-family: var(--display);
-      font-size: clamp(28px, 5vw, 48px);
+      margin: 0 0 14px;
+      color: var(--text-strong);
+      font-size: clamp(34px, 6vw, 58px);
       font-weight: 800;
-      line-height: 1.04;
-      letter-spacing: -0.04em;
+      line-height: 1.02;
+      letter-spacing: -0.05em;
+      max-width: 12ch;
     }
 
     .section-lead {
       margin: 0 0 28px;
       max-width: 62ch;
-      color: var(--text-mid);
+      color: var(--text-muted);
       font-size: clamp(15px, 2vw, 17px);
       line-height: 1.85;
       padding-left: 16px;
-      border-left: 2px solid var(--border2);
+      border-left: 2px solid var(--border-soft);
     }
 
     p {
@@ -543,22 +530,22 @@
     }
 
     p strong {
-      color: var(--heading);
+      color: var(--text-strong);
     }
 
     hr.divider {
       border: 0;
       height: 1px;
-      margin: clamp(50px, 7vw, 78px) 0 0;
-      background: linear-gradient(90deg, transparent, var(--border2), transparent);
+      margin: clamp(48px, 7vw, 76px) 0 0;
+      background: linear-gradient(90deg, transparent, var(--border-soft), transparent);
     }
 
     code {
-      font-family: var(--mono);
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
       font-size: 0.84em;
       color: var(--cyan);
-      background: var(--bg3);
-      border: 1px solid var(--border2);
+      background: var(--surface-3);
+      border: 1px solid var(--border-soft);
       padding: 1px 6px;
       border-radius: 5px;
       word-break: break-word;
@@ -566,8 +553,8 @@
 
     .term {
       margin: 24px 0;
-      background: var(--term-bg);
-      border: 1px solid var(--border2);
+      background: #05080d;
+      border: 1px solid var(--border-soft);
       border-radius: var(--radius);
       overflow: hidden;
       box-shadow: var(--shadow);
@@ -578,7 +565,7 @@
       align-items: center;
       gap: 7px;
       padding: 10px 14px;
-      background: var(--bg3);
+      background: var(--surface-3);
       border-bottom: 1px solid var(--border);
     }
 
@@ -596,14 +583,13 @@
     .term-title {
       flex: 1;
       min-width: 0;
+      text-align: center;
+      color: var(--text-faint);
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      font-size: 11px;
+      white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      white-space: nowrap;
-      text-align: center;
-      color: var(--text-dim);
-      font-family: var(--mono);
-      font-size: 11px;
-      letter-spacing: 0.04em;
     }
 
     .term-body {
@@ -611,15 +597,11 @@
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
       color: #8fa2b9;
-      font-family: var(--mono);
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
       font-size: 12px;
       line-height: 1.82;
       white-space: pre-wrap;
       overflow-wrap: anywhere;
-    }
-
-    [data-theme="light"] .term-body {
-      color: #7b8da5;
     }
 
     .t-pr   { color: var(--green); }
@@ -642,16 +624,16 @@
     }
 
     .callout strong {
-      color: var(--heading);
+      color: var(--text-strong);
     }
 
-    .callout.yellow { border-color: var(--yellow); background: var(--yellow-bg); color: #b59a46; }
-    .callout.red    { border-color: var(--red); background: var(--red-bg); color: #c66a6a; }
-    .callout.cyan   { border-color: var(--cyan); background: var(--cyan-bg); color: #63a9b9; }
+    .callout.yellow { border-color: var(--yellow); background: var(--yellow-soft); color: #b59a46; }
+    .callout.red { border-color: var(--red); background: var(--red-soft); color: #c66a6a; }
+    .callout.cyan { border-color: var(--cyan); background: var(--cyan-soft); color: #63a9b9; }
 
-    [data-theme="light"] .callout.yellow { color: #7a6400; }
-    [data-theme="light"] .callout.red    { color: #8b2e2e; }
-    [data-theme="light"] .callout.cyan   { color: #005d76; }
+    html[data-theme="light"] .callout.yellow { color: #7a6400; }
+    html[data-theme="light"] .callout.red { color: #8b2e2e; }
+    html[data-theme="light"] .callout.cyan { color: #005d76; }
 
     .cmd-grid {
       display: grid;
@@ -661,29 +643,28 @@
       border: 1px solid var(--border);
       border-radius: var(--radius);
       overflow: hidden;
-      margin-top: 24px;
     }
 
     .cmd-card {
-      background: var(--panel);
-      padding: 18px 18px 16px;
+      background: var(--surface);
+      padding: 18px;
       transition: background 0.15s ease;
     }
 
     .cmd-card:hover {
-      background: var(--panel-2);
+      background: var(--surface-2);
     }
 
     .cmd-name {
       margin-bottom: 6px;
       color: var(--green);
-      font-family: var(--mono);
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
       font-size: 13px;
       font-weight: 500;
     }
 
     .cmd-desc {
-      color: var(--text-dim);
+      color: var(--text-faint);
       font-size: 13px;
       line-height: 1.58;
     }
@@ -706,13 +687,13 @@
     }
 
     .step-num {
-      width: 48px;
+      width: 42px;
       flex-shrink: 0;
       text-align: right;
-      color: var(--border2);
-      font-family: var(--display);
-      font-size: 38px;
-      font-weight: 800;
+      color: var(--border-soft);
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      font-size: 28px;
+      font-weight: 700;
       line-height: 1;
     }
 
@@ -723,14 +704,14 @@
     .step-body strong {
       display: block;
       margin-bottom: 4px;
-      color: var(--heading);
+      color: var(--text-strong);
       font-size: 15px;
       font-weight: 600;
     }
 
     .step-body p {
       margin: 0;
-      color: var(--text-dim);
+      color: var(--text-faint);
       font-size: 13.5px;
       line-height: 1.65;
     }
@@ -741,9 +722,8 @@
       align-items: baseline;
       flex-wrap: wrap;
       margin: 42px 0 12px;
-      color: var(--heading);
-      font-family: var(--display);
-      font-size: clamp(16px, 2.6vw, 21px);
+      color: var(--text-strong);
+      font-size: 20px;
       font-weight: 700;
       letter-spacing: -0.02em;
     }
@@ -767,25 +747,25 @@
     .opsec-table th {
       text-align: left;
       padding: 10px 12px;
-      color: var(--text-dim);
-      font-family: var(--mono);
+      color: var(--text-faint);
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
       font-size: 9px;
       letter-spacing: 0.18em;
       text-transform: uppercase;
-      border-bottom: 1px solid var(--border2);
+      border-bottom: 1px solid var(--border-soft);
       white-space: nowrap;
     }
 
     .opsec-table td {
       padding: 11px 12px;
       border-bottom: 1px solid var(--border);
-      font-family: var(--mono);
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
       font-size: 12px;
       vertical-align: top;
     }
 
     .opsec-table tr:hover td {
-      background: var(--bg3);
+      background: var(--surface-3);
     }
 
     .opsec-table td:first-child {
@@ -795,13 +775,13 @@
 
     .opsec-table td:nth-child(2),
     .opsec-table td:nth-child(3) {
-      color: var(--text-dim);
+      color: var(--text-faint);
     }
 
     .report-preview {
       margin-top: 24px;
-      background: var(--panel);
-      border: 1px solid var(--border2);
+      background: var(--surface);
+      border: 1px solid var(--border-soft);
       border-radius: var(--radius);
       overflow: hidden;
       box-shadow: var(--shadow);
@@ -812,14 +792,14 @@
       align-items: center;
       gap: 7px;
       padding: 10px 16px;
-      background: var(--bg4);
+      background: var(--surface-3);
       border-bottom: 1px solid var(--border);
     }
 
     .preview-title {
       margin-left: 4px;
-      color: var(--text-dim);
-      font-family: var(--mono);
+      color: var(--text-faint);
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
       font-size: 11px;
       white-space: nowrap;
       overflow: hidden;
@@ -843,8 +823,8 @@
       gap: 6px;
       padding: 6px 10px;
       border-radius: 8px;
-      color: var(--text-dim);
-      font-family: var(--mono);
+      color: var(--text-faint);
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
       font-size: 11px;
       border: 1px solid transparent;
       background: transparent;
@@ -852,8 +832,8 @@
 
     .tab.active {
       color: var(--green);
-      border-color: rgba(0,240,168,0.18);
-      background: rgba(0,240,168,0.06);
+      border-color: rgba(0, 240, 168, 0.18);
+      background: var(--green-soft);
     }
 
     .badge {
@@ -877,21 +857,21 @@
     }
 
     .stat-card {
-      background: var(--panel-2);
+      background: var(--surface-2);
       padding: 14px 12px;
     }
 
     .stat-val {
       margin-bottom: 5px;
-      font-family: var(--display);
-      font-size: 26px;
-      font-weight: 800;
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
+      font-size: 24px;
+      font-weight: 700;
       line-height: 1;
     }
 
     .stat-lbl {
-      color: var(--text-dim);
-      font-family: var(--mono);
+      color: var(--text-faint);
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
       font-size: 9px;
       letter-spacing: 0.12em;
       text-transform: uppercase;
@@ -906,16 +886,16 @@
 
     .mini-label {
       margin: 14px 0 8px;
-      color: var(--text-dim);
-      font-family: var(--mono);
+      color: var(--text-faint);
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
       font-size: 10px;
       letter-spacing: 0.12em;
       text-transform: uppercase;
     }
 
     .path-card {
-      background: var(--panel-2);
-      border: 1px solid var(--border2);
+      background: var(--surface-2);
+      border: 1px solid var(--border-soft);
       border-radius: 8px;
       margin: 8px 0;
       overflow: hidden;
@@ -931,8 +911,8 @@
     }
 
     .path-num {
-      color: var(--text-dim);
-      font-family: var(--mono);
+      color: var(--text-faint);
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
       font-size: 11px;
     }
 
@@ -941,18 +921,18 @@
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      color: var(--heading);
-      font-family: var(--mono);
+      color: var(--text-strong);
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
       font-size: 12px;
     }
 
     .hops-tag {
       color: var(--cyan);
-      background: rgba(24,215,255,0.08);
+      background: var(--cyan-soft);
       border: 1px solid rgba(24,215,255,0.2);
       border-radius: 5px;
       padding: 4px 8px;
-      font-family: var(--mono);
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
       font-size: 10px;
       white-space: nowrap;
     }
@@ -975,7 +955,7 @@
     }
 
     .chev {
-      color: var(--text-dim);
+      color: var(--text-faint);
       font-size: 11px;
       transition: transform 0.2s ease;
     }
@@ -1001,7 +981,7 @@
       align-items: baseline;
       padding: 10px 0;
       border-bottom: 1px solid var(--border);
-      font-family: var(--mono);
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
       font-size: 12px;
     }
 
@@ -1009,7 +989,7 @@
       border-bottom: 0;
     }
 
-    .hop-n { color: var(--text-dim); width: 18px; }
+    .hop-n { color: var(--text-faint); width: 18px; }
     .hop-src { color: var(--yellow); }
     .hop-rel {
       color: var(--cyan);
@@ -1021,19 +1001,19 @@
       white-space: nowrap;
     }
 
-    .hop-arr { color: var(--text-dim); }
+    .hop-arr { color: var(--text-faint); }
     .hop-dst { color: var(--text); }
     .hop-dst.t0 { color: var(--red); }
     .hop-tip {
       width: 100%;
       padding-left: 26px;
-      color: var(--text-dim);
+      color: var(--text-faint);
       font-size: 11px;
       line-height: 1.5;
     }
 
     .footer {
-      max-width: var(--content-w);
+      max-width: var(--content);
       margin: 70px auto 0;
       padding: 28px var(--gutter) 46px;
       border-top: 1px solid var(--border);
@@ -1041,30 +1021,18 @@
       flex-wrap: wrap;
       justify-content: space-between;
       gap: 10px;
-      color: var(--text-dim);
-      font-family: var(--mono);
+      color: var(--text-faint);
+      font-family: "IBM Plex Mono", ui-monospace, monospace;
       font-size: 11px;
     }
 
     .footer .logo {
       color: var(--green);
-      font-family: var(--display);
-      font-size: 16px;
       font-weight: 700;
     }
 
-    @media (max-width: 980px) {
-      .hero-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .hero-title {
-        max-width: none;
-      }
-    }
-
-    @media (max-width: 760px) {
-      .topbar-nav {
+    @media (max-width: 840px) {
+      .nav {
         display: none;
       }
 
@@ -1076,20 +1044,8 @@
         display: none;
       }
 
-      .hero {
-        padding-top: 24px;
-      }
-
-      .hero-shell {
-        border-radius: 18px;
-      }
-
-      .hero-grid {
-        padding: 22px 18px;
-      }
-
-      .cmd-grid {
-        grid-template-columns: 1fr;
+      .hero-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
       .path-head {
@@ -1107,15 +1063,6 @@
       .noise {
         display: none;
       }
-
-      .hops-tag {
-        margin-top: 2px;
-      }
-
-      .footer {
-        flex-direction: column;
-        text-align: center;
-      }
     }
 
     @media (max-width: 560px) {
@@ -1123,23 +1070,33 @@
         font-size: 14px;
       }
 
-      .topbar-inner {
-        padding-left: 14px;
-        padding-right: 14px;
-      }
-
+      .topbar-inner,
       .hero,
-      .main {
+      .main,
+      .footer {
         padding-left: 14px;
         padding-right: 14px;
       }
 
       .hero-title {
-        font-size: clamp(40px, 17vw, 66px);
+        font-size: clamp(36px, 16vw, 54px);
       }
 
-      .metric-value {
-        font-size: 24px;
+      .section-title {
+        font-size: clamp(28px, 10vw, 40px);
+        max-width: none;
+      }
+
+      .hero-inner {
+        padding: 18px;
+      }
+
+      .hero-stats {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .cmd-grid {
+        grid-template-columns: 1fr;
       }
 
       .step {
@@ -1147,16 +1104,17 @@
       }
 
       .step-num {
-        width: 38px;
-        font-size: 30px;
+        width: 34px;
+        font-size: 24px;
       }
 
       .stat-row {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
-      .opsec-table {
-        min-width: 520px;
+      .footer {
+        flex-direction: column;
+        text-align: center;
       }
     }
 
@@ -1166,17 +1124,6 @@
       body::before {
         display: none !important;
       }
-
-      body {
-        background: #fff;
-        color: #000;
-      }
-
-      .hero,
-      .main,
-      .footer {
-        max-width: none;
-      }
     }
   </style>
 </head>
@@ -1184,12 +1131,12 @@
   <div class="site">
     <header class="topbar">
       <div class="topbar-inner">
-        <a class="topbar-logo" href="#">
-          <span class="logo-mark">🩸</span>
-          <span class="logo-text">whippet</span>
+        <a class="brand" href="#">
+          <span class="brand-mark">🩸</span>
+          <span class="brand-text">whippet</span>
         </a>
 
-        <nav class="topbar-nav" aria-label="Primary navigation">
+        <nav class="nav" aria-label="Primary navigation">
           <a href="#getting-started">Install</a>
           <a href="#commands">Commands</a>
           <a href="#workflows">Workflows</a>
@@ -1197,7 +1144,7 @@
           <a href="#report">Report</a>
         </nav>
 
-        <div class="topbar-actions">
+        <div class="actions">
           <button class="theme-btn" id="themeBtn" type="button" aria-label="Toggle light or dark mode" aria-pressed="false">
             <span class="toggle-track" aria-hidden="true"><span class="toggle-knob"></span></span>
             <span class="theme-label" id="themeLabel">Light mode</span>
@@ -1220,45 +1167,43 @@
 
     <section class="hero">
       <div class="hero-shell">
-        <div class="hero-grid">
-          <div>
-            <div class="eyebrow">Technical Overview · v10.0.0</div>
-            <h1 class="hero-title">WHIP<span class="accent">PET</span></h1>
-            <p class="hero-desc">
-              A <strong>pure-Python</strong> BloodHound attack path synthesizer.
-              No GUI. No BloodHound server. Drop your collection files in and get
-              <strong>ranked attack paths, blast radius analysis</strong>, and a
-              self-contained HTML report — straight from your terminal.
-            </p>
+        <div class="hero-inner">
+          <div class="eyebrow">Technical Overview · v10.0.0</div>
+          <h1 class="hero-title">WHIP<span class="accent">PET</span></h1>
+          <p class="hero-desc">
+            A <strong>pure-Python</strong> BloodHound attack path synthesizer.
+            No GUI. No BloodHound server. Drop your collection files in and get
+            <strong>ranked attack paths, blast radius analysis</strong>, and a self-contained
+            HTML report — straight from your terminal.
+          </p>
 
-            <div class="hero-pills">
-              <span class="pill p-red">Active Directory</span>
-              <span class="pill p-green">SharpHound v5/v6</span>
-              <span class="pill p-cyan">AzureHound</span>
-              <span class="pill p-purple">ADCS · ESC1–ESC9</span>
-              <span class="pill p-yellow">BloodHound CE</span>
-              <span class="pill p-red">DCSync</span>
-              <span class="pill p-green">Kerberoast</span>
-              <span class="pill p-cyan">Blast Radius</span>
-            </div>
+          <div class="hero-pills">
+            <span class="pill red">Active Directory</span>
+            <span class="pill green">SharpHound v5/v6</span>
+            <span class="pill cyan">AzureHound</span>
+            <span class="pill purple">ADCS · ESC1–ESC9</span>
+            <span class="pill yellow">BloodHound CE</span>
+            <span class="pill red">DCSync</span>
+            <span class="pill green">Kerberoast</span>
+            <span class="pill cyan">Blast Radius</span>
           </div>
 
-          <div class="hero-side">
-            <div class="metric green">
-              <div class="metric-value">85</div>
-              <div class="metric-label">Relationship Types</div>
+          <div class="hero-stats">
+            <div class="stat">
+              <div class="stat-value green">85</div>
+              <div class="stat-label">Relationship Types</div>
             </div>
-            <div class="metric cyan">
-              <div class="metric-value">17</div>
-              <div class="metric-label">Commands</div>
+            <div class="stat">
+              <div class="stat-value cyan">17</div>
+              <div class="stat-label">Commands</div>
             </div>
-            <div class="metric red">
-              <div class="metric-value">0</div>
-              <div class="metric-label">Core Dependencies</div>
+            <div class="stat">
+              <div class="stat-value red">0</div>
+              <div class="stat-label">Core Dependencies</div>
             </div>
-            <div class="metric yellow">
-              <div class="metric-value">3</div>
-              <div class="metric-label">Platforms</div>
+            <div class="stat">
+              <div class="stat-value yellow">3</div>
+              <div class="stat-label">Platforms</div>
             </div>
           </div>
         </div>
@@ -1305,31 +1250,9 @@
           all work without any flags or extra configuration.
         </p>
 
-        <div class="term">
-          <div class="term-bar">
-            <span class="dot red"></span>
-            <span class="dot yellow"></span>
-            <span class="dot green"></span>
-            <span class="term-title">bash — loading your collection</span>
-          </div>
-          <div class="term-body">
-<span class="t-cm"># SharpHound — point at the whole directory</span>
-<span class="t-pr">$</span> <span class="t-cmd">python3 whippet.py -d /loot/collections/*.json --cmd info</span>
-
-<span class="t-info">  ℹ  Detected collection files — merging…</span>
-<span class="t-ok">  ✓  20231103_computers.json     →  412  Computer node(s)</span>
-<span class="t-ok">  ✓  20231103_users.json         →  2,841  User node(s)</span>
-<span class="t-ok">  ✓  20231103_groups.json        →  318  Group node(s)</span>
-<span class="t-ok">  ✓  20231103_domains.json       →  2  Domain node(s)</span>
-<span class="t-ok">  ✓  20231103_gpos.json          →  47  GPO node(s)</span>
-<span class="t-ok">  ✓  20231103_certtemplates.json →  22  CertTemplate node(s)</span>
-<span class="t-ok">  ✓  Merged 3,642 nodes, 21,847 edges from 6 file(s)</span>
-          </div>
-        </div>
-
         <div class="callout yellow">
           <strong>Common gotcha:</strong> Always include your <code>*_domains.json</code> file in the glob.
-          Domain nodes anchor Tier-0 detection. Without them, proximity scoring and several analysis commands return zero results.
+          Domain nodes anchor Tier-0 detection. Without them, several analysis commands return zero results.
         </div>
       </section>
 
@@ -1340,27 +1263,27 @@
         <h2 class="section-title">17 commands. Every angle covered.</h2>
         <p class="section-lead">
           Every command prints directly to the terminal. Add <code>--format json --out file.json</code>
-          to any of them for structured output you can feed into other tooling.
+          to any of them for structured output you can feed into downstream tooling.
         </p>
 
         <div class="cmd-grid">
-          <div class="cmd-card"><div class="cmd-name">info</div><div class="cmd-desc">Graph summary and primitive counts. Run this first on every engagement to validate your data.</div></div>
-          <div class="cmd-card"><div class="cmd-name">bulk</div><div class="cmd-desc">Every enabled user with a path to Tier-0, sorted by hop count for fast target prioritization.</div></div>
-          <div class="cmd-card"><div class="cmd-name">kerberoast</div><div class="cmd-desc">SPN-bearing accounts ranked by Tier-0 proximity so you know which hashes are worth the effort.</div></div>
-          <div class="cmd-card"><div class="cmd-name">asreproast</div><div class="cmd-desc">Accounts with pre-auth disabled. No initial credentials required to request the crackable material.</div></div>
-          <div class="cmd-card"><div class="cmd-name">dcsync</div><div class="cmd-desc">Direct and transitive replication rights up to six hops deep, with full privilege chains.</div></div>
-          <div class="cmd-card"><div class="cmd-name">laps</div><div class="cmd-desc">LAPS readers and the machines they can reach, including systems that path into Tier-0.</div></div>
-          <div class="cmd-card"><div class="cmd-name">acl</div><div class="cmd-desc">ACL abuse paths to Tier-0 across multiple relationship types and write-control primitives.</div></div>
-          <div class="cmd-card"><div class="cmd-name">delegation</div><div class="cmd-desc">Unconstrained, constrained, and RBCD delegation chains with practical exploitation notes.</div></div>
-          <div class="cmd-card"><div class="cmd-name">adcs</div><div class="cmd-desc">Certificate template abuse classified by ESC type from ESC1 through ESC9.</div></div>
-          <div class="cmd-card"><div class="cmd-name">azure</div><div class="cmd-desc">Azure / Entra attack paths across cloud privilege relationships and directory role escalation.</div></div>
-          <div class="cmd-card"><div class="cmd-name">paths</div><div class="cmd-desc">Top-K ranked attack paths between arbitrary nodes, including per-hop abuse hints.</div></div>
-          <div class="cmd-card"><div class="cmd-name">simulate</div><div class="cmd-desc">Narrative walk-through of the best route with noise awareness and suggested tradeoffs.</div></div>
-          <div class="cmd-card"><div class="cmd-name">owned</div><div class="cmd-desc">Tier-0 reachability from a single compromised node with full hop breakdown.</div></div>
-          <div class="cmd-card"><div class="cmd-name">blast</div><div class="cmd-desc">Blast radius from an owned node — reachable users, computers, sessions, and privileged paths.</div></div>
-          <div class="cmd-card"><div class="cmd-name">chokepoints</div><div class="cmd-desc">Betweenness centrality ranking to identify the accounts whose hardening removes the most paths.</div></div>
-          <div class="cmd-card"><div class="cmd-name">matrix</div><div class="cmd-desc">Reachability matrix showing every user versus every Tier-0 node with hop counts.</div></div>
-          <div class="cmd-card"><div class="cmd-name">htmlreport</div><div class="cmd-desc">Self-contained interactive HTML report ready for handoff, offline review, or client deliverables.</div></div>
+          <div class="cmd-card"><div class="cmd-name">info</div><div class="cmd-desc">Graph summary and primitive counts. Run this first on every engagement.</div></div>
+          <div class="cmd-card"><div class="cmd-name">bulk</div><div class="cmd-desc">Enabled users with paths to Tier-0, sorted by hop count.</div></div>
+          <div class="cmd-card"><div class="cmd-name">kerberoast</div><div class="cmd-desc">SPN-bearing accounts ranked by proximity to high-value targets.</div></div>
+          <div class="cmd-card"><div class="cmd-name">asreproast</div><div class="cmd-desc">Accounts with pre-auth disabled and no initial credential requirement.</div></div>
+          <div class="cmd-card"><div class="cmd-name">dcsync</div><div class="cmd-desc">Direct and transitive replication rights with full privilege chains.</div></div>
+          <div class="cmd-card"><div class="cmd-name">laps</div><div class="cmd-desc">LAPS readers and the machines they can reach.</div></div>
+          <div class="cmd-card"><div class="cmd-name">acl</div><div class="cmd-desc">ACL abuse paths across write-control and delegation primitives.</div></div>
+          <div class="cmd-card"><div class="cmd-name">delegation</div><div class="cmd-desc">Unconstrained, constrained, and RBCD abuse chains.</div></div>
+          <div class="cmd-card"><div class="cmd-name">adcs</div><div class="cmd-desc">Certificate template abuse classified by ESC type.</div></div>
+          <div class="cmd-card"><div class="cmd-name">azure</div><div class="cmd-desc">Azure / Entra privilege paths and cloud-side escalation.</div></div>
+          <div class="cmd-card"><div class="cmd-name">paths</div><div class="cmd-desc">Top-K ranked attack paths between arbitrary nodes.</div></div>
+          <div class="cmd-card"><div class="cmd-name">simulate</div><div class="cmd-desc">Narrative walk-through of the best route.</div></div>
+          <div class="cmd-card"><div class="cmd-name">owned</div><div class="cmd-desc">Tier-0 reachability from a single compromised node.</div></div>
+          <div class="cmd-card"><div class="cmd-name">blast</div><div class="cmd-desc">Blast radius from an owned node.</div></div>
+          <div class="cmd-card"><div class="cmd-name">chokepoints</div><div class="cmd-desc">Betweenness centrality ranking for defensive hardening decisions.</div></div>
+          <div class="cmd-card"><div class="cmd-name">matrix</div><div class="cmd-desc">User-to-Tier-0 reachability matrix with hop counts.</div></div>
+          <div class="cmd-card"><div class="cmd-name">htmlreport</div><div class="cmd-desc">Single-file HTML report for handoff and offline review.</div></div>
         </div>
       </section>
 
@@ -1370,7 +1293,7 @@
         <div class="section-tag">Engagement Workflows</div>
         <h2 class="section-title">From no creds to Domain Admin</h2>
         <p class="section-lead">
-          The commands are meant to chain together. Each phase uses the output of the previous one to narrow focus and reduce wasted effort.
+          The commands are designed to chain together. Each phase narrows focus and reduces wasted effort during assessment.
         </p>
 
         <ol class="steps">
@@ -1378,14 +1301,14 @@
             <div class="step-num">01</div>
             <div class="step-body">
               <strong>Orient the attack surface</strong>
-              <p>Run <code>info</code> first. Verify Tier-0 node count and primitive counts before you do anything else.</p>
+              <p>Run <code>info</code> first. Verify Tier-0 node count and primitive counts before doing anything else.</p>
             </div>
           </li>
           <li class="step">
             <div class="step-num">02</div>
             <div class="step-body">
               <strong>Build the target list</strong>
-              <p>Use <code>bulk</code> for broad reachability and <code>kerberoast</code> to prioritize crackable accounts that actually matter.</p>
+              <p>Use <code>bulk</code> for broad reachability and <code>kerberoast</code> to prioritize crackable accounts that matter.</p>
             </div>
           </li>
           <li class="step">
@@ -1399,65 +1322,17 @@
             <div class="step-num">04</div>
             <div class="step-body">
               <strong>Plan the route</strong>
-              <p><code>paths</code> ranks viable attack chains. <code>simulate</code> converts the best one into a practical execution narrative.</p>
+              <p><code>paths</code> ranks viable chains. <code>simulate</code> converts the best one into an execution narrative.</p>
             </div>
           </li>
           <li class="step">
             <div class="step-num">05</div>
             <div class="step-body">
               <strong>Generate the deliverable</strong>
-              <p><code>htmlreport</code> gives you a self-contained artifact, while JSON output feeds slides, automation, or downstream tooling.</p>
+              <p><code>htmlreport</code> gives you a self-contained artifact, while JSON output supports automation and reporting.</p>
             </div>
           </li>
         </ol>
-
-        <div class="subhead"><span class="n">01.</span> Graph overview — <code style="font-size:.8em">info</code></div>
-        <div class="term">
-          <div class="term-bar">
-            <span class="dot red"></span>
-            <span class="dot yellow"></span>
-            <span class="dot green"></span>
-            <span class="term-title">python3 whippet.py -d *.json --cmd info</span>
-          </div>
-          <div class="term-body">
-<span class="t-info"> ▸ Graph Intelligence</span>
-<span class="t-dim">──────────────────────────────────────────────────────────────</span>
-  Nodes:                          3,642
-  Edges:                          21,847
-  Unique Rel Types:               47
-  Tier-0 Nodes:                   <span class="t-red">18</span>
-  Kerberoastable:                 <span class="t-yw">14</span>
-  AS-REP Roastable:               <span class="t-yw">3</span>
-  DCSync Direct:                  <span class="t-red">2</span>
-  ACL Abuse Paths:                <span class="t-red">23</span>
-  Azure Paths:                    <span class="t-yw">4</span>
-  ADCS ESC Paths:                 <span class="t-bold">8</span>
-          </div>
-        </div>
-
-        <div class="subhead"><span class="n">02.</span> Build the target list — <code style="font-size:.8em">kerberoast</code></div>
-        <div class="term">
-          <div class="term-bar">
-            <span class="dot red"></span>
-            <span class="dot yellow"></span>
-            <span class="dot green"></span>
-            <span class="term-title">python3 whippet.py -d *.json --cmd kerberoast</span>
-          </div>
-          <div class="term-body">
-<span class="t-info"> ▸ Kerberoastable Accounts</span>
-<span class="t-dim">──────────────────────────────────────────────────────────────</span>
-  Hops   Risk   Account
-  1      <span class="t-red">7.6</span>   <span class="t-bold">svc_backup@CORP.LOCAL</span>
-  1      <span class="t-red">7.1</span>   <span class="t-bold">svc_sql@CORP.LOCAL</span>
-  2      <span class="t-yw">5.4</span>   <span class="t-bold">svc_exchange@CORP.LOCAL</span>
-  3      <span class="t-yw">4.9</span>   <span class="t-bold">svc_sccm@CORP.LOCAL</span>
-  ∞      2.1   svc_print@CORP.LOCAL
-          </div>
-        </div>
-
-        <div class="callout cyan">
-          <strong>Reading the output:</strong> The <code>∞</code> in the hops column means the account has no path to Tier-0. Prioritize 1–2 hop accounts first.
-        </div>
       </section>
 
       <hr class="divider" />
@@ -1479,35 +1354,16 @@
               </tr>
             </thead>
             <tbody>
-              <tr><td>--stealth</td><td>All edges with high detection risk such as LSASS, DCSync, DCOM</td><td>MDI / strong telemetry is in place</td></tr>
+              <tr><td>--stealth</td><td>High-noise edges such as LSASS, DCSync, DCOM</td><td>Strong telemetry is in place</td></tr>
               <tr><td>--no-lsass</td><td>Session-based credential access</td><td>EDR blocks or heavily monitors LSASS</td></tr>
-              <tr><td>--no-dcsync</td><td>Replication abuse paths</td><td>Rules of engagement prohibit replication attacks</td></tr>
-              <tr><td>--no-rdp</td><td>Interactive RDP movement</td><td>Interactive login is out of scope</td></tr>
+              <tr><td>--no-dcsync</td><td>Replication abuse paths</td><td>Replication is prohibited by ROE</td></tr>
+              <tr><td>--no-rdp</td><td>Interactive RDP movement</td><td>Interactive sessions are out of scope</td></tr>
               <tr><td>--no-acl</td><td>ACL abuse primitives</td><td>Write-control attacks are restricted</td></tr>
-              <tr><td>--no-exec</td><td>AdminTo, PSRemoting, DCOM, SQL admin</td><td>Execution is restricted by the engagement</td></tr>
-              <tr><td>--no-delegation</td><td>Delegation abuse chains</td><td>Delegation techniques are explicitly out of scope</td></tr>
-              <tr><td>--no-adcs</td><td>All ADCS certificate paths</td><td>PKI infrastructure is excluded</td></tr>
+              <tr><td>--no-exec</td><td>AdminTo, PSRemoting, DCOM, SQL admin</td><td>Execution is restricted</td></tr>
+              <tr><td>--no-delegation</td><td>Delegation abuse chains</td><td>Delegation techniques are excluded</td></tr>
+              <tr><td>--no-adcs</td><td>All ADCS certificate paths</td><td>PKI infrastructure is out of scope</td></tr>
             </tbody>
           </table>
-        </div>
-
-        <div class="term">
-          <div class="term-bar">
-            <span class="dot red"></span>
-            <span class="dot yellow"></span>
-            <span class="dot green"></span>
-            <span class="term-title">bash — constrained pathfinding</span>
-          </div>
-          <div class="term-body">
-<span class="t-pr">$</span> <span class="t-cmd">python3 whippet.py -d *.json --cmd paths \
-  --from "john.doe@CORP.LOCAL" \
-  --to "Domain Admins@CORP.LOCAL" \
-  --stealth --no-lsass --no-dcsync --top 3</span>
-
-<span class="t-dim">Constraints: no_lsass, no_dcsync | Stealth: True</span>
-<span class="t-ok">Path #1 score=4.5 hops=3 noise=9</span>
-john.doe → helpdesk-admins → IT Admins → Domain Admins
-          </div>
         </div>
       </section>
 
@@ -1519,22 +1375,6 @@ john.doe → helpdesk-admins → IT Admins → Domain Admins
         <p class="section-lead">
           The HTML report runs the full analysis and compiles results into a single interactive file that works offline after generation.
         </p>
-
-        <div class="term">
-          <div class="term-bar">
-            <span class="dot red"></span>
-            <span class="dot yellow"></span>
-            <span class="dot green"></span>
-            <span class="term-title">bash</span>
-          </div>
-          <div class="term-body">
-<span class="t-pr">$</span> <span class="t-cmd">python3 whippet.py -d *.json --cmd htmlreport --out report.html</span>
-
-<span class="t-info">  ℹ  Running full analysis — this may take a moment…</span>
-<span class="t-ok">  ✓  Report written → report.html (284 KB)</span>
-<span class="t-info">  ℹ  Open in any browser — fully self-contained, no internet required</span>
-          </div>
-        </div>
 
         <div class="report-preview">
           <div class="preview-bar">
@@ -1584,7 +1424,7 @@ john.doe → helpdesk-admins → IT Admins → Domain Admins
                   <div class="hop-rel">GenericWrite</div>
                   <div class="hop-arr">→</div>
                   <div class="hop-dst">svc_backup@CORP.LOCAL</div>
-                  <div class="hop-tip">Write any attribute → set SPN or abuse delegation-related attributes.</div>
+                  <div class="hop-tip">Write any attribute and move into a more privileged service account.</div>
                 </div>
                 <div class="hop-row">
                   <div class="hop-n">2.</div>
@@ -1630,23 +1470,15 @@ john.doe → helpdesk-admins → IT Admins → Domain Admins
                   <div class="hop-rel">HasSession</div>
                   <div class="hop-arr">→</div>
                   <div class="hop-dst t0">Domain Admins@CORP.LOCAL</div>
-                  <div class="hop-tip">Active privileged session exposes credentials or tokens for Tier-0 escalation.</div>
+                  <div class="hop-tip">Privileged session exposure completes the chain.</div>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <p style="margin-top:18px;">
-          The report includes a dark/light toggle, interactive path sections, and works as a single portable HTML file suitable for client delivery or internal review.
-        </p>
-      </section>
-
-      <hr class="divider" />
-
-      <section class="section" style="padding-bottom:0">
-        <div class="callout red" style="margin-top:0;">
-          <strong>Authorized use only.</strong> whippet is built for penetration testers and red teams operating under signed engagement agreements. Use it only on systems you have explicit written permission to test.
+        <div class="callout red" style="margin-top: 22px;">
+          <strong>Authorized use only.</strong> whippet is built for penetration testers and red teams operating under signed engagement agreements.
         </div>
       </section>
     </main>
@@ -1708,7 +1540,7 @@ john.doe → helpdesk-admins → IT Admins → Domain Admins
       });
 
       window.addEventListener("resize", function () {
-        if (window.innerWidth > 760) closeMobileNav();
+        if (window.innerWidth > 840) closeMobileNav();
       });
 
       document.querySelectorAll(".path-card").forEach((card) => {
@@ -1719,10 +1551,10 @@ john.doe → helpdesk-admins → IT Admins → Domain Admins
         head.setAttribute("role", "button");
         head.setAttribute("aria-expanded", card.classList.contains("open") ? "true" : "false");
 
-        const toggle = function () {
+        function toggle() {
           card.classList.toggle("open");
           head.setAttribute("aria-expanded", card.classList.contains("open") ? "true" : "false");
-        };
+        }
 
         head.addEventListener("click", toggle);
         head.addEventListener("keydown", function (e) {
