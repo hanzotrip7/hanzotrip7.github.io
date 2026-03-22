@@ -1,799 +1,1150 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>whippet — BloodHound Attack Path Synthesizer</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
-<style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>whippet — BloodHound Attack Path Synthesizer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    :root {
+      --bg: #09090b;
+      --bg2: #0f0f12;
+      --bg3: #141417;
+      --bg4: #1c1c22;
+      --border: #222228;
+      --border2: #2e2e38;
+      --text: #c8ccd4;
+      --text-mid: #8590a8;
+      --text-dim: #52576a;
+      --heading: #ffffff;
+      --red: #ff4040;
+      --green: #2eef82;
+      --yellow: #ffc83d;
+      --cyan: #3dd6f5;
+      --purple: #b87fff;
+      --orange: #ff7c3d;
+      --topbar-bg: rgba(9, 9, 11, 0.88);
+      --term-bg: #040507;
+      --grain-op: 0.42;
+      --sans: "DM Sans", sans-serif;
+      --mono: "DM Mono", monospace;
+      --display: "Syne", sans-serif;
+      --gutter: clamp(18px, 5vw, 56px);
+      --max-w: 860px;
+      --topbar-h: 52px;
+    }
 
-/* ════════════════════════════════════════
-   DESIGN TOKENS — dark (default)
-════════════════════════════════════════ */
-:root {
-  --bg:         #09090b;
-  --bg2:        #0f0f12;
-  --bg3:        #141417;
-  --bg4:        #1c1c22;
-  --border:     #222228;
-  --border2:    #2e2e38;
-  --text:       #c8ccd4;
-  --text-mid:   #8590a8;
-  --text-dim:   #52576a;
-  --heading:    #ffffff;
-  --red:        #ff4040;
-  --green:      #2eef82;
-  --yellow:     #ffc83d;
-  --cyan:       #3dd6f5;
-  --purple:     #b87fff;
-  --orange:     #ff7c3d;
-  --topbar-bg:  rgba(9,9,11,.88);
-  --term-bg:    #040507;
-  --grain-op:   0.42;
-  --sans:       'DM Sans', sans-serif;
-  --mono:       'DM Mono', monospace;
-  --display:    'Syne', sans-serif;
-  --gutter:     clamp(18px, 5vw, 56px);
-  --max-w:      860px;
-}
+    [data-theme="light"] {
+      --bg: #f5f5f7;
+      --bg2: #ffffff;
+      --bg3: #ebebef;
+      --bg4: #e0e0e6;
+      --border: #d8d8e0;
+      --border2: #c4c4d0;
+      --text: #2c2c38;
+      --text-mid: #5a5a72;
+      --text-dim: #8888a0;
+      --heading: #0d0d14;
+      --red: #d42020;
+      --green: #0a9e50;
+      --yellow: #b07a00;
+      --cyan: #0080a0;
+      --purple: #7030c0;
+      --orange: #c04820;
+      --topbar-bg: rgba(245, 245, 247, 0.88);
+      --term-bg: #1a1a22;
+      --grain-op: 0.12;
+    }
 
-/* ════════════════════════════════════════
-   LIGHT THEME OVERRIDES
-════════════════════════════════════════ */
-[data-theme="light"] {
-  --bg:         #f5f5f7;
-  --bg2:        #ffffff;
-  --bg3:        #ebebef;
-  --bg4:        #e0e0e6;
-  --border:     #d8d8e0;
-  --border2:    #c4c4d0;
-  --text:       #2c2c38;
-  --text-mid:   #5a5a72;
-  --text-dim:   #8888a0;
-  --heading:    #0d0d14;
-  --red:        #d42020;
-  --green:      #0a9e50;
-  --yellow:     #b07a00;
-  --cyan:       #0080a0;
-  --purple:     #7030c0;
-  --orange:     #c04820;
-  --topbar-bg:  rgba(245,245,247,.88);
-  --term-bg:    #1a1a22;
-  --grain-op:   0.12;
-}
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-/* ════════════════════════════════════════
-   BASE
-════════════════════════════════════════ */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+    html {
+      scroll-behavior: smooth;
+      -webkit-text-size-adjust: 100%;
+      scroll-padding-top: calc(var(--topbar-h) + 20px);
+    }
 
-body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: var(--sans);
-  font-size: clamp(14px, 1.8vw, 15px);
-  line-height: 1.78;
-  overflow-x: hidden;
-  -webkit-font-smoothing: antialiased;
-  transition: background .25s, color .25s;
-}
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: clamp(14px, 1.8vw, 15px);
+      line-height: 1.78;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      transition: background 0.25s, color 0.25s;
+    }
 
-/* grain — only on dark */
-body::before {
-  content: '';
-  position: fixed; inset: 0;
-  pointer-events: none;
-  z-index: 9000;
-  opacity: var(--grain-op);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='.05'/%3E%3C/svg%3E");
-}
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9000;
+      opacity: var(--grain-op);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='.05'/%3E%3C/svg%3E");
+    }
 
-::selection { background: rgba(46,239,130,.2); color: var(--heading); }
-::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+    ::selection {
+      background: rgba(46, 239, 130, 0.2);
+      color: var(--heading);
+    }
 
-/* ════════════════════════════════════════
-   TOPBAR
-════════════════════════════════════════ */
-.topbar {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  height: 52px;
-  background: var(--topbar-bg);
-  border-bottom: 1px solid var(--border);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  z-index: 600;
-  display: flex;
-  align-items: center;
-  padding: 0 var(--gutter);
-  gap: 12px;
-  transition: background .25s, border-color .25s;
-}
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
 
-.topbar-logo {
-  font-family: var(--display);
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--green);
-  white-space: nowrap;
-  flex-shrink: 0;
-  text-decoration: none;
-}
+    ::-webkit-scrollbar-track {
+      background: var(--bg);
+    }
 
-.topbar-nav {
-  display: flex;
-  gap: 2px;
-  flex: 1;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-.topbar-nav a {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--text-dim);
-  text-decoration: none;
-  padding: 5px 11px;
-  border-radius: 4px;
-  letter-spacing: .04em;
-  white-space: nowrap;
-  transition: color .15s, background .15s;
-}
-.topbar-nav a:hover { color: var(--text); background: var(--bg3); }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border2);
+      border-radius: 4px;
+    }
 
-/* ── theme toggle ── */
-.theme-btn {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  background: var(--bg3);
-  border: 1px solid var(--border2);
-  border-radius: 20px;
-  padding: 5px 12px 5px 8px;
-  cursor: pointer;
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--text-mid);
-  letter-spacing: .04em;
-  transition: border-color .2s, color .2s, background .2s;
-  white-space: nowrap;
-}
-.theme-btn:hover { border-color: var(--green); color: var(--text); }
+    a {
+      color: inherit;
+    }
 
-.toggle-track {
-  width: 28px; height: 16px;
-  background: var(--border2);
-  border-radius: 8px;
-  position: relative;
-  transition: background .25s;
-  flex-shrink: 0;
-}
-[data-theme="light"] .toggle-track { background: var(--green); }
+    :focus-visible {
+      outline: 2px solid var(--green);
+      outline-offset: 3px;
+      border-radius: 4px;
+    }
 
-.toggle-knob {
-  position: absolute;
-  top: 2px; left: 2px;
-  width: 12px; height: 12px;
-  border-radius: 50%;
-  background: #fff;
-  transition: transform .25s;
-  box-shadow: 0 1px 4px rgba(0,0,0,.3);
-}
-[data-theme="light"] .toggle-knob { transform: translateX(12px); }
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--topbar-h);
+      background: var(--topbar-bg);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      z-index: 600;
+      display: flex;
+      align-items: center;
+      padding: 0 var(--gutter);
+      gap: 12px;
+      transition: background 0.25s, border-color 0.25s;
+    }
 
-.theme-label { display: inline; }
+    .topbar-logo {
+      font-family: var(--display);
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--green);
+      white-space: nowrap;
+      flex-shrink: 0;
+      text-decoration: none;
+    }
 
-/* hamburger (mobile) */
-.hamburger {
-  display: none;
-  flex-direction: column;
-  justify-content: center;
-  gap: 5px;
-  width: 36px; height: 36px;
-  cursor: pointer;
-  background: none;
-  border: 1px solid var(--border2);
-  border-radius: 4px;
-  padding: 8px;
-  flex-shrink: 0;
-}
-.hamburger span {
-  display: block;
-  width: 100%; height: 1.5px;
-  background: var(--text-mid);
-  border-radius: 2px;
-  transition: all .2s;
-}
-.hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
-.hamburger.open span:nth-child(2) { opacity: 0; }
-.hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+    .topbar-nav {
+      display: flex;
+      gap: 2px;
+      flex: 1;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
 
-/* mobile drawer */
-.mobile-nav {
-  display: none;
-  position: fixed;
-  top: 52px; left: 0; right: 0;
-  background: var(--bg2);
-  border-bottom: 1px solid var(--border2);
-  padding: 10px var(--gutter);
-  z-index: 590;
-  flex-direction: column;
-  gap: 2px;
-}
-.mobile-nav.open { display: flex; }
-.mobile-nav a {
-  font-family: var(--mono);
-  font-size: 13px;
-  color: var(--text-mid);
-  text-decoration: none;
-  padding: 10px 12px;
-  border-radius: 4px;
-  letter-spacing: .04em;
-  transition: color .15s, background .15s;
-}
-.mobile-nav a:hover { color: var(--text); background: var(--bg3); }
+    .topbar-nav a {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-dim);
+      text-decoration: none;
+      padding: 5px 11px;
+      border-radius: 4px;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+      transition: color 0.15s, background 0.15s;
+    }
 
-/* ════════════════════════════════════════
-   HERO
-════════════════════════════════════════ */
-.hero {
-  position: relative;
-  min-height: 100svh;
-  display: flex;
-  align-items: center;
-  padding: clamp(80px, 12vw, 100px) var(--gutter) clamp(48px, 8vw, 72px);
-  overflow: hidden;
-  border-bottom: 1px solid var(--border);
-}
+    .topbar-nav a:hover {
+      color: var(--text);
+      background: var(--bg3);
+    }
 
-.hero-dots {
-  position: absolute; inset: 0;
-  background-image: radial-gradient(circle, rgba(46,239,130,.15) 1px, transparent 1px);
-  background-size: 36px 36px;
-  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent);
-  -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent);
-  animation: dotsBreath 6s ease-in-out infinite;
-  transition: opacity .3s;
-}
-[data-theme="light"] .hero-dots { opacity: .35; }
-@keyframes dotsBreath { 0%,100% { opacity:.3; } 50%{ opacity:.6; } }
+    .theme-btn {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      border-radius: 20px;
+      padding: 5px 12px 5px 8px;
+      cursor: pointer;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-mid);
+      letter-spacing: 0.04em;
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+      white-space: nowrap;
+    }
 
-.hero-orb {
-  position: absolute;
-  right: -15%; top: 50%;
-  transform: translateY(-50%);
-  width: min(650px, 110vw);
-  height: min(650px, 110vw);
-  border-radius: 50%;
-  background: radial-gradient(circle at center, rgba(255,64,64,.07) 0%, rgba(255,64,64,.02) 45%, transparent 70%);
-  pointer-events: none;
-}
+    .theme-btn:hover {
+      border-color: var(--green);
+      color: var(--text);
+    }
 
-.hero-inner { position: relative; z-index: 1; max-width: 660px; width: 100%; }
+    .toggle-track {
+      width: 28px;
+      height: 16px;
+      background: var(--border2);
+      border-radius: 8px;
+      position: relative;
+      transition: background 0.25s;
+      flex-shrink: 0;
+    }
 
-.hero-kicker {
-  font-family: var(--mono);
-  font-size: clamp(9px, 2vw, 11px);
-  letter-spacing: .22em;
-  text-transform: uppercase;
-  color: var(--green);
-  margin-bottom: clamp(14px, 2vw, 20px);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  animation: fadeUp .5s ease both;
-}
-.hero-kicker::before { content: ''; width: 24px; height: 1px; background: var(--green); flex-shrink: 0; }
+    [data-theme="light"] .toggle-track {
+      background: var(--green);
+    }
 
-.hero-title {
-  font-family: var(--display);
-  font-size: clamp(54px, 14vw, 118px);
-  font-weight: 800;
-  line-height: .91;
-  letter-spacing: -.025em;
-  color: var(--heading);
-  animation: fadeUp .5s .08s ease both;
-}
-.hero-title .slash { color: var(--red); }
+    .toggle-knob {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #fff;
+      transition: transform 0.25s;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    }
 
-.hero-desc {
-  margin-top: clamp(16px, 3vw, 24px);
-  font-size: clamp(14px, 2.2vw, 16px);
-  color: var(--text-mid);
-  line-height: 1.82;
-  max-width: 520px;
-  animation: fadeUp .5s .16s ease both;
-}
-.hero-desc strong { color: var(--text); font-weight: 500; }
+    [data-theme="light"] .toggle-knob {
+      transform: translateX(12px);
+    }
 
-.hero-pills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
-  margin-top: clamp(18px, 3vw, 26px);
-  animation: fadeUp .5s .22s ease both;
-}
-.pill {
-  font-family: var(--mono);
-  font-size: clamp(10px, 1.4vw, 11px);
-  padding: 4px 10px;
-  border-radius: 20px;
-  border: 1px solid;
-  letter-spacing: .04em;
-  white-space: nowrap;
-}
-.p-r { border-color: rgba(212,32,32,.35);  color: var(--red);    background: rgba(212,32,32,.06); }
-.p-g { border-color: rgba(46,239,130,.3);  color: var(--green);  background: rgba(46,239,130,.06); }
-.p-c { border-color: rgba(61,214,245,.3);  color: var(--cyan);   background: rgba(61,214,245,.06); }
-.p-p { border-color: rgba(184,127,255,.3); color: var(--purple); background: rgba(184,127,255,.06); }
-.p-y { border-color: rgba(255,200,61,.3);  color: var(--yellow); background: rgba(255,200,61,.06); }
+    .theme-label {
+      display: inline;
+    }
 
-.hero-quick {
-  display: flex;
-  flex-wrap: wrap;
-  gap: clamp(20px, 4vw, 32px);
-  margin-top: clamp(24px, 4vw, 36px);
-  animation: fadeUp .5s .28s ease both;
-}
-.hq-item { display: flex; flex-direction: column; gap: 3px; }
-.hq-val {
-  font-family: var(--display);
-  font-size: clamp(24px, 5vw, 32px);
-  font-weight: 700;
-  color: var(--heading);
-  line-height: 1;
-}
-.hq-lbl {
-  font-family: var(--mono);
-  font-size: clamp(8px, 1.4vw, 10px);
-  color: var(--text-dim);
-  letter-spacing: .15em;
-  text-transform: uppercase;
-}
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+      width: 36px;
+      height: 36px;
+      cursor: pointer;
+      background: none;
+      border: 1px solid var(--border2);
+      border-radius: 4px;
+      padding: 8px;
+      flex-shrink: 0;
+    }
 
-@keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+    .hamburger span {
+      display: block;
+      width: 100%;
+      height: 1.5px;
+      background: var(--text-mid);
+      border-radius: 2px;
+      transition: all 0.2s;
+    }
 
-/* ════════════════════════════════════════
-   PAGE / SECTIONS
-════════════════════════════════════════ */
-.page { max-width: var(--max-w); margin: 0 auto; padding: 0 var(--gutter); }
+    .hamburger.open span:nth-child(1) {
+      transform: translateY(6.5px) rotate(45deg);
+    }
 
-.section { padding: clamp(64px, 10vw, 96px) 0 0; }
+    .hamburger.open span:nth-child(2) {
+      opacity: 0;
+    }
 
-.sec-tag {
-  font-family: var(--mono);
-  font-size: clamp(9px, 1.5vw, 10px);
-  letter-spacing: .25em;
-  text-transform: uppercase;
-  color: var(--green);
-  margin-bottom: 12px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.sec-tag::before { content: '//'; opacity: .5; }
+    .hamburger.open span:nth-child(3) {
+      transform: translateY(-6.5px) rotate(-45deg);
+    }
 
-.sec-title {
-  font-family: var(--display);
-  font-size: clamp(28px, 6vw, 50px);
-  font-weight: 800;
-  color: var(--heading);
-  line-height: 1.05;
-  letter-spacing: -.025em;
-  margin-bottom: 18px;
-}
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      top: var(--topbar-h);
+      left: 0;
+      right: 0;
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border2);
+      padding: 10px var(--gutter);
+      z-index: 590;
+      flex-direction: column;
+      gap: 2px;
+    }
 
-.sec-lead {
-  font-size: clamp(14px, 2.2vw, 16px);
-  color: var(--text-mid);
-  line-height: 1.85;
-  max-width: 640px;
-  margin-bottom: clamp(28px, 5vw, 40px);
-  border-left: 2px solid var(--border2);
-  padding-left: 16px;
-}
+    .mobile-nav.open {
+      display: flex;
+    }
 
-p { color: var(--text); line-height: 1.8; margin-bottom: 14px; }
-p strong { color: var(--heading); }
-p em { color: var(--cyan); font-style: normal; }
+    .mobile-nav a {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--text-mid);
+      text-decoration: none;
+      padding: 10px 12px;
+      border-radius: 4px;
+      letter-spacing: 0.04em;
+      transition: color 0.15s, background 0.15s;
+    }
 
-hr.div {
-  border: none;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--border2) 25%, var(--border2) 75%, transparent);
-  margin: clamp(56px, 8vw, 80px) 0 0;
-}
+    .mobile-nav a:hover {
+      color: var(--text);
+      background: var(--bg3);
+    }
 
-code {
-  font-family: var(--mono);
-  font-size: .82em;
-  background: var(--bg3);
-  border: 1px solid var(--border2);
-  padding: 1px 6px;
-  border-radius: 3px;
-  color: var(--cyan);
-  word-break: break-all;
-}
+    .hero {
+      position: relative;
+      min-height: 100svh;
+      display: flex;
+      align-items: center;
+      padding: clamp(88px, 12vw, 108px) var(--gutter) clamp(48px, 8vw, 72px);
+      overflow: hidden;
+      border-bottom: 1px solid var(--border);
+    }
 
-/* ════════════════════════════════════════
-   TERMINAL BLOCK
-════════════════════════════════════════ */
-.term {
-  background: var(--term-bg);
-  border: 1px solid var(--border2);
-  border-radius: 8px;
-  overflow: hidden;
-  margin: clamp(20px, 3vw, 28px) 0;
-  box-shadow: 0 6px 32px rgba(0,0,0,.3);
-  transition: background .25s, border-color .25s;
-}
-.term-bar {
-  background: var(--bg3);
-  border-bottom: 1px solid var(--border);
-  padding: 9px 14px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: background .25s;
-}
-.td { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
-.td-r { background: #ff5f57; } .td-y { background: #febc2e; } .td-g { background: #28c840; }
-.term-title {
-  font-family: var(--mono);
-  font-size: clamp(9px, 1.4vw, 11px);
-  color: var(--text-dim);
-  flex: 1;
-  text-align: center;
-  letter-spacing: .04em;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.term-body {
-  padding: clamp(16px, 3vw, 22px) clamp(14px, 3vw, 22px);
-  font-family: var(--mono);
-  font-size: clamp(11px, 1.7vw, 12.5px);
-  line-height: 1.82;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  color: #7a8a9c;
-}
-[data-theme="light"] .term-body { color: #9ab; }
+    .hero-dots {
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle, rgba(46, 239, 130, 0.15) 1px, transparent 1px);
+      background-size: 36px 36px;
+      mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent);
+      -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black, transparent);
+      animation: dotsBreath 6s ease-in-out infinite;
+      transition: opacity 0.3s;
+    }
 
-.t-pr   { color: #2eef82; }
-.t-cmd  { color: #fff; }
-.t-ok   { color: #2eef82; }
-.t-info { color: #3dd6f5; }
-.t-grn  { color: #2eef82; }
-.t-red  { color: #ff6060; }
-.t-yw   { color: #ffc83d; }
-.t-cy   { color: #3dd6f5; }
-.t-pu   { color: #c090ff; }
-.t-or   { color: #ff9060; }
-.t-dim  { color: #505870; }
-.t-bold { color: #e8eaf0; font-weight: 600; }
-.t-cm   { color: #505870; font-style: italic; }
+    [data-theme="light"] .hero-dots {
+      opacity: 0.35;
+    }
 
-/* ════════════════════════════════════════
-   CALLOUT
-════════════════════════════════════════ */
-.callout {
-  padding: clamp(12px, 2vw, 16px) clamp(14px, 2.5vw, 20px);
-  border-radius: 6px;
-  margin: clamp(16px, 2.5vw, 22px) 0;
-  border-left: 3px solid;
-  font-size: clamp(13px, 1.8vw, 14px);
-  line-height: 1.7;
-}
-.c-green  { border-color: var(--green);  background: rgba(46,239,130,.06);  color: #5dbe8a; }
-.c-yellow { border-color: var(--yellow); background: rgba(255,200,61,.06);  color: #a88840; }
-.c-red    { border-color: var(--red);    background: rgba(212,32,32,.06);   color: #b05050; }
-.c-cyan   { border-color: var(--cyan);   background: rgba(61,214,245,.06);  color: #5090a0; }
-[data-theme="light"] .c-green  { color: #0a7040; }
-[data-theme="light"] .c-yellow { color: #7a5800; }
-[data-theme="light"] .c-red    { color: #900020; }
-[data-theme="light"] .c-cyan   { color: #005a78; }
-.callout strong { color: var(--heading); }
+    @keyframes dotsBreath {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 0.6; }
+    }
 
-/* ════════════════════════════════════════
-   COMMAND GRID
-════════════════════════════════════════ */
-.cmd-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr));
-  gap: 1px;
-  background: var(--border);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  overflow: hidden;
-  margin: clamp(18px, 3vw, 28px) 0;
-}
-.cmd-card {
-  background: var(--bg2);
-  padding: clamp(14px, 2.5vw, 20px) clamp(14px, 2.5vw, 22px);
-  transition: background .15s;
-}
-.cmd-card:hover { background: var(--bg3); }
-.cmd-name { font-family: var(--mono); font-size: clamp(11px, 1.7vw, 13px); color: var(--green); font-weight: 500; margin-bottom: 5px; }
-.cmd-desc { font-size: clamp(11px, 1.5vw, 12.5px); color: var(--text-dim); line-height: 1.55; }
+    .hero-orb {
+      position: absolute;
+      right: -15%;
+      top: 50%;
+      transform: translateY(-50%);
+      width: min(650px, 110vw);
+      height: min(650px, 110vw);
+      border-radius: 50%;
+      background: radial-gradient(circle at center, rgba(255, 64, 64, 0.07) 0%, rgba(255, 64, 64, 0.02) 45%, transparent 70%);
+      pointer-events: none;
+    }
 
-/* ════════════════════════════════════════
-   STAT ROW (report preview)
-════════════════════════════════════════ */
-.stat-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(78px, 1fr));
-  gap: 1px;
-  background: var(--border);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  overflow: hidden;
-  margin: clamp(16px, 3vw, 26px) 0;
-}
-.stat-card { background: var(--bg2); padding: clamp(12px, 2vw, 18px) clamp(10px, 1.5vw, 14px); transition: background .25s; }
-.stat-val { font-family: var(--display); font-size: clamp(20px, 4vw, 28px); font-weight: 700; line-height: 1; margin-bottom: 4px; }
-.stat-lbl { font-family: var(--mono); font-size: clamp(7px, 1.1vw, 9px); letter-spacing: .1em; text-transform: uppercase; color: var(--text-dim); }
-.sv-r { color: var(--red); }    .sv-g { color: var(--green); }  .sv-y { color: var(--yellow); }
-.sv-c { color: var(--cyan); }   .sv-p { color: var(--purple); } .sv-o { color: var(--orange); }
+    .hero-inner {
+      position: relative;
+      z-index: 1;
+      max-width: 660px;
+      width: 100%;
+    }
 
-/* ════════════════════════════════════════
-   REPORT PREVIEW
-════════════════════════════════════════ */
-.rp-shell {
-  background: var(--bg2);
-  border: 1px solid var(--border2);
-  border-radius: 8px;
-  overflow: hidden;
-  margin: clamp(20px, 3vw, 28px) 0;
-  box-shadow: 0 10px 40px rgba(0,0,0,.25);
-  transition: background .25s, border-color .25s;
-}
-.rp-titlebar {
-  background: var(--bg4);
-  border-bottom: 1px solid var(--border);
-  padding: 10px 16px;
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  transition: background .25s;
-}
-.rp-title-txt { font-family: var(--mono); font-size: 11px; color: var(--text-dim); margin-left: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.rp-body { padding: clamp(14px, 3vw, 22px); }
+    .hero-kicker {
+      font-family: var(--mono);
+      font-size: clamp(9px, 2vw, 11px);
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: clamp(14px, 2vw, 20px);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: fadeUp 0.5s ease both;
+    }
 
-.rp-nav {
-  display: flex;
-  gap: 2px;
-  flex-wrap: wrap;
-  margin-bottom: clamp(14px, 2vw, 20px);
-}
-.rp-nav-item {
-  font-family: var(--mono);
-  font-size: clamp(9px, 1.4vw, 11px);
-  padding: 5px 10px;
-  border-radius: 4px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--text-dim);
-  border: 1px solid transparent;
-  transition: all .12s;
-  white-space: nowrap;
-}
-.rp-nav-item:hover { background: var(--bg3); }
-.rp-nav-item.active { color: var(--green); background: rgba(46,239,130,.06); border-color: rgba(46,239,130,.15); }
-.rp-badge { font-size: 9px; padding: 1px 5px; border-radius: 8px; }
-.rb-danger { background: rgba(212,32,32,.15); color: var(--red); }
-.rb-warn   { background: rgba(255,200,61,.12); color: var(--yellow); }
+    .hero-kicker::before {
+      content: "";
+      width: 24px;
+      height: 1px;
+      background: var(--green);
+      flex-shrink: 0;
+    }
 
-/* ════════════════════════════════════════
-   PATH CARDS
-════════════════════════════════════════ */
-.path-card {
-  background: var(--bg2);
-  border: 1px solid var(--border2);
-  border-radius: 6px;
-  margin: 8px 0;
-  overflow: hidden;
-  transition: background .25s, border-color .25s;
-}
-.path-card:hover { border-color: var(--border2); }
-.path-head {
-  padding: clamp(10px, 1.8vw, 13px) clamp(12px, 2vw, 16px);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-  user-select: none;
-}
-.path-num { font-family: var(--mono); font-size: 11px; color: var(--text-dim); width: 22px; flex-shrink: 0; }
-.path-chain {
-  flex: 1; min-width: 0;
-  font-family: var(--mono);
-  font-size: clamp(10px, 1.5vw, 12px);
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-.path-meta { display: flex; gap: 7px; align-items: center; flex-shrink: 0; }
-.hops-tag {
-  font-family: var(--mono); font-size: 10px; color: var(--cyan);
-  background: rgba(61,214,245,.08); border: 1px solid rgba(61,214,245,.2);
-  padding: 2px 7px; border-radius: 3px; white-space: nowrap;
-}
-.noise-pips { display: flex; gap: 2px; }
-.np { width: 5px; height: 12px; border-radius: 1px; background: var(--border2); }
-.np-l { background: var(--green); } .np-m { background: var(--yellow); } .np-h { background: var(--red); }
-/* hide noise pips on small screens */
-@media(max-width:420px) { .noise-pips { display: none; } }
+    .hero-title {
+      font-family: var(--display);
+      font-size: clamp(54px, 14vw, 118px);
+      font-weight: 800;
+      line-height: 0.91;
+      letter-spacing: -0.025em;
+      color: var(--heading);
+      animation: fadeUp 0.5s 0.08s ease both;
+    }
 
-.path-chevron { color: var(--text-dim); font-size: 10px; transition: transform .2s; flex-shrink: 0; }
-.path-card.open .path-chevron { transform: rotate(90deg); }
-.path-body { display: none; border-top: 1px solid var(--border); padding: clamp(12px, 2vw, 16px); }
-.path-card.open .path-body { display: block; }
-.hop-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 5px 8px;
-  padding: 7px 0;
-  border-bottom: 1px solid var(--border);
-  font-family: var(--mono);
-  font-size: clamp(10px, 1.5vw, 12px);
-}
-.hop-row:last-child { border: none; }
-.hop-n   { color: var(--text-dim); width: 18px; flex-shrink: 0; }
-.hop-src { color: var(--yellow); }
-.hop-rel {
-  color: var(--cyan);
-  background: rgba(61,214,245,.07);
-  border: 1px solid rgba(61,214,245,.18);
-  padding: 1px 7px; border-radius: 3px;
-  white-space: nowrap; font-size: 11px;
-}
-.hop-arr { color: var(--text-dim); }
-.hop-dst { color: var(--text); }
-.hop-tip { color: var(--text-dim); font-size: clamp(10px, 1.4vw, 11px); width: 100%; padding-left: 26px; line-height: 1.5; }
-.n-src { color: var(--yellow); } .n-mid { color: var(--text); }
-.n-t0  { color: var(--red); font-weight: 600; } .n-arr { color: var(--text-dim); }
+    .hero-title .slash {
+      color: var(--red);
+    }
 
-/* ════════════════════════════════════════
-   OPSEC TABLE
-════════════════════════════════════════ */
-.table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: clamp(16px, 2.5vw, 22px) 0; }
-.opsec-table { width: 100%; min-width: 500px; border-collapse: collapse; font-size: clamp(11px, 1.6vw, 13px); }
-.opsec-table th {
-  text-align: left; padding: 8px 12px;
-  font-family: var(--mono); font-size: clamp(8px, 1.2vw, 9px); letter-spacing: .18em;
-  text-transform: uppercase; color: var(--text-dim);
-  border-bottom: 1px solid var(--border2); white-space: nowrap;
-}
-.opsec-table td {
-  padding: 9px 12px; border-bottom: 1px solid var(--border);
-  font-family: var(--mono); font-size: clamp(11px, 1.5vw, 12px); vertical-align: top;
-}
-.opsec-table tr:hover td { background: var(--bg3); }
-.opsec-table td:first-child { color: var(--cyan); white-space: nowrap; }
-.opsec-table td:nth-child(2) { color: var(--text-dim); }
-.opsec-table td:last-child   { color: var(--text-dim); font-size: 11px; white-space: nowrap; }
+    .hero-desc {
+      margin-top: clamp(16px, 3vw, 24px);
+      font-size: clamp(14px, 2.2vw, 16px);
+      color: var(--text-mid);
+      line-height: 1.82;
+      max-width: 520px;
+      animation: fadeUp 0.5s 0.16s ease both;
+    }
 
-/* ════════════════════════════════════════
-   WORKFLOW STEPS
-════════════════════════════════════════ */
-.steps { list-style: none; }
-.step-item {
-  display: flex;
-  gap: clamp(12px, 3vw, 20px);
-  padding: clamp(18px, 3vw, 24px) 0;
-  border-bottom: 1px solid var(--border);
-}
-.step-item:last-child { border: none; }
-.step-num {
-  font-family: var(--display);
-  font-size: clamp(26px, 5.5vw, 40px);
-  font-weight: 800;
-  color: var(--border2);
-  line-height: 1;
-  flex-shrink: 0;
-  width: clamp(38px, 7vw, 52px);
-  text-align: right;
-  transition: color .2s;
-}
-.step-item:hover .step-num { color: var(--green); }
-.step-content strong { display: block; color: var(--heading); font-size: clamp(14px, 2vw, 15px); font-weight: 600; margin-bottom: 4px; }
-.step-content p { font-size: clamp(12px, 1.7vw, 13.5px); color: var(--text-dim); margin: 0; line-height: 1.6; }
+    .hero-desc strong {
+      color: var(--text);
+      font-weight: 500;
+    }
 
-/* ════════════════════════════════════════
-   SUBHEAD
-════════════════════════════════════════ */
-.subhead {
-  font-family: var(--display);
-  font-weight: 700;
-  color: var(--heading);
-  font-size: clamp(15px, 2.8vw, 20px);
-  margin: clamp(36px, 5vw, 48px) 0 12px;
-  letter-spacing: -.015em;
-  display: flex;
-  align-items: baseline;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-.subhead .n { color: var(--green); }
+    .hero-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: clamp(18px, 3vw, 26px);
+      animation: fadeUp 0.5s 0.22s ease both;
+    }
 
-/* ════════════════════════════════════════
-   SCROLL REVEAL
-════════════════════════════════════════ */
-.reveal { opacity: 0; transform: translateY(18px); transition: opacity .55s ease, transform .55s ease; }
-.reveal.vis { opacity: 1; transform: translateY(0); }
+    .pill {
+      font-family: var(--mono);
+      font-size: clamp(10px, 1.4vw, 11px);
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1px solid;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
 
-/* ════════════════════════════════════════
-   FOOTER
-════════════════════════════════════════ */
-footer {
-  border-top: 1px solid var(--border);
-  padding: clamp(32px, 5vw, 48px) var(--gutter);
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  font-family: var(--mono);
-  font-size: clamp(10px, 1.5vw, 11px);
-  color: var(--text-dim);
-  max-width: var(--max-w);
-  margin: clamp(56px, 8vw, 80px) auto 0;
-  transition: border-color .25s;
-}
-footer .logo { font-family: var(--display); font-size: 15px; font-weight: 700; color: var(--green); }
+    .p-r { border-color: rgba(212, 32, 32, 0.35); color: var(--red); background: rgba(212, 32, 32, 0.06); }
+    .p-g { border-color: rgba(46, 239, 130, 0.3); color: var(--green); background: rgba(46, 239, 130, 0.06); }
+    .p-c { border-color: rgba(61, 214, 245, 0.3); color: var(--cyan); background: rgba(61, 214, 245, 0.06); }
+    .p-p { border-color: rgba(184, 127, 255, 0.3); color: var(--purple); background: rgba(184, 127, 255, 0.06); }
+    .p-y { border-color: rgba(255, 200, 61, 0.3); color: var(--yellow); background: rgba(255, 200, 61, 0.06); }
 
-/* ════════════════════════════════════════
-   RESPONSIVE — TABLET / MOBILE
-════════════════════════════════════════ */
-@media (max-width: 680px) {
-  /* hide desktop nav, show hamburger */
-  .topbar-nav { display: none; }
-  .hamburger  { display: flex; }
+    .hero-quick {
+      display: flex;
+      flex-wrap: wrap;
+      gap: clamp(20px, 4vw, 32px);
+      margin-top: clamp(24px, 4vw, 36px);
+      animation: fadeUp 0.5s 0.28s ease both;
+    }
 
-  /* hide theme label text on very small screens */
-  .theme-label { display: none; }
+    .hq-item {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
 
-  /* cmd grid single column */
-  .cmd-grid { grid-template-columns: 1fr; }
+    .hq-val {
+      font-family: var(--display);
+      font-size: clamp(24px, 5vw, 32px);
+      font-weight: 700;
+      color: var(--heading);
+      line-height: 1;
+    }
 
-  /* report nav wraps freely */
-  .rp-nav { gap: 3px; }
+    .hq-lbl {
+      font-family: var(--mono);
+      font-size: clamp(8px, 1.4vw, 10px);
+      color: var(--text-dim);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
 
-  /* footer stack */
-  footer { flex-direction: column; text-align: center; }
-}
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
-@media (max-width: 400px) {
-  .hero-title { font-size: clamp(44px, 18vw, 64px); }
-  .path-meta .hops-tag { display: none; }
-}
+    .page {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 var(--gutter);
+    }
 
-/* print */
-@media print {
-  .topbar, .hamburger, .mobile-nav, .hero-dots, .hero-orb, body::before { display: none !important; }
-  .hero { min-height: auto; padding-top: 24px; }
-  .path-body { display: block !important; }
-  .reveal { opacity: 1 !important; transform: none !important; }
-  body { font-size: 12px; }
-}
+    .section {
+      padding: clamp(64px, 10vw, 96px) 0 0;
+    }
 
-</style>
+    .section[id] {
+      scroll-margin-top: calc(var(--topbar-h) + 20px);
+    }
+
+    .sec-tag {
+      font-family: var(--mono);
+      font-size: clamp(9px, 1.5vw, 10px);
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--green);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .sec-tag::before {
+      content: "//";
+      opacity: 0.5;
+    }
+
+    .sec-title {
+      font-family: var(--display);
+      font-size: clamp(28px, 6vw, 50px);
+      font-weight: 800;
+      color: var(--heading);
+      line-height: 1.05;
+      letter-spacing: -0.025em;
+      margin-bottom: 18px;
+    }
+
+    .sec-lead {
+      font-size: clamp(14px, 2.2vw, 16px);
+      color: var(--text-mid);
+      line-height: 1.85;
+      max-width: 640px;
+      margin-bottom: clamp(28px, 5vw, 40px);
+      border-left: 2px solid var(--border2);
+      padding-left: 16px;
+    }
+
+    p {
+      color: var(--text);
+      line-height: 1.8;
+      margin-bottom: 14px;
+    }
+
+    p strong {
+      color: var(--heading);
+    }
+
+    p em {
+      color: var(--cyan);
+      font-style: normal;
+    }
+
+    hr.div {
+      border: none;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border2) 25%, var(--border2) 75%, transparent);
+      margin: clamp(56px, 8vw, 80px) 0 0;
+    }
+
+    code {
+      font-family: var(--mono);
+      font-size: 0.82em;
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      padding: 1px 6px;
+      border-radius: 3px;
+      color: var(--cyan);
+      word-break: break-word;
+    }
+
+    .term {
+      background: var(--term-bg);
+      border: 1px solid var(--border2);
+      border-radius: 8px;
+      overflow: hidden;
+      margin: clamp(20px, 3vw, 28px) 0;
+      box-shadow: 0 6px 32px rgba(0, 0, 0, 0.3);
+      transition: background 0.25s, border-color 0.25s;
+    }
+
+    .term-bar {
+      background: var(--bg3);
+      border-bottom: 1px solid var(--border);
+      padding: 9px 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.25s;
+    }
+
+    .td {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .td-r { background: #ff5f57; }
+    .td-y { background: #febc2e; }
+    .td-g { background: #28c840; }
+
+    .term-title {
+      font-family: var(--mono);
+      font-size: clamp(9px, 1.4vw, 11px);
+      color: var(--text-dim);
+      flex: 1;
+      text-align: center;
+      letter-spacing: 0.04em;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .term-body {
+      padding: clamp(16px, 3vw, 22px) clamp(14px, 3vw, 22px);
+      font-family: var(--mono);
+      font-size: clamp(11px, 1.7vw, 12.5px);
+      line-height: 1.82;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      color: #7a8a9c;
+      white-space: pre-wrap;
+      word-break: normal;
+      overflow-wrap: anywhere;
+    }
+
+    [data-theme="light"] .term-body {
+      color: #9ab;
+    }
+
+    .t-pr   { color: #2eef82; }
+    .t-cmd  { color: #fff; }
+    .t-ok   { color: #2eef82; }
+    .t-info { color: #3dd6f5; }
+    .t-grn  { color: #2eef82; }
+    .t-red  { color: #ff6060; }
+    .t-yw   { color: #ffc83d; }
+    .t-cy   { color: #3dd6f5; }
+    .t-pu   { color: #c090ff; }
+    .t-or   { color: #ff9060; }
+    .t-dim  { color: #505870; }
+    .t-bold { color: #e8eaf0; font-weight: 600; }
+    .t-cm   { color: #505870; font-style: italic; }
+
+    .callout {
+      padding: clamp(12px, 2vw, 16px) clamp(14px, 2.5vw, 20px);
+      border-radius: 6px;
+      margin: clamp(16px, 2.5vw, 22px) 0;
+      border-left: 3px solid;
+      font-size: clamp(13px, 1.8vw, 14px);
+      line-height: 1.7;
+    }
+
+    .c-green  { border-color: var(--green);  background: rgba(46, 239, 130, 0.06); color: #5dbe8a; }
+    .c-yellow { border-color: var(--yellow); background: rgba(255, 200, 61, 0.06); color: #a88840; }
+    .c-red    { border-color: var(--red);    background: rgba(212, 32, 32, 0.06); color: #b05050; }
+    .c-cyan   { border-color: var(--cyan);   background: rgba(61, 214, 245, 0.06); color: #5090a0; }
+
+    [data-theme="light"] .c-green  { color: #0a7040; }
+    [data-theme="light"] .c-yellow { color: #7a5800; }
+    [data-theme="light"] .c-red    { color: #900020; }
+    [data-theme="light"] .c-cyan   { color: #005a78; }
+
+    .callout strong {
+      color: var(--heading);
+    }
+
+    .cmd-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      margin: clamp(18px, 3vw, 28px) 0;
+    }
+
+    .cmd-card {
+      background: var(--bg2);
+      padding: clamp(14px, 2.5vw, 20px) clamp(14px, 2.5vw, 22px);
+      transition: background 0.15s;
+    }
+
+    .cmd-card:hover {
+      background: var(--bg3);
+    }
+
+    .cmd-name {
+      font-family: var(--mono);
+      font-size: clamp(11px, 1.7vw, 13px);
+      color: var(--green);
+      font-weight: 500;
+      margin-bottom: 5px;
+    }
+
+    .cmd-desc {
+      font-size: clamp(11px, 1.5vw, 12.5px);
+      color: var(--text-dim);
+      line-height: 1.55;
+    }
+
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(78px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      margin: clamp(16px, 3vw, 26px) 0;
+    }
+
+    .stat-card {
+      background: var(--bg2);
+      padding: clamp(12px, 2vw, 18px) clamp(10px, 1.5vw, 14px);
+      transition: background 0.25s;
+    }
+
+    .stat-val {
+      font-family: var(--display);
+      font-size: clamp(20px, 4vw, 28px);
+      font-weight: 700;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .stat-lbl {
+      font-family: var(--mono);
+      font-size: clamp(7px, 1.1vw, 9px);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    .sv-r { color: var(--red); }
+    .sv-g { color: var(--green); }
+    .sv-y { color: var(--yellow); }
+    .sv-c { color: var(--cyan); }
+    .sv-p { color: var(--purple); }
+    .sv-o { color: var(--orange); }
+
+    .rp-shell {
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: 8px;
+      overflow: hidden;
+      margin: clamp(20px, 3vw, 28px) 0;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+      transition: background 0.25s, border-color 0.25s;
+    }
+
+    .rp-titlebar {
+      background: var(--bg4);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      transition: background 0.25s;
+    }
+
+    .rp-title-txt {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-dim);
+      margin-left: 4px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .rp-body {
+      padding: clamp(14px, 3vw, 22px);
+    }
+
+    .rp-nav {
+      display: flex;
+      gap: 2px;
+      flex-wrap: wrap;
+      margin-bottom: clamp(14px, 2vw, 20px);
+    }
+
+    .rp-nav-item {
+      font-family: var(--mono);
+      font-size: clamp(9px, 1.4vw, 11px);
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-dim);
+      border: 1px solid transparent;
+      transition: all 0.12s;
+      white-space: nowrap;
+    }
+
+    .rp-nav-item:hover {
+      background: var(--bg3);
+    }
+
+    .rp-nav-item.active {
+      color: var(--green);
+      background: rgba(46, 239, 130, 0.06);
+      border-color: rgba(46, 239, 130, 0.15);
+    }
+
+    .rp-badge {
+      font-size: 9px;
+      padding: 1px 5px;
+      border-radius: 8px;
+    }
+
+    .rb-danger { background: rgba(212, 32, 32, 0.15); color: var(--red); }
+    .rb-warn   { background: rgba(255, 200, 61, 0.12); color: var(--yellow); }
+
+    .path-card {
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: 6px;
+      margin: 8px 0;
+      overflow: hidden;
+      transition: background 0.25s, border-color 0.25s;
+    }
+
+    .path-card:hover {
+      border-color: var(--border2);
+    }
+
+    .path-head {
+      padding: clamp(10px, 1.8vw, 13px) clamp(12px, 2vw, 16px);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .path-num {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-dim);
+      width: 22px;
+      flex-shrink: 0;
+    }
+
+    .path-chain {
+      flex: 1;
+      min-width: 0;
+      font-family: var(--mono);
+      font-size: clamp(10px, 1.5vw, 12px);
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .path-meta {
+      display: flex;
+      gap: 7px;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .hops-tag {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--cyan);
+      background: rgba(61, 214, 245, 0.08);
+      border: 1px solid rgba(61, 214, 245, 0.2);
+      padding: 2px 7px;
+      border-radius: 3px;
+      white-space: nowrap;
+    }
+
+    .noise-pips {
+      display: flex;
+      gap: 2px;
+    }
+
+    .np {
+      width: 5px;
+      height: 12px;
+      border-radius: 1px;
+      background: var(--border2);
+    }
+
+    .np-l { background: var(--green); }
+    .np-m { background: var(--yellow); }
+    .np-h { background: var(--red); }
+
+    .path-chevron {
+      color: var(--text-dim);
+      font-size: 10px;
+      transition: transform 0.2s;
+      flex-shrink: 0;
+    }
+
+    .path-card.open .path-chevron {
+      transform: rotate(90deg);
+    }
+
+    .path-body {
+      display: none;
+      border-top: 1px solid var(--border);
+      padding: clamp(12px, 2vw, 16px);
+    }
+
+    .path-card.open .path-body {
+      display: block;
+    }
+
+    .hop-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 5px 8px;
+      padding: 7px 0;
+      border-bottom: 1px solid var(--border);
+      font-family: var(--mono);
+      font-size: clamp(10px, 1.5vw, 12px);
+    }
+
+    .hop-row:last-child {
+      border: none;
+    }
+
+    .hop-n   { color: var(--text-dim); width: 18px; flex-shrink: 0; }
+    .hop-src { color: var(--yellow); }
+    .hop-rel {
+      color: var(--cyan);
+      background: rgba(61, 214, 245, 0.07);
+      border: 1px solid rgba(61, 214, 245, 0.18);
+      padding: 1px 7px;
+      border-radius: 3px;
+      white-space: nowrap;
+      font-size: 11px;
+    }
+    .hop-arr { color: var(--text-dim); }
+    .hop-dst { color: var(--text); }
+    .hop-tip {
+      color: var(--text-dim);
+      font-size: clamp(10px, 1.4vw, 11px);
+      width: 100%;
+      padding-left: 26px;
+      line-height: 1.5;
+    }
+
+    .n-src { color: var(--yellow); }
+    .n-mid { color: var(--text); }
+    .n-t0  { color: var(--red); font-weight: 600; }
+    .n-arr { color: var(--text-dim); }
+
+    .table-scroll {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin: clamp(16px, 2.5vw, 22px) 0;
+    }
+
+    .opsec-table {
+      width: 100%;
+      min-width: 500px;
+      border-collapse: collapse;
+      font-size: clamp(11px, 1.6vw, 13px);
+    }
+
+    .opsec-table th {
+      text-align: left;
+      padding: 8px 12px;
+      font-family: var(--mono);
+      font-size: clamp(8px, 1.2vw, 9px);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      border-bottom: 1px solid var(--border2);
+      white-space: nowrap;
+    }
+
+    .opsec-table td {
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--border);
+      font-family: var(--mono);
+      font-size: clamp(11px, 1.5vw, 12px);
+      vertical-align: top;
+    }
+
+    .opsec-table tr:hover td {
+      background: var(--bg3);
+    }
+
+    .opsec-table td:first-child {
+      color: var(--cyan);
+      white-space: nowrap;
+    }
+
+    .opsec-table td:nth-child(2) {
+      color: var(--text-dim);
+    }
+
+    .opsec-table td:last-child {
+      color: var(--text-dim);
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .steps {
+      list-style: none;
+    }
+
+    .step-item {
+      display: flex;
+      gap: clamp(12px, 3vw, 20px);
+      padding: clamp(18px, 3vw, 24px) 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .step-item:last-child {
+      border: none;
+    }
+
+    .step-num {
+      font-family: var(--display);
+      font-size: clamp(26px, 5.5vw, 40px);
+      font-weight: 800;
+      color: var(--border2);
+      line-height: 1;
+      flex-shrink: 0;
+      width: clamp(38px, 7vw, 52px);
+      text-align: right;
+      transition: color 0.2s;
+    }
+
+    .step-item:hover .step-num {
+      color: var(--green);
+    }
+
+    .step-content strong {
+      display: block;
+      color: var(--heading);
+      font-size: clamp(14px, 2vw, 15px);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .step-content p {
+      font-size: clamp(12px, 1.7vw, 13.5px);
+      color: var(--text-dim);
+      margin: 0;
+      line-height: 1.6;
+    }
+
+    .subhead {
+      font-family: var(--display);
+      font-weight: 700;
+      color: var(--heading);
+      font-size: clamp(15px, 2.8vw, 20px);
+      margin: clamp(36px, 5vw, 48px) 0 12px;
+      letter-spacing: -0.015em;
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .subhead .n {
+      color: var(--green);
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.55s ease, transform 0.55s ease;
+    }
+
+    .reveal.vis {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: clamp(32px, 5vw, 48px) var(--gutter);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      font-family: var(--mono);
+      font-size: clamp(10px, 1.5vw, 11px);
+      color: var(--text-dim);
+      max-width: var(--max-w);
+      margin: clamp(56px, 8vw, 80px) auto 0;
+      transition: border-color 0.25s;
+    }
+
+    footer .logo {
+      font-family: var(--display);
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--green);
+    }
+
+    @media (max-width: 680px) {
+      .topbar-nav { display: none; }
+      .hamburger  { display: flex; }
+      .theme-label { display: none; }
+      .cmd-grid { grid-template-columns: 1fr; }
+      .rp-nav { gap: 3px; }
+      footer { flex-direction: column; text-align: center; }
+    }
+
+    @media (max-width: 520px) {
+      .path-head {
+        align-items: flex-start;
+      }
+
+      .path-chain {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+        line-height: 1.55;
+      }
+
+      .path-meta {
+        align-self: center;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .noise-pips { display: none; }
+    }
+
+    @media (max-width: 400px) {
+      .hero-title { font-size: clamp(44px, 18vw, 64px); }
+      .path-meta .hops-tag { display: none; }
+    }
+
+    @media print {
+      .topbar, .hamburger, .mobile-nav, .hero-dots, .hero-orb, body::before { display: none !important; }
+      .hero { min-height: auto; padding-top: 24px; }
+      .path-body { display: block !important; }
+      .reveal { opacity: 1 !important; transform: none !important; }
+      body { font-size: 12px; }
+    }
+  </style>
 </head>
 <body>
+  <nav class="topbar">
+    <a class="topbar-logo" href="#">🩸 whippet</a>
 
-<!-- ══ TOPBAR ══ -->
-<nav class="topbar">
-  <a class="topbar-logo" href="#">🩸 whippet</a>
+    <div class="topbar-nav">
+      <a href="#getting-started">Install</a>
+      <a href="#commands">Commands</a>
+      <a href="#workflows">Workflows</a>
+      <a href="#opsec">OPSEC</a>
+      <a href="#report">Report</a>
+    </div>
 
-  <div class="topbar-nav">
+    <button class="theme-btn" id="themeBtn" type="button" aria-label="Toggle light or dark mode" aria-pressed="false">
+      <div class="toggle-track"><div class="toggle-knob"></div></div>
+      <span class="theme-label" id="themeLabel">Light mode</span>
+    </button>
+
+    <button class="hamburger" id="burger" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="mobileNav">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <div class="mobile-nav" id="mobileNav">
     <a href="#getting-started">Install</a>
     <a href="#commands">Commands</a>
     <a href="#workflows">Workflows</a>
@@ -801,70 +1152,47 @@ footer .logo { font-family: var(--display); font-size: 15px; font-weight: 700; c
     <a href="#report">Report</a>
   </div>
 
-  <!-- theme toggle -->
-  <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" aria-label="Toggle light/dark mode">
-    <div class="toggle-track"><div class="toggle-knob"></div></div>
-    <span class="theme-label" id="themeLabel">Light mode</span>
-  </button>
-
-  <!-- hamburger (mobile) -->
-  <button class="hamburger" id="burger" onclick="toggleMobileNav()" aria-label="Open navigation">
-    <span></span><span></span><span></span>
-  </button>
-</nav>
-
-<!-- mobile nav drawer -->
-<div class="mobile-nav" id="mobileNav">
-  <a href="#getting-started" onclick="closeMobileNav()">Install</a>
-  <a href="#commands"        onclick="closeMobileNav()">Commands</a>
-  <a href="#workflows"       onclick="closeMobileNav()">Workflows</a>
-  <a href="#opsec"           onclick="closeMobileNav()">OPSEC</a>
-  <a href="#report"          onclick="closeMobileNav()">Report</a>
-</div>
-
-<!-- ══ HERO ══ -->
-<header class="hero">
-  <div class="hero-dots"></div>
-  <div class="hero-orb"></div>
-  <div class="hero-inner">
-    <div class="hero-kicker">Technical Overview · v10.0.0</div>
-    <h1 class="hero-title">WHIP<span class="slash">PET</span></h1>
-    <p class="hero-desc">
-      A <strong>pure-Python</strong> BloodHound attack path synthesizer.
-      No GUI. No BloodHound server. Drop your collection files in and get
-      <strong>ranked attack paths, blast radius analysis</strong>, and a
-      self-contained HTML report — straight from your terminal.
-    </p>
-    <div class="hero-pills">
-      <span class="pill p-r">Active Directory</span>
-      <span class="pill p-g">SharpHound v5/v6</span>
-      <span class="pill p-c">AzureHound</span>
-      <span class="pill p-p">ADCS · ESC1–ESC9</span>
-      <span class="pill p-y">BloodHound CE</span>
-      <span class="pill p-r">DCSync</span>
-      <span class="pill p-g">Kerberoast</span>
-      <span class="pill p-c">Blast Radius</span>
+  <header class="hero">
+    <div class="hero-dots"></div>
+    <div class="hero-orb"></div>
+    <div class="hero-inner">
+      <div class="hero-kicker">Technical Overview · v10.0.0</div>
+      <h1 class="hero-title">WHIP<span class="slash">PET</span></h1>
+      <p class="hero-desc">
+        A <strong>pure-Python</strong> BloodHound attack path synthesizer.
+        No GUI. No BloodHound server. Drop your collection files in and get
+        <strong>ranked attack paths, blast radius analysis</strong>, and a
+        self-contained HTML report — straight from your terminal.
+      </p>
+      <div class="hero-pills">
+        <span class="pill p-r">Active Directory</span>
+        <span class="pill p-g">SharpHound v5/v6</span>
+        <span class="pill p-c">AzureHound</span>
+        <span class="pill p-p">ADCS · ESC1–ESC9</span>
+        <span class="pill p-y">BloodHound CE</span>
+        <span class="pill p-r">DCSync</span>
+        <span class="pill p-g">Kerberoast</span>
+        <span class="pill p-c">Blast Radius</span>
+      </div>
+      <div class="hero-quick">
+        <div class="hq-item"><div class="hq-val" style="color:var(--green)">85</div><div class="hq-lbl">Rel. Types</div></div>
+        <div class="hq-item"><div class="hq-val" style="color:var(--cyan)">17</div><div class="hq-lbl">Commands</div></div>
+        <div class="hq-item"><div class="hq-val" style="color:var(--red)">0</div><div class="hq-lbl">Dependencies</div></div>
+        <div class="hq-item"><div class="hq-val" style="color:var(--yellow)">3</div><div class="hq-lbl">Platforms</div></div>
+      </div>
     </div>
-    <div class="hero-quick">
-      <div class="hq-item"><div class="hq-val" style="color:var(--green)">85</div><div class="hq-lbl">Rel. Types</div></div>
-      <div class="hq-item"><div class="hq-val" style="color:var(--cyan)">17</div><div class="hq-lbl">Commands</div></div>
-      <div class="hq-item"><div class="hq-val" style="color:var(--red)">0</div><div class="hq-lbl">Dependencies</div></div>
-      <div class="hq-item"><div class="hq-val" style="color:var(--yellow)">3</div><div class="hq-lbl">Platforms</div></div>
-    </div>
-  </div>
-</header>
+  </header>
 
-<div class="page">
+  <div class="page">
 
-<!-- ══ GETTING STARTED ══ -->
-<section class="section reveal" id="getting-started">
-  <div class="sec-tag">Getting Started</div>
-  <h2 class="sec-title">Up and running<br>in 30 seconds</h2>
-  <p class="sec-lead">Python 3.8 or later. No pip packages required for core functionality. One optional install unlocks network chokepoint analysis.</p>
+    <section class="section reveal" id="getting-started">
+      <div class="sec-tag">Getting Started</div>
+      <h2 class="sec-title">Up and running<br>in 30 seconds</h2>
+      <p class="sec-lead">Python 3.8 or later. No pip packages required for core functionality. One optional install unlocks network chokepoint analysis.</p>
 
-  <div class="term">
-    <div class="term-bar"><div class="td td-r"></div><div class="td td-y"></div><div class="td td-g"></div><div class="term-title">bash</div></div>
-    <div class="term-body">
+      <div class="term">
+        <div class="term-bar"><div class="td td-r"></div><div class="td td-y"></div><div class="td td-g"></div><div class="term-title">bash</div></div>
+        <div class="term-body">
 <span class="t-cm"># Optional — enables the chokepoints command</span>
 <span class="t-pr">$</span> <span class="t-cmd">pip install networkx</span>
 
@@ -873,22 +1201,23 @@ footer .logo { font-family: var(--display); font-size: 15px; font-weight: 700; c
 
 <span class="t-bold">╔══════════════════════════════════════════════════════════════════╗
 ║ 🩸 whippet v10.0.0 — BloodHound Attack Path Synthesizer          ║
-║   Author: hanzotrip7                                               ║
+║   Author: hanzotrip7                                             ║
 ╚══════════════════════════════════════════════════════════════════╝</span>
 
 <span class="t-info">  ℹ  Demo mode — enterprise graph loaded</span>
-<span class="t-ok">  ✓  Graph ready — 13 nodes, 14 edges</span></div>
-  </div>
+<span class="t-ok">  ✓  Graph ready — 13 nodes, 14 edges</span>
+        </div>
+      </div>
 
-  <p>If you see the banner and a node count, you're ready. Now point it at your collection files. whippet auto-detects the format — <strong>SharpHound v5/v6</strong>, <strong>BloodHound CE exports</strong>, and <strong>AzureHound</strong> all work without any flags or configuration.</p>
+      <p>If you see the banner and a node count, you're ready. Now point it at your collection files. whippet auto-detects the format — <strong>SharpHound v5/v6</strong>, <strong>BloodHound CE exports</strong>, and <strong>AzureHound</strong> all work without any flags or configuration.</p>
 
-  <div class="term">
-    <div class="term-bar"><div class="td td-r"></div><div class="td td-y"></div><div class="td td-g"></div><div class="term-title">bash — loading your collection</div></div>
-    <div class="term-body">
+      <div class="term">
+        <div class="term-bar"><div class="td td-r"></div><div class="td td-y"></div><div class="td td-g"></div><div class="term-title">bash — loading your collection</div></div>
+        <div class="term-body">
 <span class="t-cm"># SharpHound — point at the whole directory</span>
 <span class="t-pr">$</span> <span class="t-cmd">python3 whippet.py -d /loot/collections/*.json --cmd info</span>
 
-<span class="t-info">  ℹ  Detected collection files — merging...</span>
+<span class="t-info">  ℹ  Detected collection files — merging…</span>
 <span class="t-ok">  ✓  20231103_computers.json     →  412  Computer node(s)</span>
 <span class="t-ok">  ✓  20231103_users.json         →  2,841  User node(s)</span>
 <span class="t-ok">  ✓  20231103_groups.json        →  318  Group node(s)</span>
@@ -901,62 +1230,60 @@ footer .logo { font-family: var(--display); font-size: 15px; font-weight: 700; c
 <span class="t-pr">$</span> <span class="t-cmd">python3 whippet.py -d /loot/sharphound/*.json /loot/azurehound.json --cmd info</span>
 
 <span class="t-ok">  ✓  AzureHound: 891 nodes, 4,203 edges from azurehound.json</span>
-<span class="t-ok">  ✓  Merged 4,533 nodes, 26,050 edges from 7 file(s)</span></div>
-  </div>
+<span class="t-ok">  ✓  Merged 4,533 nodes, 26,050 edges from 7 file(s)</span>
+        </div>
+      </div>
 
-  <div class="callout c-yellow"><strong>Common gotcha:</strong> Always include your <code>*_domains.json</code> file in the glob. Domain nodes anchor the Tier-0 detection system. Without them, proximity scoring and most analysis commands return zero results.</div>
-</section>
+      <div class="callout c-yellow"><strong>Common gotcha:</strong> Always include your <code>*_domains.json</code> file in the glob. Domain nodes anchor the Tier-0 detection system. Without them, proximity scoring and most analysis commands return zero results.</div>
+    </section>
 
-<hr class="div">
+    <hr class="div">
 
-<!-- ══ COMMANDS ══ -->
-<section class="section reveal" id="commands">
-  <div class="sec-tag">Command Reference</div>
-  <h2 class="sec-title">17 commands.<br>Every angle covered.</h2>
-  <p class="sec-lead">Every command outputs directly to the terminal. Add <code>--format json --out file.json</code> to any of them for structured output you can pipe elsewhere.</p>
+    <section class="section reveal" id="commands">
+      <div class="sec-tag">Command Reference</div>
+      <h2 class="sec-title">17 commands.<br>Every angle covered.</h2>
+      <p class="sec-lead">Every command outputs directly to the terminal. Add <code>--format json --out file.json</code> to any of them for structured output you can pipe elsewhere.</p>
 
-  <div class="cmd-grid">
-    <div class="cmd-card"><div class="cmd-name">info</div><div class="cmd-desc">Graph summary and all primitive counts. Run this first on every engagement to confirm data loaded correctly.</div></div>
-    <div class="cmd-card"><div class="cmd-name">bulk</div><div class="cmd-desc">Every enabled user with a path to Tier-0, sorted by hop count. Your fastest prioritized target list.</div></div>
-    <div class="cmd-card"><div class="cmd-name">kerberoast</div><div class="cmd-desc">SPN-bearing accounts sorted by hops to T0. Focus on accounts at 1–2 hops — ignore ∞.</div></div>
-    <div class="cmd-card"><div class="cmd-name">asreproast</div><div class="cmd-desc">Pre-auth disabled accounts. No credentials required to request the hash.</div></div>
-    <div class="cmd-card"><div class="cmd-name">dcsync</div><div class="cmd-desc">Direct and transitive DCSync rights. Transitive paths up to 6 hops deep, full chain shown.</div></div>
-    <div class="cmd-card"><div class="cmd-name">laps</div><div class="cmd-desc">LAPS readers and which machines they control. Flags readers whose machines reach T0.</div></div>
-    <div class="cmd-card"><div class="cmd-name">acl</div><div class="cmd-desc">All ACL abuse paths to Tier-0 across 13 relationship types.</div></div>
-    <div class="cmd-card"><div class="cmd-name">delegation</div><div class="cmd-desc">Unconstrained, constrained, and RBCD delegation chains with exploitation notes.</div></div>
-    <div class="cmd-card"><div class="cmd-name">adcs</div><div class="cmd-desc">Certificate template abuse paths classified by ESC type — ESC1 through ESC9.</div></div>
-    <div class="cmd-card"><div class="cmd-name">azure</div><div class="cmd-desc">Azure / Entra ID attack paths across 38 cloud relationship types.</div></div>
-    <div class="cmd-card"><div class="cmd-name">paths</div><div class="cmd-desc">Top-K ranked attack paths between any two nodes. Scored, noise-rated, with per-hop abuse tips.</div></div>
-    <div class="cmd-card"><div class="cmd-name">simulate</div><div class="cmd-desc">Step-by-step narrative on the best path. Flags high-noise steps with suggested alternatives.</div></div>
-    <div class="cmd-card"><div class="cmd-name">owned</div><div class="cmd-desc">Tier-0 reachability from a single owned node with full hop chains.</div></div>
-    <div class="cmd-card"><div class="cmd-name">blast</div><div class="cmd-desc">Total blast radius from an owned node — reachable nodes, exec hosts, credential sources.</div></div>
-    <div class="cmd-card"><div class="cmd-name">chokepoints</div><div class="cmd-desc">Betweenness centrality ranking. Find the one account whose hardening removes the most paths. Requires networkx.</div></div>
-    <div class="cmd-card"><div class="cmd-name">matrix</div><div class="cmd-desc">Reachability matrix — every user vs every T0 node with hop count.</div></div>
-    <div class="cmd-card"><div class="cmd-name">htmlreport</div><div class="cmd-desc">Self-contained interactive HTML report covering all analyses. One file, open in any browser.</div></div>
-  </div>
-</section>
+      <div class="cmd-grid">
+        <div class="cmd-card"><div class="cmd-name">info</div><div class="cmd-desc">Graph summary and all primitive counts. Run this first on every engagement to confirm data loaded correctly.</div></div>
+        <div class="cmd-card"><div class="cmd-name">bulk</div><div class="cmd-desc">Every enabled user with a path to Tier-0, sorted by hop count. Your fastest prioritized target list.</div></div>
+        <div class="cmd-card"><div class="cmd-name">kerberoast</div><div class="cmd-desc">SPN-bearing accounts sorted by hops to T0. Focus on accounts at 1–2 hops — ignore ∞.</div></div>
+        <div class="cmd-card"><div class="cmd-name">asreproast</div><div class="cmd-desc">Pre-auth disabled accounts. No credentials required to request the hash.</div></div>
+        <div class="cmd-card"><div class="cmd-name">dcsync</div><div class="cmd-desc">Direct and transitive DCSync rights. Transitive paths up to 6 hops deep, full chain shown.</div></div>
+        <div class="cmd-card"><div class="cmd-name">laps</div><div class="cmd-desc">LAPS readers and which machines they control. Flags readers whose machines reach T0.</div></div>
+        <div class="cmd-card"><div class="cmd-name">acl</div><div class="cmd-desc">All ACL abuse paths to Tier-0 across 13 relationship types.</div></div>
+        <div class="cmd-card"><div class="cmd-name">delegation</div><div class="cmd-desc">Unconstrained, constrained, and RBCD delegation chains with exploitation notes.</div></div>
+        <div class="cmd-card"><div class="cmd-name">adcs</div><div class="cmd-desc">Certificate template abuse paths classified by ESC type — ESC1 through ESC9.</div></div>
+        <div class="cmd-card"><div class="cmd-name">azure</div><div class="cmd-desc">Azure / Entra ID attack paths across 38 cloud relationship types.</div></div>
+        <div class="cmd-card"><div class="cmd-name">paths</div><div class="cmd-desc">Top-K ranked attack paths between any two nodes. Scored, noise-rated, with per-hop abuse tips.</div></div>
+        <div class="cmd-card"><div class="cmd-name">simulate</div><div class="cmd-desc">Step-by-step narrative on the best path. Flags high-noise steps with suggested alternatives.</div></div>
+        <div class="cmd-card"><div class="cmd-name">owned</div><div class="cmd-desc">Tier-0 reachability from a single owned node with full hop chains.</div></div>
+        <div class="cmd-card"><div class="cmd-name">blast</div><div class="cmd-desc">Total blast radius from an owned node — reachable nodes, exec hosts, credential sources.</div></div>
+        <div class="cmd-card"><div class="cmd-name">chokepoints</div><div class="cmd-desc">Betweenness centrality ranking. Find the one account whose hardening removes the most paths. Requires networkx.</div></div>
+        <div class="cmd-card"><div class="cmd-name">matrix</div><div class="cmd-desc">Reachability matrix — every user vs every T0 node with hop count.</div></div>
+        <div class="cmd-card"><div class="cmd-name">htmlreport</div><div class="cmd-desc">Self-contained interactive HTML report covering all analyses. One file, open in any browser.</div></div>
+      </div>
+    </section>
 
-<hr class="div">
+    <hr class="div">
 
-<!-- ══ WORKFLOWS ══ -->
-<section class="section reveal" id="workflows">
-  <div class="sec-tag">Engagement Workflows</div>
-  <h2 class="sec-title">From no creds<br>to Domain Admin</h2>
-  <p class="sec-lead">The commands build on each other. Each phase uses the output of the previous one to narrow focus and prioritize effort.</p>
+    <section class="section reveal" id="workflows">
+      <div class="sec-tag">Engagement Workflows</div>
+      <h2 class="sec-title">From no creds<br>to Domain Admin</h2>
+      <p class="sec-lead">The commands build on each other. Each phase uses the output of the previous one to narrow focus and prioritize effort.</p>
 
-  <ol class="steps">
-    <li class="step-item"><div class="step-num">01</div><div class="step-content"><strong>Orient the attack surface</strong><p>Run <code>info</code> first. Verify Tier-0 node count, check all primitive counts at once. This is your engagement briefing.</p></div></li>
-    <li class="step-item"><div class="step-num">02</div><div class="step-content"><strong>Build your target list</strong><p><code>bulk</code> ranks every enabled user by hop count to T0. <code>kerberoast</code> shows which of those are worth cracking. Combine both.</p></div></li>
-    <li class="step-item"><div class="step-num">03</div><div class="step-content"><strong>Assess a compromised account</strong><p><code>owned</code> tells you whether the account leads anywhere. <code>blast</code> tells you how much. No T0 reachability means move on.</p></div></li>
-    <li class="step-item"><div class="step-num">04</div><div class="step-content"><strong>Plan the path</strong><p><code>paths</code> gives ranked alternatives with per-hop abuse tips. <code>simulate</code> renders the best path step-by-step, high-noise steps flagged.</p></div></li>
-    <li class="step-item"><div class="step-num">05</div><div class="step-content"><strong>Generate deliverables</strong><p><code>htmlreport</code> for the client. <code>report --format json</code> for automated tooling. <code>blast --format json</code> for the impact slide.</p></div></li>
-  </ol>
+      <ol class="steps">
+        <li class="step-item"><div class="step-num">01</div><div class="step-content"><strong>Orient the attack surface</strong><p>Run <code>info</code> first. Verify Tier-0 node count, check all primitive counts at once. This is your engagement briefing.</p></div></li>
+        <li class="step-item"><div class="step-num">02</div><div class="step-content"><strong>Build your target list</strong><p><code>bulk</code> ranks every enabled user by hop count to T0. <code>kerberoast</code> shows which of those are worth cracking. Combine both.</p></div></li>
+        <li class="step-item"><div class="step-num">03</div><div class="step-content"><strong>Assess a compromised account</strong><p><code>owned</code> tells you whether the account leads anywhere. <code>blast</code> tells you how much. No T0 reachability means move on.</p></div></li>
+        <li class="step-item"><div class="step-num">04</div><div class="step-content"><strong>Plan the path</strong><p><code>paths</code> gives ranked alternatives with per-hop abuse tips. <code>simulate</code> renders the best path step-by-step, high-noise steps flagged.</p></div></li>
+        <li class="step-item"><div class="step-num">05</div><div class="step-content"><strong>Generate deliverables</strong><p><code>htmlreport</code> for the client. <code>report --format json</code> for automated tooling. <code>blast --format json</code> for the impact slide.</p></div></li>
+      </ol>
 
-  <!-- 01 info -->
-  <div class="subhead"><span class="n">01.</span> Graph overview — <code style="font-size:.8em">info</code></div>
-  <div class="term">
-    <div class="term-bar"><div class="td td-r"></div><div class="td td-y"></div><div class="td td-g"></div><div class="term-title">python3 whippet.py -d *.json --cmd info</div></div>
-    <div class="term-body">
+      <div class="subhead"><span class="n">01.</span> Graph overview — <code style="font-size:.8em">info</code></div>
+      <div class="term">
+        <div class="term-bar"><div class="td td-r"></div><div class="td td-y"></div><div class="td td-g"></div><div class="term-title">python3 whippet.py -d *.json --cmd info</div></div>
+        <div class="term-body">
 <span class="t-cy"> ▸ Graph Intelligence</span>
 <span class="t-dim">──────────────────────────────────────────────────────────────</span>
   <span class="t-cy">Nodes:</span>                          3,642
@@ -974,20 +1301,20 @@ footer .logo { font-family: var(--display); font-size: 15px; font-weight: 700; c
   <span class="t-cy">Cross-Domain Paths:</span>             3
   <span class="t-cy">Users → T0 Direct:</span>              <span class="t-red">47</span>
 
-  <span class="t-dim">   ┌─ Highest Risk Nodes</span>
-  <span class="t-red t-bold">CRITICAL          </span>  <span class="t-red"> 9.8</span>  DC01.CORP.LOCAL
-  <span class="t-red t-bold">CRITICAL          </span>  <span class="t-red"> 9.5</span>  DC02.CORP.LOCAL
-  <span class="t-red t-bold">CRITICAL          </span>  <span class="t-red"> 9.1</span>  CORP.LOCAL
-  <span class="t-or t-bold">HIGH              </span>  <span class="t-or"> 7.6</span>  svc_backup@CORP.LOCAL
-  <span class="t-or t-bold">HIGH              </span>  <span class="t-or"> 7.1</span>  svc_sql@CORP.LOCAL
-  <span class="t-yw">MEDIUM            </span>  <span class="t-yw"> 5.4</span>  IT Admins@CORP.LOCAL</div>
-  </div>
+<span class="t-dim">   ┌─ Highest Risk Nodes</span>
+<span class="t-red t-bold">CRITICAL          </span>  <span class="t-red"> 9.8</span>  DC01.CORP.LOCAL
+<span class="t-red t-bold">CRITICAL          </span>  <span class="t-red"> 9.5</span>  DC02.CORP.LOCAL
+<span class="t-red t-bold">CRITICAL          </span>  <span class="t-red"> 9.1</span>  CORP.LOCAL
+<span class="t-or t-bold">HIGH              </span>  <span class="t-or"> 7.6</span>  svc_backup@CORP.LOCAL
+<span class="t-or t-bold">HIGH              </span>  <span class="t-or"> 7.1</span>  svc_sql@CORP.LOCAL
+<span class="t-yw">MEDIUM            </span>  <span class="t-yw"> 5.4</span>  IT Admins@CORP.LOCAL
+        </div>
+      </div>
 
-  <!-- 02 kerberoast -->
-  <div class="subhead"><span class="n">02.</span> Build your target list — <code style="font-size:.8em">kerberoast</code></div>
-  <div class="term">
-    <div class="term-bar"><div class="td td-r"></div><div class="td td-y"></div><div class="td td-g"></div><div class="term-title">python3 whippet.py -d *.json --cmd kerberoast</div></div>
-    <div class="term-body">
+      <div class="subhead"><span class="n">02.</span> Build your target list — <code style="font-size:.8em">kerberoast</code></div>
+      <div class="term">
+        <div class="term-bar"><div class="td td-r"></div><div class="td td-y"></div><div class="td td-g"></div><div class="term-title">python3 whippet.py -d *.json --cmd kerberoast</div></div>
+        <div class="term-body">
 <span class="t-cy"> ▸ Kerberoastable Accounts</span>
 <span class="t-dim">──────────────────────────────────────────────────────────────────────</span>
   <span class="t-dim">Hops   Risk   Account                                        Source</span>
@@ -999,159 +1326,164 @@ footer .logo { font-family: var(--display); font-size: 15px; font-weight: 700; c
   <span class="t-cy">   ∞</span>  <span class="t-dim"> 2.1</span>  <span class="t-dim">svc_print@CORP.LOCAL                         </span>  direct
 
 <span class="t-dim">  Crack hashes:  hashcat -m 13100 &lt;hash_file&gt; /wordlists/rockyou.txt --force</span>
-<span class="t-dim">  Request SPNs:  GetUserSPNs.py 'CORP/user:pass' -request -outputfile kerb.hashes</span></div>
-  </div>
-  <div class="callout c-cyan"><strong>Reading the output:</strong> The <code>∞</code> in the hops column means <code>svc_print</code> has no path to Tier-0 — cracking that hash wastes time. Prioritize the 1–2 hop accounts.</div>
+<span class="t-dim">  Request SPNs:  GetUserSPNs.py ‘CORP/user:pass’ -request -outputfile kerb.hashes</span>
+        </div>
+      </div>
 
-  <!-- 03 owned + blast -->
-  <div class="subhead"><span class="n">03.</span> Assess a compromise — <code style="font-size:.8em">owned</code> + <code style="font-size:.8em">blast</code></div>
-  <div class="term">
-    <div class="term-bar"><div class="td td-r"></div><div class="td td-y"></div><div class="td td-g"></div><div class="term-title">python3 whippet.py -d *.json --cmd owned --node svc_backup</div></div>
-    <div class="term-body">
+      <div class="callout c-cyan"><strong>Reading the output:</strong> The <code>∞</code> in the hops column means <code>svc_print</code> has no path to Tier-0 — cracking that hash wastes time. Prioritize the 1–2 hop accounts.</div>
+
+      <div class="subhead"><span class="n">03.</span> Assess a compromise — <code style="font-size:.8em">owned</code> + <code style="font-size:.8em">blast</code></div>
+      <div class="term">
+        <div class="term-bar"><div class="td td-r"></div><div class="td td-y"></div><div class="td td-g"></div><div class="term-title">python3 whippet.py -d *.json --cmd owned --node svc_backup</div></div>
+        <div class="term-body">
 <span class="t-cy"> ▸ Owned: svc_backup@CORP.LOCAL — Tier-0 Reachability</span>
 
-  <span class="t-red">→</span> <span class="t-red t-bold">Domain Admins@CORP.LOCAL</span>  (2 hops)
-     svc_backup → IT Admins → Domain Admins
-     <span class="t-cy">AdminTo</span> → <span class="t-cy">MemberOf</span>
+<span class="t-red">→</span> <span class="t-red t-bold">Domain Admins@CORP.LOCAL</span>  (2 hops)
+svc_backup → IT Admins → Domain Admins
+<span class="t-cy">AdminTo</span> → <span class="t-cy">MemberOf</span>
 
-  <span class="t-red">→</span> <span class="t-red t-bold">DC01.CORP.LOCAL</span>  (1 hop)
-     svc_backup → DC01.CORP.LOCAL
-     <span class="t-cy">AdminTo</span></div>
-  </div>
-  <div class="term">
-    <div class="term-bar"><div class="td td-r"></div><div class="td td-y"></div><div class="td td-g"></div><div class="term-title">python3 whippet.py -d *.json --cmd blast --node svc_backup</div></div>
-    <div class="term-body">
+<span class="t-red">→</span> <span class="t-red t-bold">DC01.CORP.LOCAL</span>  (1 hop)
+svc_backup → DC01.CORP.LOCAL
+<span class="t-cy">AdminTo</span>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-bar"><div class="td td-r"></div><div class="td td-y"></div><div class="td td-g"></div><div class="term-title">python3 whippet.py -d *.json --cmd blast --node svc_backup</div></div>
+        <div class="term-body">
 <span class="t-cy"> ▸ Blast Radius: svc_backup@CORP.LOCAL</span>
 
-  Owned Node   : <span class="t-bold">svc_backup@CORP.LOCAL</span>
-  Type         : User
-  Risk Score   : <span class="t-red t-bold">7.6</span>  (HIGH)
-  Total Reachable : <span class="t-yw t-bold">214</span>
+Owned Node   : <span class="t-bold">svc_backup@CORP.LOCAL</span>
+Type         : User
+Risk Score   : <span class="t-red t-bold">7.6</span>  (HIGH)
+Total Reachable : <span class="t-yw t-bold">214</span>
 
-  <span class="t-cy">   ┌─ Reachable by Type</span>
-  Computer        <span class="t-cy">  87</span>  <span class="t-cy">████████████████████████████████████████</span>
-  User            <span class="t-cy">  91</span>  <span class="t-cy">████████████████████████████████████████</span>
-  Group           <span class="t-cy">  31</span>  <span class="t-cy">████████████████</span>
-  Domain          <span class="t-cy">   2</span>  <span class="t-cy">██</span>
+<span class="t-cy">   ┌─ Reachable by Type</span>
+Computer        <span class="t-cy">  87</span>  <span class="t-cy">████████████████████████████████████████</span>
+User            <span class="t-cy">  91</span>  <span class="t-cy">████████████████████████████████████████</span>
+Group           <span class="t-cy">  31</span>  <span class="t-cy">████████████████</span>
+Domain          <span class="t-cy">   2</span>  <span class="t-cy">██</span>
 
-  <span class="t-cy">   ┌─ Tier-0 Reachable — 4 node(s)</span>
-  <span class="t-red">●</span> <span class="t-bold">DC01.CORP.LOCAL</span>               (1 hop)
-  <span class="t-red">●</span> <span class="t-bold">DC02.CORP.LOCAL</span>               (2 hops)
-  <span class="t-red">●</span> <span class="t-bold">Domain Admins@CORP.LOCAL</span>      (2 hops)
-  <span class="t-red">●</span> <span class="t-bold">Enterprise Admins@CORP.LOCAL</span>   (3 hops)
+<span class="t-cy">   ┌─ Tier-0 Reachable — 4 node(s)</span>
+<span class="t-red">●</span> <span class="t-bold">DC01.CORP.LOCAL</span>               (1 hop)
+<span class="t-red">●</span> <span class="t-bold">DC02.CORP.LOCAL</span>               (2 hops)
+<span class="t-red">●</span> <span class="t-bold">Domain Admins@CORP.LOCAL</span>      (2 hops)
+<span class="t-red">●</span> <span class="t-bold">Enterprise Admins@CORP.LOCAL</span>   (3 hops)
 
-  <span class="t-cy">   ┌─ Execution Hosts</span>
-  <span class="t-or">⚙</span> DC01.CORP.LOCAL
-  <span class="t-or">⚙</span> SRV-EXCH01.CORP.LOCAL
+<span class="t-cy">   ┌─ Execution Hosts</span>
+<span class="t-or">⚙</span> DC01.CORP.LOCAL
+<span class="t-or">⚙</span> SRV-EXCH01.CORP.LOCAL
 
-  <span class="t-cy">   ┌─ Credential Sources</span>
-  <span class="t-yw">🔑</span> administrator@CORP.LOCAL
-  <span class="t-yw">🔑</span> john.doe@CORP.LOCAL</div>
-  </div>
+<span class="t-cy">   ┌─ Credential Sources</span>
+<span class="t-yw">🔑</span> administrator@CORP.LOCAL
+<span class="t-yw">🔑</span> john.doe@CORP.LOCAL
+        </div>
+      </div>
 
-  <!-- 04 paths -->
-  <div class="subhead"><span class="n">04.</span> Ranked attack paths — <code style="font-size:.8em">paths</code></div>
-  <div class="term">
-    <div class="term-bar"><div class="td td-r"></div><div class="td td-y"></div><div class="td td-g"></div><div class="term-title">python3 whippet.py -d *.json --cmd paths --from john.doe --to "Domain Admins"</div></div>
-    <div class="term-body">
+      <div class="subhead"><span class="n">04.</span> Ranked attack paths — <code style="font-size:.8em">paths</code></div>
+      <div class="term">
+        <div class="term-bar"><div class="td td-r"></div><div class="td td-y"></div><div class="td td-g"></div><div class="term-title">python3 whippet.py -d *.json --cmd paths --from john.doe --to "Domain Admins"</div></div>
+        <div class="term-body">
 <span class="t-cy"> ▸ Attack Paths: john.doe@CORP.LOCAL → Domain Admins@CORP.LOCAL</span>
 <span class="t-dim">  ℹ  Constraints: none  |  Stealth: False</span>
 
- <span class="t-grn">Path #1</span>  <span class="t-grn">score=−12.0</span>  <span class="t-cy">hops=2</span>  <span class="t-grn">noise=10  [████░░░░░░]</span>  <span class="t-dim">acl, exec</span>
+<span class="t-grn">Path #1</span>  <span class="t-grn">score=−12.0</span>  <span class="t-cy">hops=2</span>  <span class="t-grn">noise=10  [████░░░░░░]</span>  <span class="t-dim">acl, exec</span>
 
-  <span class="t-yw">john.doe</span> → <span class="t-dim">svc_backup</span> → <span class="t-red">Domain Admins</span>
+<span class="t-yw">john.doe</span> → <span class="t-dim">svc_backup</span> → <span class="t-red">Domain Admins</span>
 
-    <span class="t-dim">1.</span>  john.doe  <span class="t-cy">[GenericWrite]</span>  →  svc_backup
-         <span class="t-dim">Write any attribute → set SPN or write msDS-AllowedToActOnBehalf.</span>
-    <span class="t-dim">2.</span>  svc_backup  <span class="t-cy">[MemberOf]</span>  →  IT Admins  <span class="t-cy">[MemberOf]</span>  →  <span class="t-red">Domain Admins</span>
-         <span class="t-dim">Inherit all group privileges.</span>
+<span class="t-dim">1.</span>  john.doe  <span class="t-cy">[GenericWrite]</span>  →  svc_backup
+     <span class="t-dim">Write any attribute → set SPN or write msDS-AllowedToActOnBehalf.</span>
+<span class="t-dim">2.</span>  svc_backup  <span class="t-cy">[MemberOf]</span>  →  IT Admins  <span class="t-cy">[MemberOf]</span>  →  <span class="t-red">Domain Admins</span>
+     <span class="t-dim">Inherit all group privileges.</span>
 
- <span class="t-yw">Path #2</span>  <span class="t-yw">score=8.5</span>  <span class="t-cy">hops=3</span>  <span class="t-yw">noise=18  [██████░░░░]</span>  <span class="t-dim">acl, creds</span>
+<span class="t-yw">Path #2</span>  <span class="t-yw">score=8.5</span>  <span class="t-cy">hops=3</span>  <span class="t-yw">noise=18  [██████░░░░]</span>  <span class="t-dim">acl, creds</span>
 
-  <span class="t-yw">john.doe</span> → <span class="t-dim">helpdesk</span> → <span class="t-dim">SRV-EXCH01</span> → <span class="t-red">Domain Admins</span>
+<span class="t-yw">john.doe</span> → <span class="t-dim">helpdesk</span> → <span class="t-dim">SRV-EXCH01</span> → <span class="t-red">Domain Admins</span>
 
-    <span class="t-dim">1.</span>  john.doe  <span class="t-cy">[ForceChangePassword]</span>  →  helpdesk
-         <span class="t-dim">Reset password without knowing current value.</span>
-    <span class="t-dim">2.</span>  helpdesk  <span class="t-cy">[AdminTo]</span>  →  SRV-EXCH01
-         <span class="t-dim">Local admin → dump LSASS / lateral move.</span>
-    <span class="t-dim">3.</span>  SRV-EXCH01  <span class="t-cy">[HasSession]</span>  →  <span class="t-red">Domain Admins</span>
-         <span class="t-dim">Active logon → steal credentials via LSASS dump.</span></div>
-  </div>
+<span class="t-dim">1.</span>  john.doe  <span class="t-cy">[ForceChangePassword]</span>  →  helpdesk
+     <span class="t-dim">Reset password without knowing current value.</span>
+<span class="t-dim">2.</span>  helpdesk  <span class="t-cy">[AdminTo]</span>  →  SRV-EXCH01
+     <span class="t-dim">Local admin → dump LSASS / lateral move.</span>
+<span class="t-dim">3.</span>  SRV-EXCH01  <span class="t-cy">[HasSession]</span>  →  <span class="t-red">Domain Admins</span>
+     <span class="t-dim">Active logon → steal credentials via LSASS dump.</span>
+        </div>
+      </div>
 
-  <!-- adcs -->
-  <div class="subhead"><span class="n">Bonus.</span> Certificate abuse — <code style="font-size:.8em">adcs</code></div>
-  <div class="term">
-    <div class="term-bar"><div class="td td-r"></div><div class="td td-y"></div><div class="td td-g"></div><div class="term-title">python3 whippet.py -d *.json --cmd adcs</div></div>
-    <div class="term-body">
+      <div class="subhead"><span class="n">Bonus.</span> Certificate abuse — <code style="font-size:.8em">adcs</code></div>
+      <div class="term">
+        <div class="term-bar"><div class="td td-r"></div><div class="td td-y"></div><div class="td td-g"></div><div class="term-title">python3 whippet.py -d *.json --cmd adcs</div></div>
+        <div class="term-body">
 <span class="t-cy"> ▸ ADCS ESC1–ESC9 Analysis</span>
 
-  <span class="t-red t-bold">ESC1</span> — 3 path(s)
-    <span class="t-yw">john.doe@CORP.LOCAL</span>        →[<span class="t-cy">Enroll</span>]→              <span class="t-bold">WebServer Template</span>
-    <span class="t-yw">helpdesk@CORP.LOCAL</span>        →[<span class="t-cy">ClientAuth</span>]→          <span class="t-bold">UserAuth Template</span>
-    <span class="t-yw">svc_backup@CORP.LOCAL</span>       →[<span class="t-cy">Enroll</span>]→              <span class="t-bold">VPN Template</span>
+<span class="t-red t-bold">ESC1</span> — 3 path(s)
+<span class="t-yw">john.doe@CORP.LOCAL</span>        →[<span class="t-cy">Enroll</span>]→              <span class="t-bold">WebServer Template</span>
+<span class="t-yw">helpdesk@CORP.LOCAL</span>        →[<span class="t-cy">ClientAuth</span>]→          <span class="t-bold">UserAuth Template</span>
+<span class="t-yw">svc_backup@CORP.LOCAL</span>       →[<span class="t-cy">Enroll</span>]→              <span class="t-bold">VPN Template</span>
 
-  <span class="t-pu t-bold">ESC4</span> — 1 path(s)
-    <span class="t-yw">helpdesk-mgr@CORP.LOCAL</span>    →[<span class="t-cy">WritePKIEnrollmentFlag</span>]→  <span class="t-bold">Workstation Template</span>
+<span class="t-pu t-bold">ESC4</span> — 1 path(s)
+<span class="t-yw">helpdesk-mgr@CORP.LOCAL</span>    →[<span class="t-cy">WritePKIEnrollmentFlag</span>]→  <span class="t-bold">Workstation Template</span>
 
-  <span class="t-or t-bold">ESC7</span> — 1 path(s)
-    <span class="t-yw">svc_backup@CORP.LOCAL</span>       →[<span class="t-cy">ManageCA</span>]→            <span class="t-bold">CORP-CA</span>
+<span class="t-or t-bold">ESC7</span> — 1 path(s)
+<span class="t-yw">svc_backup@CORP.LOCAL</span>       →[<span class="t-cy">ManageCA</span>]→            <span class="t-bold">CORP-CA</span>
 
-<span class="t-dim">  certipy find -u 'user@domain' -p 'pass' -enabled -vulnerable</span>
-<span class="t-dim">  certipy req  -u 'user@domain' -p 'pass' -template WebServer -upn 'administrator@corp.local' -ca CORP-CA</span>
-<span class="t-dim">  certipy auth -pfx administrator.pfx -domain corp.local</span></div>
-  </div>
+<span class="t-dim">  certipy find -u ‘user@domain’ -p ‘pass’ -enabled -vulnerable</span>
+<span class="t-dim">  certipy req  -u ‘user@domain’ -p ‘pass’ -template WebServer -upn ‘administrator@corp.local’ -ca CORP-CA</span>
+<span class="t-dim">  certipy auth -pfx administrator.pfx -domain corp.local</span>
+        </div>
+      </div>
 
-  <!-- dcsync -->
-  <div class="subhead"><span class="n">Bonus.</span> DCSync rights — <code style="font-size:.8em">dcsync</code></div>
-  <div class="term">
-    <div class="term-bar"><div class="td td-r"></div><div class="td td-y"></div><div class="td td-g"></div><div class="term-title">python3 whippet.py -d *.json --cmd dcsync</div></div>
-    <div class="term-body">
+      <div class="subhead"><span class="n">Bonus.</span> DCSync rights — <code style="font-size:.8em">dcsync</code></div>
+      <div class="term">
+        <div class="term-bar"><div class="td td-r"></div><div class="td td-y"></div><div class="td td-g"></div><div class="term-title">python3 whippet.py -d *.json --cmd dcsync</div></div>
+        <div class="term-body">
 <span class="t-cy"> ▸ DCSync Rights Analysis</span>
 
-  <span class="t-cy">   ┌─ Direct DCSync Rights</span>
-  <span class="t-red">●</span> <span class="t-red t-bold">svc_backup@CORP.LOCAL</span>       GetChanges+GetChangesAll
-  <span class="t-red">●</span> <span class="t-red t-bold">svc_replication@CORP.LOCAL</span>  GetChanges+GetChangesAll
+<span class="t-cy">   ┌─ Direct DCSync Rights</span>
+<span class="t-red">●</span> <span class="t-red t-bold">svc_backup@CORP.LOCAL</span>       GetChanges+GetChangesAll
+<span class="t-red">●</span> <span class="t-red t-bold">svc_replication@CORP.LOCAL</span>  GetChanges+GetChangesAll
 
-  <span class="t-cy">   ┌─ Transitive DCSync (≤6 hops) — 7 accounts</span>
-  <span class="t-yw">○</span> <span class="t-yw">john.doe@CORP.LOCAL</span> (3 hops)
-    john.doe → svc_backup → CORP.LOCAL
-  <span class="t-yw">○</span> <span class="t-yw">helpdesk@CORP.LOCAL</span> (4 hops)
-    helpdesk → john.doe → svc_backup → CORP.LOCAL
+<span class="t-cy">   ┌─ Transitive DCSync (≤6 hops) — 7 accounts</span>
+<span class="t-yw">○</span> <span class="t-yw">john.doe@CORP.LOCAL</span> (3 hops)
+john.doe → svc_backup → CORP.LOCAL
+<span class="t-yw">○</span> <span class="t-yw">helpdesk@CORP.LOCAL</span> (4 hops)
+helpdesk → john.doe → svc_backup → CORP.LOCAL
 
-<span class="t-dim">  secretsdump.py -just-dc 'CORP/svc_backup:P@ssword1!@DC01.CORP.LOCAL'</span>
-<span class="t-dim">  secretsdump.py -just-dc-user krbtgt 'CORP/svc_backup:P@ssword1!@DC01.CORP.LOCAL'</span></div>
-  </div>
-</section>
+<span class="t-dim">  secretsdump.py -just-dc ‘CORP/svc_backup:P@ssword1!@DC01.CORP.LOCAL’</span>
+<span class="t-dim">  secretsdump.py -just-dc-user krbtgt ‘CORP/svc_backup:P@ssword1!@DC01.CORP.LOCAL’</span>
+        </div>
+      </div>
+    </section>
 
-<hr class="div">
+    <hr class="div">
 
-<!-- ══ OPSEC ══ -->
-<section class="section reveal" id="opsec">
-  <div class="sec-tag">Operational Security</div>
-  <h2 class="sec-title">Route around<br>what's off-limits.</h2>
-  <p class="sec-lead">OPSEC flags filter the graph at the edge level. Any path requiring a blocked technique simply won't be returned — the router finds alternatives instead.</p>
+    <section class="section reveal" id="opsec">
+      <div class="sec-tag">Operational Security</div>
+      <h2 class="sec-title">Route around<br>what's off-limits.</h2>
+      <p class="sec-lead">OPSEC flags filter the graph at the edge level. Any path requiring a blocked technique simply won't be returned — the router finds alternatives instead.</p>
 
-  <div class="table-scroll">
-    <table class="opsec-table">
-      <thead><tr><th>Flag</th><th>What it blocks</th><th>Use when</th></tr></thead>
-      <tbody>
-        <tr><td>--stealth</td><td>All edges with detection risk ≥ 7 (LSASS, DCSync, DCOM, AZ Global Admin)</td><td>MDI deployed, monitored environment</td></tr>
-        <tr><td>--no-lsass</td><td>HasSession edges</td><td>EDR blocks LSASS (CrowdStrike, SentinelOne)</td></tr>
-        <tr><td>--no-dcsync</td><td>DCSync, GetChanges, GetChangesAll</td><td>ROE prohibits replication attacks</td></tr>
-        <tr><td>--no-rdp</td><td>CanRDP edges</td><td>Interactive sessions out of scope</td></tr>
-        <tr><td>--no-acl</td><td>All 13 ACL relationship types</td><td>ACL abuse restricted by ROE</td></tr>
-        <tr><td>--no-exec</td><td>AdminTo, CanRDP, CanPSRemote, ExecuteDCOM, SQLAdmin</td><td>Code execution out of scope</td></tr>
-        <tr><td>--no-delegation</td><td>AllowedToDelegate, AllowedToAct, WriteAccountRestrictions</td><td>Delegation attacks restricted</td></tr>
-        <tr><td>--no-adcs</td><td>All 9 certificate relationships</td><td>PKI infrastructure out of scope</td></tr>
-      </tbody>
-    </table>
-  </div>
+      <div class="table-scroll">
+        <table class="opsec-table">
+          <thead>
+            <tr><th>Flag</th><th>What it blocks</th><th>Use when</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>--stealth</td><td>All edges with detection risk ≥ 7 (LSASS, DCSync, DCOM, AZ Global Admin)</td><td>MDI deployed, monitored environment</td></tr>
+            <tr><td>--no-lsass</td><td>HasSession edges</td><td>EDR blocks LSASS (CrowdStrike, SentinelOne)</td></tr>
+            <tr><td>--no-dcsync</td><td>DCSync, GetChanges, GetChangesAll</td><td>ROE prohibits replication attacks</td></tr>
+            <tr><td>--no-rdp</td><td>CanRDP edges</td><td>Interactive sessions out of scope</td></tr>
+            <tr><td>--no-acl</td><td>All 13 ACL relationship types</td><td>ACL abuse restricted by ROE</td></tr>
+            <tr><td>--no-exec</td><td>AdminTo, CanRDP, CanPSRemote, ExecuteDCOM, SQLAdmin</td><td>Code execution out of scope</td></tr>
+            <tr><td>--no-delegation</td><td>AllowedToDelegate, AllowedToAct, WriteAccountRestrictions</td><td>Delegation attacks restricted</td></tr>
+            <tr><td>--no-adcs</td><td>All 9 certificate relationships</td><td>PKI infrastructure out of scope</td></tr>
+          </tbody>
+        </table>
+      </div>
 
-  <p>Flags stack freely. Here's the same path search under strict rules of engagement — whippet finds a quieter route that avoids everything blocked:</p>
+      <p>Flags stack freely. Here's the same path search under strict rules of engagement — whippet finds a quieter route that avoids everything blocked:</p>
 
-  <div class="term">
-    <div class="term-bar"><div class="td td-r"></div><div class="td td-y"></div><div class="td td-g"></div><div class="term-title">bash — constrained pathfinding</div></div>
-    <div class="term-body">
+      <div class="term">
+        <div class="term-bar"><div class="td td-r"></div><div class="td td-y"></div><div class="td td-g"></div><div class="term-title">bash — constrained pathfinding</div></div>
+        <div class="term-body">
 <span class="t-pr">$</span> <span class="t-cmd">python3 whippet.py -d *.json --cmd paths \
     --from "john.doe@CORP.LOCAL" \
     --to   "Domain Admins@CORP.LOCAL" \
@@ -1159,116 +1491,116 @@ footer .logo { font-family: var(--display); font-size: 15px; font-weight: 700; c
 
 <span class="t-dim">  ℹ  Constraints: no_lsass, no_dcsync  |  Stealth: True</span>
 
- <span class="t-grn">Path #1</span>  <span class="t-grn">score=4.5</span>  <span class="t-cy">hops=3</span>  <span class="t-grn">noise=9  [███░░░░░░░]</span>  <span class="t-dim">acl, membership</span>
+<span class="t-grn">Path #1</span>  <span class="t-grn">score=4.5</span>  <span class="t-cy">hops=3</span>  <span class="t-grn">noise=9  [███░░░░░░░]</span>  <span class="t-dim">acl, membership</span>
 
-  <span class="t-yw">john.doe</span> → <span class="t-dim">helpdesk-admins</span> → <span class="t-dim">IT Admins</span> → <span class="t-red">Domain Admins</span>
+<span class="t-yw">john.doe</span> → <span class="t-dim">helpdesk-admins</span> → <span class="t-dim">IT Admins</span> → <span class="t-red">Domain Admins</span>
 
-    <span class="t-dim">1.</span>  john.doe  <span class="t-cy">[AddSelf]</span>  →  helpdesk-admins
-         <span class="t-dim">Add self to group → instant privilege escalation.</span>
-    <span class="t-dim">2.</span>  helpdesk-admins  <span class="t-cy">[MemberOf]</span>  →  IT Admins
-         <span class="t-dim">Inherit all group privileges.</span>
-    <span class="t-dim">3.</span>  IT Admins  <span class="t-cy">[MemberOf]</span>  →  <span class="t-red">Domain Admins</span>
-         <span class="t-dim">Inherit all group privileges.</span>
+<span class="t-dim">1.</span>  john.doe  <span class="t-cy">[AddSelf]</span>  →  helpdesk-admins
+     <span class="t-dim">Add self to group → instant privilege escalation.</span>
+<span class="t-dim">2.</span>  helpdesk-admins  <span class="t-cy">[MemberOf]</span>  →  IT Admins
+     <span class="t-dim">Inherit all group privileges.</span>
+<span class="t-dim">3.</span>  IT Admins  <span class="t-cy">[MemberOf]</span>  →  <span class="t-red">Domain Admins</span>
+     <span class="t-dim">Inherit all group privileges.</span>
 
-  <span class="t-dim">⚠  No high-noise steps in this path — clean route.</span></div>
-  </div>
-</section>
+<span class="t-dim">⚠  No high-noise steps in this path — clean route.</span>
+        </div>
+      </div>
+    </section>
 
-<hr class="div">
+    <hr class="div">
 
-<!-- ══ REPORT ══ -->
-<section class="section reveal" id="report">
-  <div class="sec-tag">Deliverables</div>
-  <h2 class="sec-title">One command.<br>A full report.</h2>
-  <p class="sec-lead">The HTML report runs every analysis, compiles results into a single interactive file, and renders it ready to hand to a client. No server, no dependencies, works offline after generation.</p>
+    <section class="section reveal" id="report">
+      <div class="sec-tag">Deliverables</div>
+      <h2 class="sec-title">One command.<br>A full report.</h2>
+      <p class="sec-lead">The HTML report runs every analysis, compiles results into a single interactive file, and renders it ready to hand to a client. No server, no dependencies, works offline after generation.</p>
 
-  <div class="term">
-    <div class="term-bar"><div class="td td-r"></div><div class="td td-y"></div><div class="td td-g"></div><div class="term-title">bash</div></div>
-    <div class="term-body">
+      <div class="term">
+        <div class="term-bar"><div class="td td-r"></div><div class="td td-y"></div><div class="td td-g"></div><div class="term-title">bash</div></div>
+        <div class="term-body">
 <span class="t-pr">$</span> <span class="t-cmd">python3 whippet.py -d *.json --cmd htmlreport --out report.html</span>
 
-<span class="t-info">  ℹ  Running full analysis — this may take a moment...</span>
+<span class="t-info">  ℹ  Running full analysis — this may take a moment…</span>
 <span class="t-ok">  ✓  Report written → report.html  (284 KB)</span>
 <span class="t-info">  ℹ  Open in any browser — fully self-contained, no internet required</span>
 
 <span class="t-cm"># Date-stamped for the deliverables folder</span>
-<span class="t-pr">$</span> <span class="t-cmd">python3 whippet.py -d *.json --cmd htmlreport --out $(date +%Y%m%d)_CORP_report.html</span></div>
-  </div>
-
-  <!-- report preview -->
-  <div class="rp-shell">
-    <div class="rp-titlebar">
-      <div class="td td-r"></div><div class="td td-y"></div><div class="td td-g"></div>
-      <span class="rp-title-txt">20231103_CORP_report.html — Chrome</span>
-    </div>
-    <div class="rp-body">
-      <div class="rp-nav">
-        <div class="rp-nav-item active">⚡ Attack Paths <span class="rp-badge rb-danger">47</span></div>
-        <div class="rp-nav-item">◈ Risk Nodes <span class="rp-badge">30</span></div>
-        <div class="rp-nav-item">🎟 Kerberoast <span class="rp-badge rb-danger">14</span></div>
-        <div class="rp-nav-item">💀 DCSync <span class="rp-badge rb-danger">2</span></div>
-        <div class="rp-nav-item">⚙ ACL <span class="rp-badge rb-danger">23</span></div>
-        <div class="rp-nav-item">🏛 ADCS <span class="rp-badge rb-danger">8</span></div>
-        <div class="rp-nav-item">☁ Azure <span class="rp-badge rb-warn">4</span></div>
-        <div class="rp-nav-item">⬡ Chokepoints <span class="rp-badge">15</span></div>
+<span class="t-pr">$</span> <span class="t-cmd">python3 whippet.py -d *.json --cmd htmlreport --out $(date +%Y%m%d)_CORP_report.html</span>
+        </div>
       </div>
 
-      <div class="stat-row">
-        <div class="stat-card"><div class="stat-val sv-r">14</div><div class="stat-lbl">Kerberoast</div></div>
-        <div class="stat-card"><div class="stat-val sv-y">3</div><div class="stat-lbl">AS-REP</div></div>
-        <div class="stat-card"><div class="stat-val sv-r">2</div><div class="stat-lbl">DCSync</div></div>
-        <div class="stat-card"><div class="stat-val sv-o">23</div><div class="stat-lbl">ACL Paths</div></div>
-        <div class="stat-card"><div class="stat-val sv-o">5</div><div class="stat-lbl">Delegation</div></div>
-        <div class="stat-card"><div class="stat-val sv-p">8</div><div class="stat-lbl">ADCS ESC</div></div>
-        <div class="stat-card"><div class="stat-val sv-c">4</div><div class="stat-lbl">Azure</div></div>
-        <div class="stat-card"><div class="stat-val sv-y">6</div><div class="stat-lbl">LAPS</div></div>
-        <div class="stat-card"><div class="stat-val sv-g">47</div><div class="stat-lbl">Users→T0</div></div>
-      </div>
-
-      <div style="font-family:var(--mono);font-size:10px;color:var(--text-dim);letter-spacing:.1em;text-transform:uppercase;margin:16px 0 8px;">⚡ Attack Paths — sorted by hop count</div>
-
-      <div class="path-card open" onclick="this.classList.toggle('open')">
-        <div class="path-head">
-          <div class="path-num">#1</div>
-          <div class="path-chain"><span class="n-src">john.doe@CORP.LOCAL</span><span class="n-arr"> → </span><span class="n-mid">svc_backup@CORP.LOCAL</span><span class="n-arr"> → </span><span class="n-t0">Domain Admins@CORP.LOCAL</span></div>
-          <div class="path-meta">
-            <span class="hops-tag">2 hops</span>
-            <div class="noise-pips"><div class="np np-l"></div><div class="np np-l"></div><div class="np np-l"></div><div class="np"></div><div class="np"></div><div class="np"></div><div class="np"></div><div class="np"></div><div class="np"></div><div class="np"></div></div>
+      <div class="rp-shell">
+        <div class="rp-titlebar">
+          <div class="td td-r"></div><div class="td td-y"></div><div class="td td-g"></div>
+          <span class="rp-title-txt">20231103_CORP_report.html — Chrome</span>
+        </div>
+        <div class="rp-body">
+          <div class="rp-nav">
+            <div class="rp-nav-item active">⚡ Attack Paths <span class="rp-badge rb-danger">47</span></div>
+            <div class="rp-nav-item">◈ Risk Nodes <span class="rp-badge">30</span></div>
+            <div class="rp-nav-item">🎟 Kerberoast <span class="rp-badge rb-danger">14</span></div>
+            <div class="rp-nav-item">💀 DCSync <span class="rp-badge rb-danger">2</span></div>
+            <div class="rp-nav-item">⚙ ACL <span class="rp-badge rb-danger">23</span></div>
+            <div class="rp-nav-item">🏛 ADCS <span class="rp-badge rb-danger">8</span></div>
+            <div class="rp-nav-item">☁ Azure <span class="rp-badge rb-warn">4</span></div>
+            <div class="rp-nav-item">⬡ Chokepoints <span class="rp-badge">15</span></div>
           </div>
-          <div class="path-chevron">▶</div>
-        </div>
-        <div class="path-body">
-          <div class="hop-row"><div class="hop-n">1.</div><div class="hop-src">john.doe@CORP.LOCAL</div><div class="hop-rel">GenericWrite</div><div class="hop-arr">→</div><div class="hop-dst">svc_backup@CORP.LOCAL</div><div class="hop-tip">Write any attribute → set SPN or write msDS-AllowedToActOnBehalf.</div></div>
-          <div class="hop-row"><div class="hop-n">2.</div><div class="hop-src">svc_backup@CORP.LOCAL</div><div class="hop-rel">MemberOf</div><div class="hop-arr">→</div><div class="hop-dst" style="color:var(--red)">Domain Admins@CORP.LOCAL</div><div class="hop-tip">Inherit all group privileges.</div></div>
-        </div>
-      </div>
 
-      <div class="path-card" onclick="this.classList.toggle('open')">
-        <div class="path-head">
-          <div class="path-num">#2</div>
-          <div class="path-chain"><span class="n-src">helpdesk@CORP.LOCAL</span><span class="n-arr"> → </span><span class="n-mid">SRV-EXCH01.CORP.LOCAL</span><span class="n-arr"> → </span><span class="n-t0">Domain Admins@CORP.LOCAL</span></div>
-          <div class="path-meta">
-            <span class="hops-tag">3 hops</span>
-            <div class="noise-pips"><div class="np np-m"></div><div class="np np-m"></div><div class="np np-m"></div><div class="np np-m"></div><div class="np np-m"></div><div class="np np-m"></div><div class="np"></div><div class="np"></div><div class="np"></div><div class="np"></div></div>
+          <div class="stat-row">
+            <div class="stat-card"><div class="stat-val sv-r">14</div><div class="stat-lbl">Kerberoast</div></div>
+            <div class="stat-card"><div class="stat-val sv-y">3</div><div class="stat-lbl">AS-REP</div></div>
+            <div class="stat-card"><div class="stat-val sv-r">2</div><div class="stat-lbl">DCSync</div></div>
+            <div class="stat-card"><div class="stat-val sv-o">23</div><div class="stat-lbl">ACL Paths</div></div>
+            <div class="stat-card"><div class="stat-val sv-o">5</div><div class="stat-lbl">Delegation</div></div>
+            <div class="stat-card"><div class="stat-val sv-p">8</div><div class="stat-lbl">ADCS ESC</div></div>
+            <div class="stat-card"><div class="stat-val sv-c">4</div><div class="stat-lbl">Azure</div></div>
+            <div class="stat-card"><div class="stat-val sv-y">6</div><div class="stat-lbl">LAPS</div></div>
+            <div class="stat-card"><div class="stat-val sv-g">47</div><div class="stat-lbl">Users→T0</div></div>
           </div>
-          <div class="path-chevron">▶</div>
-        </div>
-        <div class="path-body">
-          <div class="hop-row"><div class="hop-n">1.</div><div class="hop-src">helpdesk@CORP.LOCAL</div><div class="hop-rel">ForceChangePassword</div><div class="hop-arr">→</div><div class="hop-dst">svc_exch@CORP.LOCAL</div><div class="hop-tip">Reset password without knowing current value.</div></div>
-          <div class="hop-row"><div class="hop-n">2.</div><div class="hop-src">svc_exch@CORP.LOCAL</div><div class="hop-rel">AdminTo</div><div class="hop-arr">→</div><div class="hop-dst">SRV-EXCH01.CORP.LOCAL</div><div class="hop-tip">Local admin → dump LSASS / lateral move.</div></div>
-          <div class="hop-row"><div class="hop-n">3.</div><div class="hop-src">SRV-EXCH01.CORP.LOCAL</div><div class="hop-rel">HasSession</div><div class="hop-arr">→</div><div class="hop-dst" style="color:var(--red)">Domain Admins@CORP.LOCAL</div><div class="hop-tip">Active logon → steal credentials via LSASS dump.</div></div>
+
+          <div style="font-family:var(--mono);font-size:10px;color:var(--text-dim);letter-spacing:.1em;text-transform:uppercase;margin:16px 0 8px;">⚡ Attack Paths — sorted by hop count</div>
+
+          <div class="path-card open">
+            <div class="path-head">
+              <div class="path-num">#1</div>
+              <div class="path-chain"><span class="n-src">john.doe@CORP.LOCAL</span><span class="n-arr"> → </span><span class="n-mid">svc_backup@CORP.LOCAL</span><span class="n-arr"> → </span><span class="n-t0">Domain Admins@CORP.LOCAL</span></div>
+              <div class="path-meta">
+                <span class="hops-tag">2 hops</span>
+                <div class="noise-pips"><div class="np np-l"></div><div class="np np-l"></div><div class="np np-l"></div><div class="np"></div><div class="np"></div><div class="np"></div><div class="np"></div><div class="np"></div><div class="np"></div><div class="np"></div></div>
+              </div>
+              <div class="path-chevron">▶</div>
+            </div>
+            <div class="path-body">
+              <div class="hop-row"><div class="hop-n">1.</div><div class="hop-src">john.doe@CORP.LOCAL</div><div class="hop-rel">GenericWrite</div><div class="hop-arr">→</div><div class="hop-dst">svc_backup@CORP.LOCAL</div><div class="hop-tip">Write any attribute → set SPN or write msDS-AllowedToActOnBehalf.</div></div>
+              <div class="hop-row"><div class="hop-n">2.</div><div class="hop-src">svc_backup@CORP.LOCAL</div><div class="hop-rel">MemberOf</div><div class="hop-arr">→</div><div class="hop-dst" style="color:var(--red)">Domain Admins@CORP.LOCAL</div><div class="hop-tip">Inherit all group privileges.</div></div>
+            </div>
+          </div>
+
+          <div class="path-card">
+            <div class="path-head">
+              <div class="path-num">#2</div>
+              <div class="path-chain"><span class="n-src">helpdesk@CORP.LOCAL</span><span class="n-arr"> → </span><span class="n-mid">SRV-EXCH01.CORP.LOCAL</span><span class="n-arr"> → </span><span class="n-t0">Domain Admins@CORP.LOCAL</span></div>
+              <div class="path-meta">
+                <span class="hops-tag">3 hops</span>
+                <div class="noise-pips"><div class="np np-m"></div><div class="np np-m"></div><div class="np np-m"></div><div class="np np-m"></div><div class="np np-m"></div><div class="np np-m"></div><div class="np"></div><div class="np"></div><div class="np"></div><div class="np"></div></div>
+              </div>
+              <div class="path-chevron">▶</div>
+            </div>
+            <div class="path-body">
+              <div class="hop-row"><div class="hop-n">1.</div><div class="hop-src">helpdesk@CORP.LOCAL</div><div class="hop-rel">ForceChangePassword</div><div class="hop-arr">→</div><div class="hop-dst">svc_exch@CORP.LOCAL</div><div class="hop-tip">Reset password without knowing current value.</div></div>
+              <div class="hop-row"><div class="hop-n">2.</div><div class="hop-src">svc_exch@CORP.LOCAL</div><div class="hop-rel">AdminTo</div><div class="hop-arr">→</div><div class="hop-dst">SRV-EXCH01.CORP.LOCAL</div><div class="hop-tip">Local admin → dump LSASS / lateral move.</div></div>
+              <div class="hop-row"><div class="hop-n">3.</div><div class="hop-src">SRV-EXCH01.CORP.LOCAL</div><div class="hop-rel">HasSession</div><div class="hop-arr">→</div><div class="hop-dst" style="color:var(--red)">Domain Admins@CORP.LOCAL</div><div class="hop-tip">Active logon → steal credentials via LSASS dump.</div></div>
+            </div>
+          </div>
+
+          <div style="font-family:var(--mono);font-size:11px;color:var(--text-dim);padding:10px 0;">+ 45 more paths &nbsp;·&nbsp; filter by user, technique, or category above</div>
         </div>
       </div>
 
-      <div style="font-family:var(--mono);font-size:11px;color:var(--text-dim);padding:10px 0;">+ 45 more paths &nbsp;·&nbsp; filter by user, technique, or category above</div>
-    </div>
-  </div>
+      <p>The report includes dark/light mode toggle, live text filters on every table, a category dropdown on the attack paths section, and is fully print-ready. For structured JSON output:</p>
 
-  <p>The report includes dark/light mode toggle, live text filters on every table, a category dropdown on the attack paths section, and is fully print-ready. For structured JSON output:</p>
-
-  <div class="term">
-    <div class="term-bar"><div class="td td-r"></div><div class="td td-y"></div><div class="td td-g"></div><div class="term-title">bash — structured output</div></div>
-    <div class="term-body">
+      <div class="term">
+        <div class="term-bar"><div class="td td-r"></div><div class="td td-y"></div><div class="td td-g"></div><div class="term-title">bash — structured output</div></div>
+        <div class="term-body">
 <span class="t-cm"># Full structured report — JSON</span>
 <span class="t-pr">$</span> <span class="t-cmd">python3 whippet.py -d *.json --cmd report --format json --out report.json</span>
 
@@ -1276,71 +1608,103 @@ footer .logo { font-family: var(--display); font-size: 15px; font-weight: 700; c
 <span class="t-pr">$</span> <span class="t-cmd">python3 whippet.py -d *.json --cmd kerberoast --format json | jq '.kerberoastable[:5]'</span>
 
 <span class="t-cm"># Blast radius as JSON for the impact slide</span>
-<span class="t-pr">$</span> <span class="t-cmd">python3 whippet.py -d *.json --cmd blast --node svc_backup --format json --out blast.json</span></div>
+<span class="t-pr">$</span> <span class="t-cmd">python3 whippet.py -d *.json --cmd blast --node svc_backup --format json --out blast.json</span>
+        </div>
+      </div>
+    </section>
+
+    <hr class="div">
+
+    <section class="section reveal" style="padding-bottom:0">
+      <div class="callout c-red" style="margin-top:0"><strong>Authorized use only.</strong> whippet is built for penetration testers and red teams operating under signed engagement agreements. Use it only on systems you have explicit written permission to test. Every technique surfaced here has a corresponding detection opportunity — understanding attack paths is equally valuable for defenders hardening the environment.</div>
+    </section>
   </div>
-</section>
 
-<hr class="div">
+  <footer>
+    <div class="logo">🩸 whippet</div>
+    <div>v10.0.0 · MIT License · Python 3.8+</div>
+    <div>by hanzotrip7 &nbsp;·&nbsp; authorized use only</div>
+  </footer>
 
-<section class="section reveal" style="padding-bottom:0">
-  <div class="callout c-red" style="margin-top:0"><strong>Authorized use only.</strong> whippet is built for penetration testers and red teams operating under signed engagement agreements. Use it only on systems you have explicit written permission to test. Every technique surfaced here has a corresponding detection opportunity — understanding attack paths is equally valuable for defenders hardening the environment.</div>
-</section>
+  <script>
+    function applyTheme(theme) {
+      const html = document.documentElement;
+      const themeLabel = document.getElementById("themeLabel");
+      const themeBtn = document.getElementById("themeBtn");
+      html.setAttribute("data-theme", theme);
+      localStorage.setItem("whippet-theme", theme);
+      const isDark = theme === "dark";
+      themeLabel.textContent = isDark ? "Light mode" : "Dark mode";
+      themeBtn.setAttribute("aria-pressed", String(!isDark));
+    }
 
-</div><!-- /page -->
+    function toggleTheme() {
+      const html = document.documentElement;
+      const isDark = html.getAttribute("data-theme") === "dark";
+      applyTheme(isDark ? "light" : "dark");
+    }
 
-<footer>
-  <div class="logo">🩸 whippet</div>
-  <div>v10.0.0 · MIT License · Python 3.8+</div>
-  <div>by hanzotrip7 &nbsp;·&nbsp; authorized use only</div>
-</footer>
+    (function () {
+      const saved = localStorage.getItem("whippet-theme");
+      const preferLight = saved
+        ? saved === "light"
+        : window.matchMedia("(prefers-color-scheme: light)").matches;
+      applyTheme(preferLight ? "light" : "dark");
+    })();
 
-<script>
-/* ── theme toggle ── */
-function toggleTheme() {
-  const html  = document.documentElement;
-  const isDark = html.getAttribute('data-theme') === 'dark';
-  const next   = isDark ? 'light' : 'dark';
-  html.setAttribute('data-theme', next);
-  localStorage.setItem('whippet-theme', next);
-  document.getElementById('themeLabel').textContent = isDark ? 'Dark mode' : 'Light mode';
-}
+    function toggleMobileNav() {
+      const nav = document.getElementById("mobileNav");
+      const burger = document.getElementById("burger");
+      const open = nav.classList.toggle("open");
+      burger.classList.toggle("open", open);
+      burger.setAttribute("aria-expanded", String(open));
+    }
 
-/* restore saved preference */
-(function() {
-  const saved = localStorage.getItem('whippet-theme');
-  const preferLight = saved
-    ? saved === 'light'
-    : window.matchMedia('(prefers-color-scheme: light)').matches;
-  if (preferLight) {
-    document.documentElement.setAttribute('data-theme', 'light');
-    const lbl = document.getElementById('themeLabel');
-    if (lbl) lbl.textContent = 'Dark mode';
-  }
-})();
+    function closeMobileNav() {
+      document.getElementById("mobileNav").classList.remove("open");
+      const burger = document.getElementById("burger");
+      burger.classList.remove("open");
+      burger.setAttribute("aria-expanded", "false");
+    }
 
-/* ── mobile nav ── */
-function toggleMobileNav() {
-  const nav    = document.getElementById('mobileNav');
-  const burger = document.getElementById('burger');
-  const open   = nav.classList.toggle('open');
-  burger.classList.toggle('open', open);
-}
-function closeMobileNav() {
-  document.getElementById('mobileNav').classList.remove('open');
-  document.getElementById('burger').classList.remove('open');
-}
+    const revObs = new IntersectionObserver(
+      entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add("vis"); }),
+      { threshold: 0.07 }
+    );
+    document.querySelectorAll(".reveal").forEach(el => revObs.observe(el));
 
-/* ── scroll reveal ── */
-const revObs = new IntersectionObserver(
-  entries => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('vis'); }),
-  { threshold: 0.07 }
-);
-document.querySelectorAll('.reveal').forEach(el => revObs.observe(el));
+    window.addEventListener("resize", () => {
+      if (window.innerWidth > 680) closeMobileNav();
+    });
 
-/* ── close mobile nav on resize to desktop ── */
-window.addEventListener('resize', () => {
-  if (window.innerWidth > 680) closeMobileNav();
-});
-</script>
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeMobileNav();
+    });
+
+    document.querySelectorAll(".mobile-nav a").forEach(a => {
+      a.addEventListener("click", closeMobileNav);
+    });
+
+    document.querySelectorAll(".path-card").forEach(card => {
+      const head = card.querySelector(".path-head");
+      if (!head) return;
+      head.setAttribute("tabindex", "0");
+      head.setAttribute("role", "button");
+      head.setAttribute("aria-expanded", card.classList.contains("open") ? "true" : "false");
+
+      const toggle = () => {
+        card.classList.toggle("open");
+        head.setAttribute("aria-expanded", card.classList.contains("open") ? "true" : "false");
+      };
+
+      head.addEventListener("click", toggle);
+      head.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          toggle();
+        }
+      });
+    });
+  </script>
 </body>
 </html>
