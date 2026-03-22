@@ -1,1127 +1,219 @@
-<!DOCTYPE html>
-<html lang="en" data-theme="dark">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>whippet — BloodHound Attack Path Synthesizer</title>
-  <meta
-    name="description"
-    content="BloodHound attack path reporting tool, summary metrics, attack path filtering and dark/light mode."
-  />
-  <style>
-    :root {
-      --bg: #06090f;
-      --bg-elev: #0a0f18;
-      --panel: #0b111a;
-      --panel-2: #0f1622;
-      --panel-3: #121b29;
-      --border: #1d2a3d;
-      --border-soft: #162233;
-      --text: #c7d1df;
-      --text-soft: #91a0b7;
-      --text-dim: #60708a;
-      --heading: #eef4ff;
-      --green: #00f0a8;
-      --cyan: #16d7ff;
-      --red: #ff4b4b;
-      --orange: #ffab1a;
-      --yellow: #ffd84d;
-      --shadow: 0 18px 42px rgba(0, 0, 0, 0.36);
-      --radius: 14px;
-      --radius-lg: 18px;
-      --topbar-h: 72px;
-      --container: 1440px;
-      color-scheme: dark;
-    }
-
-    html[data-theme="light"] {
-      --bg: #f3f7fc;
-      --bg-elev: #ffffff;
-      --panel: #ffffff;
-      --panel-2: #f8fbff;
-      --panel-3: #eef4fb;
-      --border: #d7e2ef;
-      --border-soft: #e7eef7;
-      --text: #243246;
-      --text-soft: #53647a;
-      --text-dim: #7d8da2;
-      --heading: #08101c;
-      --green: #0aa66c;
-      --cyan: #0088c7;
-      --red: #d03434;
-      --orange: #c97b00;
-      --yellow: #9f8800;
-      --shadow: 0 18px 42px rgba(15, 23, 42, 0.08);
-      color-scheme: light;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    html {
-      scroll-behavior: smooth;
-      scroll-padding-top: calc(var(--topbar-h) + 18px);
-    }
-
-    body {
-      margin: 0;
-      background:
-        radial-gradient(circle at top right, rgba(0, 240, 168, 0.06), transparent 26%),
-        radial-gradient(circle at top left, rgba(22, 215, 255, 0.06), transparent 24%),
-        linear-gradient(180deg, var(--bg) 0%, var(--bg) 100%);
-      color: var(--text);
-      font: 400 15px/1.65 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      -webkit-font-smoothing: antialiased;
-      text-rendering: optimizeLegibility;
-    }
-
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      opacity: 0.22;
-      background:
-        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-      background-size: 28px 28px;
-      mask-image: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent 85%);
-    }
-
-    a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    button,
-    input,
-    select {
-      font: inherit;
-    }
-
-    :focus-visible {
-      outline: 2px solid var(--green);
-      outline-offset: 2px;
-    }
-
-    .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      min-height: var(--topbar-h);
-      background: rgba(6, 9, 15, 0.84);
-      backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--border);
-    }
-
-    html[data-theme="light"] .topbar {
-      background: rgba(243, 247, 252, 0.9);
-    }
-
-    .topbar-inner {
-      max-width: var(--container);
-      margin: 0 auto;
-      padding: 14px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      min-width: 0;
-    }
-
-    .brand-mark {
-      font-size: 24px;
-      line-height: 1;
-      color: var(--red);
-      flex-shrink: 0;
-    }
-
-    .brand-copy {
-      min-width: 0;
-    }
-
-    .brand-title {
-      margin: 0;
-      color: var(--green);
-      font: 800 clamp(20px, 3vw, 26px)/1.05 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      letter-spacing: -0.03em;
-    }
-
-    .brand-sub {
-      margin-top: 4px;
-      color: var(--text-dim);
-      font: 500 12px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-    }
-
-    .topbar-actions {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
-    .theme-toggle {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      border: 1px solid var(--border);
-      background: var(--panel-2);
-      color: var(--text-soft);
-      border-radius: 999px;
-      padding: 7px 12px;
-      cursor: pointer;
-      min-height: 40px;
-    }
-
-    .theme-toggle:hover {
-      border-color: var(--green);
-      color: var(--text);
-    }
-
-    .theme-pill {
-      width: 34px;
-      height: 18px;
-      border-radius: 999px;
-      background: var(--border);
-      position: relative;
-      flex-shrink: 0;
-    }
-
-    .theme-pill::after {
-      content: "";
-      position: absolute;
-      top: 2px;
-      left: 2px;
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: #fff;
-      transition: transform 0.2s ease;
-    }
-
-    html[data-theme="light"] .theme-pill {
-      background: var(--green);
-    }
-
-    html[data-theme="light"] .theme-pill::after {
-      transform: translateX(16px);
-    }
-
-    .page {
-      max-width: var(--container);
-      margin: 0 auto;
-      padding: 18px 20px 40px;
-    }
-
-    .hero {
-      background: linear-gradient(180deg, var(--panel) 0%, var(--bg-elev) 100%);
-      border: 1px solid var(--border);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-    }
-
-    .hero-main {
-      display: grid;
-      grid-template-columns: 1.6fr 1fr;
-      gap: 20px;
-      padding: 22px;
-      align-items: start;
-    }
-
-    .hero-left {
-      min-width: 0;
-    }
-
-    .hero-right {
-      display: grid;
-      gap: 6px;
-      justify-items: end;
-      text-align: right;
-      min-width: 0;
-    }
-
-    .eyebrow {
-      color: var(--text-dim);
-      font: 500 12px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
-
-    .meta-line {
-      color: var(--text-soft);
-      font: 500 13px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      word-break: break-word;
-    }
-
-    .warning {
-      margin: 0 22px 22px;
-      border: 1px solid rgba(255, 75, 75, 0.28);
-      background: rgba(255, 75, 75, 0.08);
-      color: #ff6b6b;
-      border-radius: 8px;
-      padding: 12px 14px;
-      font: 500 13px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      letter-spacing: 0.03em;
-    }
-
-    .kpi-grid {
-      display: grid;
-      grid-template-columns: repeat(8, minmax(0, 1fr));
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-    }
-
-    .kpi {
-      padding: 18px 12px 16px;
-      border-right: 1px solid var(--border);
-      background: linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
-      min-height: 88px;
-    }
-
-    .kpi:last-child {
-      border-right: 0;
-    }
-
-    .kpi-value {
-      color: var(--heading);
-      font: 800 clamp(24px, 3vw, 30px)/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      margin-bottom: 8px;
-    }
-
-    .kpi.red .kpi-value { color: var(--red); }
-    .kpi.orange .kpi-value { color: var(--orange); }
-    .kpi.green .kpi-value { color: var(--green); }
-    .kpi.cyan .kpi-value { color: var(--cyan); }
-    .kpi.yellow .kpi-value { color: var(--yellow); }
-
-    .kpi-label {
-      color: var(--text-dim);
-      font: 500 11px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-    }
-
-    .main-grid {
-      display: grid;
-      grid-template-columns: 260px minmax(0, 1fr);
-      gap: 18px;
-      margin-top: 18px;
-      align-items: start;
-    }
-
-    .sidebar {
-      background: linear-gradient(180deg, var(--panel) 0%, var(--bg-elev) 100%);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow: hidden;
-      position: sticky;
-      top: calc(var(--topbar-h) + 18px);
-    }
-
-    .sidebar-top {
-      padding: 18px 16px;
-      border-bottom: 1px solid var(--border);
-      background: linear-gradient(180deg, rgba(22,215,255,0.06), transparent);
-    }
-
-    .sidebar-kpi {
-      color: var(--cyan);
-      font: 800 44px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      margin-bottom: 8px;
-    }
-
-    .sidebar-label {
-      color: var(--text-dim);
-      font: 500 11px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-    }
-
-    .nav-group {
-      padding: 14px 10px 12px;
-      border-bottom: 1px solid var(--border-soft);
-    }
-
-    .nav-group:last-child {
-      border-bottom: 0;
-    }
-
-    .nav-title {
-      color: var(--text-dim);
-      font: 500 10px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      padding: 0 8px 10px;
-    }
-
-    .nav-link {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 10px 10px;
-      border-radius: 10px;
-      color: var(--text-soft);
-      font: 500 14px/1.35 Inter, ui-sans-serif, system-ui, sans-serif;
-    }
-
-    .nav-link:hover {
-      background: var(--panel-3);
-      color: var(--text);
-    }
-
-    .nav-link.active {
-      background: rgba(0, 240, 168, 0.08);
-      color: var(--green);
-    }
-
-    .nav-left {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      min-width: 0;
-    }
-
-    .nav-icon {
-      width: 16px;
-      text-align: center;
-      flex-shrink: 0;
-      opacity: 0.95;
-    }
-
-    .nav-badge {
-      min-width: 22px;
-      height: 22px;
-      border-radius: 999px;
-      padding: 0 7px;
-      display: inline-grid;
-      place-items: center;
-      font: 700 11px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      background: rgba(255,255,255,0.05);
-      color: var(--text-soft);
-      flex-shrink: 0;
-    }
-
-    .nav-badge.red { background: rgba(255, 75, 75, 0.16); color: #ff7474; }
-    .nav-badge.orange { background: rgba(255, 171, 26, 0.14); color: #ffb84d; }
-    .nav-badge.cyan { background: rgba(22, 215, 255, 0.14); color: #63e4ff; }
-    .nav-badge.green { background: rgba(0, 240, 168, 0.14); color: #55f7c3; }
-
-    .content {
-      min-width: 0;
-      background: linear-gradient(180deg, var(--panel) 0%, var(--bg-elev) 100%);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 22px;
-      box-shadow: var(--shadow);
-    }
-
-    .section-title {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: baseline;
-      gap: 12px;
-      margin-bottom: 18px;
-    }
-
-    .section-title h2 {
-      margin: 0;
-      color: var(--heading);
-      font: 800 clamp(26px, 3.2vw, 34px)/1.15 Inter, ui-sans-serif, system-ui, sans-serif;
-      letter-spacing: -0.03em;
-    }
-
-    .section-title .sub {
-      color: var(--text-dim);
-      font: 500 12px/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    }
-
-    .toolbar {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-bottom: 16px;
-    }
-
-    .toolbar input,
-    .toolbar select {
-      min-height: 44px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: var(--panel-2);
-      color: var(--text);
-      padding: 10px 12px;
-    }
-
-    .toolbar input {
-      flex: 1 1 320px;
-      min-width: 220px;
-    }
-
-    .toolbar select {
-      flex: 0 0 180px;
-      max-width: 100%;
-    }
-
-    .path-list {
-      display: grid;
-      gap: 10px;
-    }
-
-    .path-card {
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: linear-gradient(180deg, var(--panel-2) 0%, rgba(255,255,255,0.01) 100%);
-      overflow: hidden;
-    }
-
-    .path-summary {
-      display: grid;
-      grid-template-columns: 54px minmax(0, 1fr) auto auto auto;
-      gap: 14px;
-      align-items: center;
-      padding: 14px 16px;
-      cursor: pointer;
-    }
-
-    .path-summary:hover {
-      background: rgba(255,255,255,0.02);
-    }
-
-    .path-index {
-      color: var(--text-dim);
-      font: 500 12px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    }
-
-    .path-chain {
-      min-width: 0;
-      color: var(--heading);
-      font: 500 15px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .path-pill {
-      border: 1px solid rgba(22, 215, 255, 0.3);
-      background: rgba(22, 215, 255, 0.08);
-      color: var(--cyan);
-      border-radius: 6px;
-      padding: 5px 8px;
-      font: 600 11px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      white-space: nowrap;
-    }
-
-    .noise {
-      display: inline-flex;
-      gap: 2px;
-      align-items: center;
-    }
-
-    .noise span {
-      width: 4px;
-      height: 14px;
-      border-radius: 1px;
-      background: #334154;
-      display: inline-block;
-    }
-
-    .noise span.on {
-      background: var(--green);
-    }
-
-    .chev {
-      color: var(--text-dim);
-      transition: transform 0.2s ease;
-      font-size: 12px;
-    }
-
-    .path-card.open .chev {
-      transform: rotate(90deg);
-    }
-
-    .path-details {
+<style>
+  :root {
+    --ink: #1a1612;
+    --paper: #f5f0e8;
+    --aged: #e8dfc8;
+    --rust: #b5451b;
+    --steel: #4a5568;
+    --muted: #7c6f5e;
+    --highlight: #fff3cd;
+
+    --content-width: 72ch;
+    --page-pad: clamp(1rem, 3vw, 2rem);
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Source Serif 4", Georgia, serif;
+    font-size: clamp(1rem, 0.95rem + 0.3vw, 1.125rem);
+    line-height: 1.75;
+    overflow-x: hidden;
+  }
+
+  img, video, svg {
+    max-width: 100%;
+    height: auto;
+  }
+
+  article {
+    width: min(var(--content-width), calc(100% - 2 * var(--page-pad)));
+    margin-inline: auto;
+  }
+
+  .hero,
+  .content {
+    padding-inline: 0;
+  }
+
+  .hero {
+    padding-top: clamp(2rem, 5vw, 4rem);
+    border-bottom: 3px double var(--ink);
+  }
+
+  .hero-inner,
+  .content {
+    max-width: var(--content-width);
+    margin-inline: auto;
+  }
+
+  .hero-inner,
+  .content {
+    padding-inline: var(--page-pad);
+  }
+
+  .hero h1 {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: clamp(2.2rem, 4vw, 4.5rem);
+    line-height: 1.05;
+    margin: 0 0 0.5rem;
+    overflow-wrap: anywhere;
+  }
+
+  .hero-subtitle {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: clamp(1.05rem, 0.95rem + 0.6vw, 1.35rem);
+    font-style: italic;
+    color: var(--muted);
+    margin: 0 0 1.5rem;
+  }
+
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1rem;
+    align-items: center;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--aged);
+  }
+
+  .content {
+    padding-top: clamp(1.75rem, 4vw, 3rem);
+    padding-bottom: clamp(3rem, 6vw, 5rem);
+  }
+
+  .content > * + * {
+    margin-top: 1.25rem;
+  }
+
+  p {
+    margin: 0;
+    max-width: 70ch;
+  }
+
+  h2 {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: clamp(1.6rem, 1.2rem + 1.5vw, 2.25rem);
+    line-height: 1.15;
+    margin-top: 3rem;
+    margin-bottom: 0.25rem;
+    overflow-wrap: anywhere;
+  }
+
+  h3 {
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: clamp(1.2rem, 1rem + 0.6vw, 1.5rem);
+    line-height: 1.25;
+    margin-top: 2rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .drop-cap::first-letter {
+    float: left;
+    font-family: "Playfair Display", Georgia, serif;
+    font-size: 4rem;
+    line-height: 0.8;
+    margin: 0.05em 0.08em 0 0;
+    color: var(--rust);
+  }
+
+  .pull-quote,
+  .key-statement {
+    margin: 2rem 0;
+    padding: 1rem 1.25rem;
+    border-left: 4px solid var(--rust);
+    background: var(--aged);
+  }
+
+  .pull-quote p,
+  .key-statement p {
+    margin: 0;
+  }
+
+  .checklist {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0;
+    border-top: 1px solid var(--aged);
+  }
+
+  .checklist li {
+    padding: 0.6rem 0 0.6rem 1.6rem;
+    border-bottom: 1px solid var(--aged);
+    position: relative;
+  }
+
+  .checklist li::before {
+    content: "→";
+    position: absolute;
+    left: 0;
+    color: var(--rust);
+  }
+
+  .meme-frame {
+    width: 100%;
+    max-width: 460px;
+    aspect-ratio: 16 / 9;
+    border: 2px dashed var(--muted);
+    border-radius: 6px;
+    background: var(--aged);
+    display: grid;
+    place-items: center;
+    text-align: center;
+    padding: 1rem;
+  }
+
+  .next-post {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1rem;
+    align-items: end;
+    border-top: 3px double var(--ink);
+    padding-top: 2rem;
+    margin-top: 3rem;
+  }
+
+  @media (max-width: 600px) {
+    .next-post {
+      grid-template-columns: 1fr;
+    }
+
+    .next-arrow {
       display: none;
-      border-top: 1px solid var(--border-soft);
-      padding: 14px 16px;
-      background: rgba(255,255,255,0.015);
     }
 
-    .path-card.open .path-details {
-      display: block;
+    .drop-cap::first-letter {
+      font-size: 3.3rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
     }
 
-    .hop {
-      display: grid;
-      grid-template-columns: 24px minmax(0, 1fr);
-      gap: 10px;
-      padding: 8px 0;
-      border-bottom: 1px solid var(--border-soft);
+    *,
+    *::before,
+    *::after {
+      animation: none !important;
+      transition: none !important;
     }
-
-    .hop:last-child {
-      border-bottom: 0;
-    }
-
-    .hop-num {
-      color: var(--text-dim);
-      font: 500 12px/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    }
-
-    .hop-main {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px 8px;
-      align-items: center;
-      color: var(--text);
-      font: 500 13px/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    }
-
-    .hop-src { color: #ffd36f; }
-    .hop-rel {
-      border: 1px solid rgba(22, 215, 255, 0.22);
-      background: rgba(22, 215, 255, 0.08);
-      color: var(--cyan);
-      border-radius: 4px;
-      padding: 1px 6px;
-      font-size: 11px;
-      white-space: nowrap;
-    }
-
-    .hop-dst.t0 { color: var(--red); }
-    .hop-tip {
-      margin-top: 4px;
-      color: var(--text-dim);
-      font-size: 12px;
-      line-height: 1.55;
-    }
-
-    .footer-note {
-      margin-top: 20px;
-      color: var(--text-dim);
-      font: 500 12px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    }
-
-    @media (max-width: 1180px) {
-      .kpi-grid {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-      }
-
-      .main-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .sidebar {
-        position: static;
-      }
-
-      .sidebar-top {
-        display: none;
-      }
-
-      .sidebar {
-        padding: 10px;
-      }
-
-      .sidebar-inner {
-        display: flex;
-        gap: 12px;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        padding-bottom: 2px;
-      }
-
-      .nav-group {
-        min-width: 240px;
-        border: 1px solid var(--border-soft);
-        border-radius: 12px;
-        padding: 12px 10px 10px;
-        background: var(--panel-2);
-      }
-    }
-
-    @media (max-width: 900px) {
-      .hero-main {
-        grid-template-columns: 1fr;
-      }
-
-      .hero-right {
-        justify-items: start;
-        text-align: left;
-      }
-
-      .path-summary {
-        grid-template-columns: 44px minmax(0, 1fr) auto;
-        grid-template-areas:
-          "idx chain chev"
-          ". meta meta";
-        align-items: start;
-      }
-
-      .path-index { grid-area: idx; }
-      .path-chain { grid-area: chain; white-space: normal; overflow: visible; text-overflow: clip; }
-      .chev { grid-area: chev; justify-self: end; margin-top: 2px; }
-
-      .path-summary .path-pill,
-      .path-summary .noise {
-        margin-top: 2px;
-      }
-
-      .path-summary .path-pill:first-of-type {
-        margin-left: 58px;
-      }
-    }
-
-    @media (max-width: 640px) {
-      .topbar-inner,
-      .page {
-        padding-left: 14px;
-        padding-right: 14px;
-      }
-
-      .topbar-inner {
-        align-items: flex-start;
-        flex-direction: column;
-      }
-
-      .topbar-actions {
-        width: 100%;
-        justify-content: space-between;
-      }
-
-      .warning,
-      .hero-main,
-      .content {
-        padding-left: 14px;
-        padding-right: 14px;
-      }
-
-      .warning {
-        margin-left: 14px;
-        margin-right: 14px;
-        margin-bottom: 14px;
-      }
-
-      .kpi-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .kpi {
-        min-height: 82px;
-      }
-
-      .toolbar {
-        flex-direction: column;
-      }
-
-      .toolbar input,
-      .toolbar select {
-        width: 100%;
-      }
-
-      .theme-toggle {
-        padding-right: 10px;
-      }
-
-      .theme-text {
-        display: none;
-      }
-
-      .section-title h2 {
-        font-size: 22px;
-      }
-    }
-
-    @media (max-width: 420px) {
-      .path-summary .noise {
-        display: none;
-      }
-
-      .path-summary .path-pill:first-of-type {
-        margin-left: 0;
-      }
-    }
-  </style>
-</head>
-<body>
-  <header class="topbar">
-    <div class="topbar-inner">
-      <div class="brand">
-        <div class="brand-mark">🩸</div>
-        <div class="brand-copy">
-          <h1 class="brand-title">bhsynth — Attack Path Report</h1>
-          <div class="brand-sub">v9.0.0 · Enterprise-grade BloodHound Analysis</div>
-        </div>
-      </div>
-
-      <div class="topbar-actions">
-        <button class="theme-toggle" id="themeToggle" type="button" aria-label="Toggle light or dark mode" aria-pressed="false">
-          <span class="theme-pill" aria-hidden="true"></span>
-          <span class="theme-text" id="themeText">Light mode</span>
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <main class="page">
-    <section class="hero">
-      <div class="hero-main">
-        <div class="hero-left">
-          <div class="eyebrow">Attack Surface Summary</div>
-          <div class="meta-line">Generated: 2026-03-21 06:23 UTC</div>
-          <div class="meta-line">Domains: GHOST.CORP, PHANTOM.CORP, WRAITH.CORP</div>
-          <div class="meta-line">Graph: 1,333 nodes · 10,788 edges · 7 Tier-0</div>
-        </div>
-        <div class="hero-right">
-          <div class="eyebrow">Report Scope</div>
-          <div class="meta-line">Attack paths, identity risk, credential exposure, privilege escalation, and blast radius.</div>
-        </div>
-      </div>
-
-      <div class="warning">△ AUTHORIZED USE ONLY — This report contains sensitive security findings. Handle as confidential.</div>
-
-      <div class="kpi-grid">
-        <div class="kpi red"><div class="kpi-value">9</div><div class="kpi-label">Kerberoastable</div></div>
-        <div class="kpi red"><div class="kpi-value">1</div><div class="kpi-label">AS-REP Roastable</div></div>
-        <div class="kpi red"><div class="kpi-value">9</div><div class="kpi-label">DCSync Direct</div></div>
-        <div class="kpi orange"><div class="kpi-value">16</div><div class="kpi-label">ACL Abuse Paths</div></div>
-        <div class="kpi orange"><div class="kpi-value">4</div><div class="kpi-label">Delegation Chains</div></div>
-        <div class="kpi green"><div class="kpi-value">0</div><div class="kpi-label">ADCS ESC Paths</div></div>
-        <div class="kpi yellow"><div class="kpi-value">1</div><div class="kpi-label">LAPS Readers</div></div>
-        <div class="kpi cyan"><div class="kpi-value">23</div><div class="kpi-label">Users → T0</div></div>
-      </div>
-    </section>
-
-    <div class="main-grid">
-      <aside class="sidebar" aria-label="Report navigation">
-        <div class="sidebar-top">
-          <div class="sidebar-kpi">23</div>
-          <div class="sidebar-label">Users → T0</div>
-        </div>
-
-        <div class="sidebar-inner">
-          <div class="nav-group">
-            <div class="nav-title">Overview</div>
-            <a class="nav-link active" href="#attack-paths">
-              <span class="nav-left"><span class="nav-icon">⚡</span><span>Attack Paths</span></span>
-              <span class="nav-badge red">23</span>
-            </a>
-            <a class="nav-link" href="#high-risk">
-              <span class="nav-left"><span class="nav-icon">◈</span><span>High Risk Nodes</span></span>
-              <span class="nav-badge">30</span>
-            </a>
-          </div>
-
-          <div class="nav-group">
-            <div class="nav-title">Credential Access</div>
-            <a class="nav-link" href="#kerberoast">
-              <span class="nav-left"><span class="nav-icon">🎟</span><span>Kerberoast</span></span>
-              <span class="nav-badge red">9</span>
-            </a>
-            <a class="nav-link" href="#asrep">
-              <span class="nav-left"><span class="nav-icon">🪪</span><span>AS-REP Roast</span></span>
-              <span class="nav-badge red">1</span>
-            </a>
-            <a class="nav-link" href="#dcsync">
-              <span class="nav-left"><span class="nav-icon">💀</span><span>DCSync</span></span>
-              <span class="nav-badge red">9</span>
-            </a>
-            <a class="nav-link" href="#laps">
-              <span class="nav-left"><span class="nav-icon">🔑</span><span>LAPS</span></span>
-              <span class="nav-badge orange">1</span>
-            </a>
-          </div>
-
-          <div class="nav-group">
-            <div class="nav-title">Privilege Escalation</div>
-            <a class="nav-link" href="#acl">
-              <span class="nav-left"><span class="nav-icon">⚙</span><span>ACL Abuse</span></span>
-              <span class="nav-badge red">16</span>
-            </a>
-            <a class="nav-link" href="#delegation">
-              <span class="nav-left"><span class="nav-icon">🛰</span><span>Delegation</span></span>
-              <span class="nav-badge orange">4</span>
-            </a>
-            <a class="nav-link" href="#adcs">
-              <span class="nav-left"><span class="nav-icon">🏛</span><span>ADCS ESC</span></span>
-              <span class="nav-badge">0</span>
-            </a>
-          </div>
-        </div>
-      </aside>
-
-      <section class="content" id="attack-paths">
-        <div class="section-title">
-          <h2>⚡ Attack Paths — All Users to Tier-0</h2>
-          <div class="sub">23 paths shown (sorted by hop count)</div>
-        </div>
-
-        <div class="toolbar">
-          <input id="pathFilter" type="text" placeholder="Filter by user, target, or technique" />
-          <select id="categoryFilter" aria-label="Filter categories">
-            <option value="all">All categories</option>
-            <option value="acl">ACL abuse</option>
-            <option value="session">Session-based</option>
-            <option value="group">Group chaining</option>
-          </select>
-        </div>
-
-        <div class="path-list" id="pathList">
-          <article class="path-card open" data-category="group acl">
-            <div class="path-summary">
-              <div class="path-index">#1</div>
-              <div class="path-chain">DU001@PHANTOM.CORP → DC01.PHANTOM.CORP</div>
-              <div class="path-pill">2 hops</div>
-              <div class="noise" aria-label="Low noise">
-                <span class="on"></span><span class="on"></span><span></span><span></span><span></span><span></span><span></span><span></span>
-              </div>
-              <div class="chev">▶</div>
-            </div>
-            <div class="path-details">
-              <div class="hop">
-                <div class="hop-num">1.</div>
-                <div>
-                  <div class="hop-main">
-                    <span class="hop-src">DU001@PHANTOM.CORP</span>
-                    <span class="hop-rel">MemberOf</span>
-                    <span class="hop-dst">IT-SUPPORT@PHANTOM.CORP</span>
-                  </div>
-                  <div class="hop-tip">Inherited group control provides delegated administrative access over a privileged workstation tier.</div>
-                </div>
-              </div>
-              <div class="hop">
-                <div class="hop-num">2.</div>
-                <div>
-                  <div class="hop-main">
-                    <span class="hop-src">IT-SUPPORT@PHANTOM.CORP</span>
-                    <span class="hop-rel">AdminTo</span>
-                    <span class="hop-dst t0">DC01.PHANTOM.CORP</span>
-                  </div>
-                  <div class="hop-tip">Administrative access over the domain controller yields direct Tier-0 compromise.</div>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          <article class="path-card" data-category="session">
-            <div class="path-summary">
-              <div class="path-index">#2</div>
-              <div class="path-chain">ADMINISTRATOR@PHANTOM.CORP → DC01.PHANTOM.CORP</div>
-              <div class="path-pill">2 hops</div>
-              <div class="noise" aria-label="Low noise">
-                <span class="on"></span><span class="on"></span><span></span><span></span><span></span><span></span><span></span><span></span>
-              </div>
-              <div class="chev">▶</div>
-            </div>
-            <div class="path-details">
-              <div class="hop">
-                <div class="hop-num">1.</div>
-                <div>
-                  <div class="hop-main">
-                    <span class="hop-src">ADMINISTRATOR@PHANTOM.CORP</span>
-                    <span class="hop-rel">HasSession</span>
-                    <span class="hop-dst">MGMT-01.PHANTOM.CORP</span>
-                  </div>
-                  <div class="hop-tip">Active session creates immediate credential material exposure on the management host.</div>
-                </div>
-              </div>
-              <div class="hop">
-                <div class="hop-num">2.</div>
-                <div>
-                  <div class="hop-main">
-                    <span class="hop-src">MGMT-01.PHANTOM.CORP</span>
-                    <span class="hop-rel">AdminTo</span>
-                    <span class="hop-dst t0">DC01.PHANTOM.CORP</span>
-                  </div>
-                  <div class="hop-tip">Local admin rights enable remote service creation, token impersonation, or credential extraction.</div>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          <article class="path-card" data-category="group">
-            <div class="path-summary">
-              <div class="path-index">#3</div>
-              <div class="path-chain">ANDY@PHANTOM.CORP → DC01.PHANTOM.CORP</div>
-              <div class="path-pill">2 hops</div>
-              <div class="noise" aria-label="Low noise">
-                <span class="on"></span><span class="on"></span><span></span><span></span><span></span><span></span><span></span><span></span>
-              </div>
-              <div class="chev">▶</div>
-            </div>
-            <div class="path-details">
-              <div class="hop">
-                <div class="hop-num">1.</div>
-                <div>
-                  <div class="hop-main">
-                    <span class="hop-src">ANDY@PHANTOM.CORP</span>
-                    <span class="hop-rel">MemberOf</span>
-                    <span class="hop-dst">SERVER-OPS@PHANTOM.CORP</span>
-                  </div>
-                  <div class="hop-tip">Nested group membership chains the account into operational server administration.</div>
-                </div>
-              </div>
-              <div class="hop">
-                <div class="hop-num">2.</div>
-                <div>
-                  <div class="hop-main">
-                    <span class="hop-src">SERVER-OPS@PHANTOM.CORP</span>
-                    <span class="hop-rel">AdminTo</span>
-                    <span class="hop-dst t0">DC01.PHANTOM.CORP</span>
-                  </div>
-                  <div class="hop-tip">Administrative rights over the Tier-0 system complete the attack chain.</div>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          <article class="path-card" data-category="acl">
-            <div class="path-summary">
-              <div class="path-index">#4</div>
-              <div class="path-chain">FABIAN@PHANTOM.CORP → DC01.PHANTOM.CORP</div>
-              <div class="path-pill">2 hops</div>
-              <div class="noise" aria-label="Low noise">
-                <span class="on"></span><span class="on"></span><span></span><span></span><span></span><span></span><span></span><span></span>
-              </div>
-              <div class="chev">▶</div>
-            </div>
-            <div class="path-details">
-              <div class="hop">
-                <div class="hop-num">1.</div>
-                <div>
-                  <div class="hop-main">
-                    <span class="hop-src">FABIAN@PHANTOM.CORP</span>
-                    <span class="hop-rel">GenericAll</span>
-                    <span class="hop-dst">HELPDESK-ADMINS@PHANTOM.CORP</span>
-                  </div>
-                  <div class="hop-tip">Full control over the group allows direct membership manipulation and privilege escalation.</div>
-                </div>
-              </div>
-              <div class="hop">
-                <div class="hop-num">2.</div>
-                <div>
-                  <div class="hop-main">
-                    <span class="hop-src">HELPDESK-ADMINS@PHANTOM.CORP</span>
-                    <span class="hop-rel">AdminTo</span>
-                    <span class="hop-dst t0">DC01.PHANTOM.CORP</span>
-                  </div>
-                  <div class="hop-tip">The group already holds administration over the target Tier-0 asset.</div>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          <article class="path-card" data-category="session">
-            <div class="path-summary">
-              <div class="path-index">#5</div>
-              <div class="path-chain">HACKERDA@PHANTOM.CORP → DC01.PHANTOM.CORP</div>
-              <div class="path-pill">2 hops</div>
-              <div class="noise" aria-label="Low noise">
-                <span class="on"></span><span class="on"></span><span></span><span></span><span></span><span></span><span></span><span></span>
-              </div>
-              <div class="chev">▶</div>
-            </div>
-            <div class="path-details">
-              <div class="hop">
-                <div class="hop-num">1.</div>
-                <div>
-                  <div class="hop-main">
-                    <span class="hop-src">HACKERDA@PHANTOM.CORP</span>
-                    <span class="hop-rel">CanPSRemote</span>
-                    <span class="hop-dst">WS-ADMIN-02.PHANTOM.CORP</span>
-                  </div>
-                  <div class="hop-tip">Remote PowerShell provides code execution and follow-on credential access on the workstation.</div>
-                </div>
-              </div>
-              <div class="hop">
-                <div class="hop-num">2.</div>
-                <div>
-                  <div class="hop-main">
-                    <span class="hop-src">WS-ADMIN-02.PHANTOM.CORP</span>
-                    <span class="hop-rel">HasSession</span>
-                    <span class="hop-dst t0">DC01.PHANTOM.CORP</span>
-                  </div>
-                  <div class="hop-tip">Privileged logon session on the remote host creates a direct route to Tier-0 material.</div>
-                </div>
-              </div>
-            </div>
-          </article>
-        </div>
-
-        <div class="footer-note">Responsive layout notes: the sidebar becomes a horizontal overview strip on smaller screens, path chains wrap cleanly on tablet/mobile, and the filters stack vertically under 640px.</div>
-      </section>
-    </div>
-  </main>
-
-  <script>
-    (function () {
-      const root = document.documentElement;
-      const themeToggle = document.getElementById("themeToggle");
-      const themeText = document.getElementById("themeText");
-      const storageKey = "bhsynth-theme";
-
-      function applyTheme(theme) {
-        root.setAttribute("data-theme", theme);
-        const isLight = theme === "light";
-        themeText.textContent = isLight ? "Dark mode" : "Light mode";
-        themeToggle.setAttribute("aria-pressed", String(isLight));
-      }
-
-      const savedTheme = localStorage.getItem(storageKey);
-      applyTheme(savedTheme === "light" ? "light" : "dark");
-
-      themeToggle.addEventListener("click", () => {
-        const next = root.getAttribute("data-theme") === "light" ? "dark" : "light";
-        localStorage.setItem(storageKey, next);
-        applyTheme(next);
-      });
-
-      document.querySelectorAll(".path-card").forEach((card) => {
-        const summary = card.querySelector(".path-summary");
-        summary.setAttribute("tabindex", "0");
-        summary.setAttribute("role", "button");
-
-        const toggle = () => card.classList.toggle("open");
-
-        summary.addEventListener("click", toggle);
-        summary.addEventListener("keydown", (e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            toggle();
-          }
-        });
-      });
-
-      const pathFilter = document.getElementById("pathFilter");
-      const categoryFilter = document.getElementById("categoryFilter");
-      const cards = [...document.querySelectorAll(".path-card")];
-
-      function filterCards() {
-        const q = pathFilter.value.trim().toLowerCase();
-        const cat = categoryFilter.value;
-
-        cards.forEach((card) => {
-          const text = card.textContent.toLowerCase();
-          const inText = !q || text.includes(q);
-          const inCat = cat === "all" || card.dataset.category.includes(cat);
-          card.style.display = inText && inCat ? "" : "none";
-        });
-      }
-
-      pathFilter.addEventListener("input", filterCards);
-      categoryFilter.addEventListener("change", filterCards);
-    })();
-  </script>
-</body>
-</html>
+  }
+</style>
