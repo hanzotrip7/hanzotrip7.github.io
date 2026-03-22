@@ -1,219 +1,1738 @@
-<style>
-  :root {
-    --ink: #1a1612;
-    --paper: #f5f0e8;
-    --aged: #e8dfc8;
-    --rust: #b5451b;
-    --steel: #4a5568;
-    --muted: #7c6f5e;
-    --highlight: #fff3cd;
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>whippet — BloodHound Attack Path Synthesizer</title>
+  <meta
+    name="description"
+    content="whippet is a pure-Python BloodHound attack path synthesizer for ranked paths, blast radius analysis, and self-contained HTML reporting."
+  />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    :root {
+      --bg: #06090f;
+      --bg2: #0a1018;
+      --bg3: #0d1521;
+      --bg4: #121d2c;
+      --panel: #0b121b;
+      --panel-2: #0f1825;
+      --panel-3: #101a28;
+      --border: #1b2a3f;
+      --border2: #24364f;
 
-    --content-width: 72ch;
-    --page-pad: clamp(1rem, 3vw, 2rem);
-  }
+      --text: #c9d6e5;
+      --text-mid: #8fa0b8;
+      --text-dim: #5f7089;
+      --heading: #f3f7fd;
 
-  *,
-  *::before,
-  *::after {
-    box-sizing: border-box;
-  }
+      --green: #00f0a8;
+      --cyan: #18d7ff;
+      --red: #ff4d4d;
+      --yellow: #ffd84e;
+      --orange: #ffab1a;
+      --purple: #ad8cff;
 
-  html {
-    scroll-behavior: smooth;
-    -webkit-text-size-adjust: 100%;
-    text-size-adjust: 100%;
-  }
+      --success-bg: rgba(0, 240, 168, 0.08);
+      --cyan-bg: rgba(24, 215, 255, 0.08);
+      --red-bg: rgba(255, 77, 77, 0.08);
+      --yellow-bg: rgba(255, 216, 78, 0.08);
 
-  body {
-    margin: 0;
-    min-height: 100vh;
-    background: var(--paper);
-    color: var(--ink);
-    font-family: "Source Serif 4", Georgia, serif;
-    font-size: clamp(1rem, 0.95rem + 0.3vw, 1.125rem);
-    line-height: 1.75;
-    overflow-x: hidden;
-  }
+      --topbar-bg: rgba(6, 9, 15, 0.84);
+      --term-bg: #05080d;
 
-  img, video, svg {
-    max-width: 100%;
-    height: auto;
-  }
+      --shadow: 0 16px 48px rgba(0, 0, 0, 0.34);
+      --radius: 14px;
+      --radius-sm: 10px;
+      --max-w: 1220px;
+      --content-w: 860px;
+      --gutter: clamp(16px, 4vw, 42px);
+      --topbar-h: 62px;
 
-  article {
-    width: min(var(--content-width), calc(100% - 2 * var(--page-pad)));
-    margin-inline: auto;
-  }
-
-  .hero,
-  .content {
-    padding-inline: 0;
-  }
-
-  .hero {
-    padding-top: clamp(2rem, 5vw, 4rem);
-    border-bottom: 3px double var(--ink);
-  }
-
-  .hero-inner,
-  .content {
-    max-width: var(--content-width);
-    margin-inline: auto;
-  }
-
-  .hero-inner,
-  .content {
-    padding-inline: var(--page-pad);
-  }
-
-  .hero h1 {
-    font-family: "Playfair Display", Georgia, serif;
-    font-size: clamp(2.2rem, 4vw, 4.5rem);
-    line-height: 1.05;
-    margin: 0 0 0.5rem;
-    overflow-wrap: anywhere;
-  }
-
-  .hero-subtitle {
-    font-family: "Playfair Display", Georgia, serif;
-    font-size: clamp(1.05rem, 0.95rem + 0.6vw, 1.35rem);
-    font-style: italic;
-    color: var(--muted);
-    margin: 0 0 1.5rem;
-  }
-
-  .meta-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem 1rem;
-    align-items: center;
-    font-family: "IBM Plex Mono", monospace;
-    font-size: 0.75rem;
-    color: var(--muted);
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid var(--aged);
-  }
-
-  .content {
-    padding-top: clamp(1.75rem, 4vw, 3rem);
-    padding-bottom: clamp(3rem, 6vw, 5rem);
-  }
-
-  .content > * + * {
-    margin-top: 1.25rem;
-  }
-
-  p {
-    margin: 0;
-    max-width: 70ch;
-  }
-
-  h2 {
-    font-family: "Playfair Display", Georgia, serif;
-    font-size: clamp(1.6rem, 1.2rem + 1.5vw, 2.25rem);
-    line-height: 1.15;
-    margin-top: 3rem;
-    margin-bottom: 0.25rem;
-    overflow-wrap: anywhere;
-  }
-
-  h3 {
-    font-family: "Playfair Display", Georgia, serif;
-    font-size: clamp(1.2rem, 1rem + 0.6vw, 1.5rem);
-    line-height: 1.25;
-    margin-top: 2rem;
-    margin-bottom: 0.25rem;
-  }
-
-  .drop-cap::first-letter {
-    float: left;
-    font-family: "Playfair Display", Georgia, serif;
-    font-size: 4rem;
-    line-height: 0.8;
-    margin: 0.05em 0.08em 0 0;
-    color: var(--rust);
-  }
-
-  .pull-quote,
-  .key-statement {
-    margin: 2rem 0;
-    padding: 1rem 1.25rem;
-    border-left: 4px solid var(--rust);
-    background: var(--aged);
-  }
-
-  .pull-quote p,
-  .key-statement p {
-    margin: 0;
-  }
-
-  .checklist {
-    list-style: none;
-    padding: 0;
-    margin: 1rem 0;
-    border-top: 1px solid var(--aged);
-  }
-
-  .checklist li {
-    padding: 0.6rem 0 0.6rem 1.6rem;
-    border-bottom: 1px solid var(--aged);
-    position: relative;
-  }
-
-  .checklist li::before {
-    content: "→";
-    position: absolute;
-    left: 0;
-    color: var(--rust);
-  }
-
-  .meme-frame {
-    width: 100%;
-    max-width: 460px;
-    aspect-ratio: 16 / 9;
-    border: 2px dashed var(--muted);
-    border-radius: 6px;
-    background: var(--aged);
-    display: grid;
-    place-items: center;
-    text-align: center;
-    padding: 1rem;
-  }
-
-  .next-post {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 1rem;
-    align-items: end;
-    border-top: 3px double var(--ink);
-    padding-top: 2rem;
-    margin-top: 3rem;
-  }
-
-  @media (max-width: 600px) {
-    .next-post {
-      grid-template-columns: 1fr;
+      --sans: "DM Sans", sans-serif;
+      --mono: "DM Mono", monospace;
+      --display: "Syne", sans-serif;
     }
 
-    .next-arrow {
-      display: none;
+    [data-theme="light"] {
+      --bg: #f4f8fc;
+      --bg2: #ffffff;
+      --bg3: #edf3f9;
+      --bg4: #e5edf6;
+      --panel: #ffffff;
+      --panel-2: #f8fbff;
+      --panel-3: #eef4fa;
+      --border: #d8e3ef;
+      --border2: #c8d5e3;
+
+      --text: #243244;
+      --text-mid: #5f7085;
+      --text-dim: #8190a3;
+      --heading: #08101b;
+
+      --green: #0aa66c;
+      --cyan: #007fa8;
+      --red: #d33636;
+      --yellow: #aa8600;
+      --orange: #c97700;
+      --purple: #7046c9;
+
+      --success-bg: rgba(10, 166, 108, 0.08);
+      --cyan-bg: rgba(0, 127, 168, 0.08);
+      --red-bg: rgba(211, 54, 54, 0.08);
+      --yellow-bg: rgba(170, 134, 0, 0.08);
+
+      --topbar-bg: rgba(244, 248, 252, 0.9);
+      --term-bg: #0d1220;
+      --shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
     }
 
-    .drop-cap::first-letter {
-      font-size: 3.3rem;
+    * {
+      box-sizing: border-box;
     }
-  }
 
-  @media (prefers-reduced-motion: reduce) {
     html {
-      scroll-behavior: auto;
+      scroll-behavior: smooth;
+      scroll-padding-top: calc(var(--topbar-h) + 18px);
+      -webkit-text-size-adjust: 100%;
     }
 
-    *,
-    *::before,
-    *::after {
-      animation: none !important;
-      transition: none !important;
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at top right, rgba(0, 240, 168, 0.05), transparent 24%),
+        radial-gradient(circle at top left, rgba(24, 215, 255, 0.05), transparent 22%),
+        linear-gradient(180deg, var(--bg) 0%, var(--bg) 100%);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 15px;
+      line-height: 1.75;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+      transition: background 0.25s ease, color 0.25s ease;
     }
-  }
-</style>
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.18;
+      background:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 28px 28px;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,0.85), transparent 85%);
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--green);
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+
+    ::selection {
+      background: rgba(0, 240, 168, 0.18);
+      color: var(--heading);
+    }
+
+    .site {
+      position: relative;
+      z-index: 1;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      min-height: var(--topbar-h);
+      background: var(--topbar-bg);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    .topbar-inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 12px var(--gutter);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .topbar-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      flex-shrink: 0;
+    }
+
+    .logo-mark {
+      color: var(--red);
+      font-size: 22px;
+      line-height: 1;
+    }
+
+    .logo-text {
+      font-family: var(--display);
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      color: var(--green);
+    }
+
+    .topbar-nav {
+      display: flex;
+      gap: 4px;
+      flex: 1;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .topbar-nav a {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.06em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      padding: 7px 10px;
+      border-radius: 8px;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .topbar-nav a:hover {
+      background: var(--bg3);
+      color: var(--text);
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .theme-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 38px;
+      padding: 5px 12px 5px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--border2);
+      background: var(--bg3);
+      color: var(--text-mid);
+      cursor: pointer;
+      transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .theme-btn:hover {
+      border-color: var(--green);
+      color: var(--text);
+    }
+
+    .toggle-track {
+      width: 28px;
+      height: 16px;
+      border-radius: 999px;
+      background: var(--border2);
+      position: relative;
+      flex-shrink: 0;
+      transition: background 0.2s ease;
+    }
+
+    .toggle-knob {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #fff;
+      transition: transform 0.2s ease;
+    }
+
+    [data-theme="light"] .toggle-track {
+      background: var(--green);
+    }
+
+    [data-theme="light"] .toggle-knob {
+      transform: translateX(12px);
+    }
+
+    .theme-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.04em;
+    }
+
+    .menu-btn {
+      display: none;
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      border: 1px solid var(--border2);
+      background: var(--bg3);
+      padding: 0;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .menu-btn span {
+      position: absolute;
+      left: 10px;
+      right: 10px;
+      height: 1.5px;
+      background: var(--text-mid);
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+
+    .menu-btn span:nth-child(1) { top: 12px; }
+    .menu-btn span:nth-child(2) { top: 18px; }
+    .menu-btn span:nth-child(3) { top: 24px; }
+
+    .menu-btn.open span:nth-child(1) {
+      transform: translateY(6px) rotate(45deg);
+    }
+
+    .menu-btn.open span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .menu-btn.open span:nth-child(3) {
+      transform: translateY(-6px) rotate(-45deg);
+    }
+
+    .mobile-nav {
+      display: none;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg2);
+      padding: 8px var(--gutter) 14px;
+    }
+
+    .mobile-nav.open {
+      display: grid;
+      gap: 4px;
+    }
+
+    .mobile-nav a {
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--text-mid);
+      padding: 10px 12px;
+      border-radius: 8px;
+    }
+
+    .mobile-nav a:hover {
+      background: var(--bg3);
+      color: var(--text);
+    }
+
+    .hero {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: clamp(40px, 7vw, 78px) var(--gutter) clamp(28px, 5vw, 46px);
+    }
+
+    .hero-shell {
+      background: linear-gradient(180deg, rgba(11,18,27,0.92), rgba(10,16,24,0.86));
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    [data-theme="light"] .hero-shell {
+      background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(248,251,255,0.94));
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.4fr) minmax(260px, 360px);
+      gap: 28px;
+      padding: clamp(26px, 4vw, 40px);
+      align-items: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+      color: var(--green);
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 20px;
+      height: 1px;
+      background: var(--green);
+      opacity: 0.8;
+    }
+
+    .hero-title {
+      margin: 0;
+      color: var(--heading);
+      font-family: var(--display);
+      font-size: clamp(46px, 10vw, 94px);
+      font-weight: 800;
+      line-height: 0.94;
+      letter-spacing: -0.05em;
+      max-width: 10ch;
+    }
+
+    .hero-title .accent {
+      color: var(--red);
+    }
+
+    .hero-desc {
+      margin: 18px 0 0;
+      max-width: 58ch;
+      color: var(--text-mid);
+      font-size: clamp(15px, 2vw, 17px);
+      line-height: 1.8;
+    }
+
+    .hero-desc strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .hero-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 22px;
+    }
+
+    .pill {
+      border: 1px solid var(--border2);
+      border-radius: 999px;
+      padding: 5px 10px;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+      background: rgba(255,255,255,0.02);
+    }
+
+    .p-green  { color: var(--green);  border-color: rgba(0,240,168,0.22); background: rgba(0,240,168,0.06); }
+    .p-cyan   { color: var(--cyan);   border-color: rgba(24,215,255,0.22); background: rgba(24,215,255,0.06); }
+    .p-red    { color: var(--red);    border-color: rgba(255,77,77,0.22); background: rgba(255,77,77,0.06); }
+    .p-orange { color: var(--orange); border-color: rgba(255,171,26,0.22); background: rgba(255,171,26,0.06); }
+    .p-yellow { color: var(--yellow); border-color: rgba(255,216,78,0.22); background: rgba(255,216,78,0.06); }
+    .p-purple { color: var(--purple); border-color: rgba(173,140,255,0.22); background: rgba(173,140,255,0.06); }
+
+    .hero-side {
+      display: grid;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      overflow: hidden;
+    }
+
+    .metric {
+      background: var(--panel-2);
+      padding: 16px 16px 14px;
+    }
+
+    .metric-value {
+      font-family: var(--display);
+      font-size: clamp(24px, 4vw, 30px);
+      font-weight: 800;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .metric-label {
+      color: var(--text-dim);
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .metric.green .metric-value { color: var(--green); }
+    .metric.cyan .metric-value { color: var(--cyan); }
+    .metric.red .metric-value { color: var(--red); }
+    .metric.orange .metric-value { color: var(--orange); }
+    .metric.yellow .metric-value { color: var(--yellow); }
+
+    .main {
+      max-width: var(--content-w);
+      margin: 0 auto;
+      padding: 0 var(--gutter) 70px;
+    }
+
+    .section {
+      padding-top: clamp(56px, 7vw, 82px);
+    }
+
+    .section[id] {
+      scroll-margin-top: calc(var(--topbar-h) + 16px);
+    }
+
+    .section-tag {
+      color: var(--green);
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .section-tag::before {
+      content: "//";
+      opacity: 0.55;
+    }
+
+    .section-title {
+      margin: 0 0 16px;
+      color: var(--heading);
+      font-family: var(--display);
+      font-size: clamp(28px, 5vw, 48px);
+      font-weight: 800;
+      line-height: 1.04;
+      letter-spacing: -0.04em;
+    }
+
+    .section-lead {
+      margin: 0 0 28px;
+      max-width: 62ch;
+      color: var(--text-mid);
+      font-size: clamp(15px, 2vw, 17px);
+      line-height: 1.85;
+      padding-left: 16px;
+      border-left: 2px solid var(--border2);
+    }
+
+    p {
+      margin: 0 0 16px;
+      color: var(--text);
+      line-height: 1.82;
+    }
+
+    p strong {
+      color: var(--heading);
+    }
+
+    hr.divider {
+      border: 0;
+      height: 1px;
+      margin: clamp(50px, 7vw, 78px) 0 0;
+      background: linear-gradient(90deg, transparent, var(--border2), transparent);
+    }
+
+    code {
+      font-family: var(--mono);
+      font-size: 0.84em;
+      color: var(--cyan);
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      padding: 1px 6px;
+      border-radius: 5px;
+      word-break: break-word;
+    }
+
+    .term {
+      margin: 24px 0;
+      background: var(--term-bg);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .term-bar {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 10px 14px;
+      background: var(--bg3);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .dot.red { background: #ff5f57; }
+    .dot.yellow { background: #febc2e; }
+    .dot.green { background: #28c840; }
+
+    .term-title {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      text-align: center;
+      color: var(--text-dim);
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.04em;
+    }
+
+    .term-body {
+      padding: 18px 18px 20px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      color: #8fa2b9;
+      font-family: var(--mono);
+      font-size: 12px;
+      line-height: 1.82;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    [data-theme="light"] .term-body {
+      color: #7b8da5;
+    }
+
+    .t-pr   { color: var(--green); }
+    .t-cmd  { color: #ffffff; }
+    .t-ok   { color: var(--green); }
+    .t-info { color: var(--cyan); }
+    .t-red  { color: #ff7272; }
+    .t-yw   { color: var(--yellow); }
+    .t-dim  { color: #4e6076; }
+    .t-bold { color: #eef4ff; font-weight: 600; }
+    .t-cm   { color: #4e6076; font-style: italic; }
+
+    .callout {
+      margin: 22px 0;
+      padding: 14px 16px;
+      border-left: 3px solid;
+      border-radius: 8px;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .callout strong {
+      color: var(--heading);
+    }
+
+    .callout.yellow { border-color: var(--yellow); background: var(--yellow-bg); color: #b59a46; }
+    .callout.red    { border-color: var(--red); background: var(--red-bg); color: #c66a6a; }
+    .callout.cyan   { border-color: var(--cyan); background: var(--cyan-bg); color: #63a9b9; }
+
+    [data-theme="light"] .callout.yellow { color: #7a6400; }
+    [data-theme="light"] .callout.red    { color: #8b2e2e; }
+    [data-theme="light"] .callout.cyan   { color: #005d76; }
+
+    .cmd-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-top: 24px;
+    }
+
+    .cmd-card {
+      background: var(--panel);
+      padding: 18px 18px 16px;
+      transition: background 0.15s ease;
+    }
+
+    .cmd-card:hover {
+      background: var(--panel-2);
+    }
+
+    .cmd-name {
+      margin-bottom: 6px;
+      color: var(--green);
+      font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .cmd-desc {
+      color: var(--text-dim);
+      font-size: 13px;
+      line-height: 1.58;
+    }
+
+    .steps {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .step {
+      display: flex;
+      gap: 18px;
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .step:last-child {
+      border-bottom: 0;
+    }
+
+    .step-num {
+      width: 48px;
+      flex-shrink: 0;
+      text-align: right;
+      color: var(--border2);
+      font-family: var(--display);
+      font-size: 38px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .step:hover .step-num {
+      color: var(--green);
+    }
+
+    .step-body strong {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--heading);
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .step-body p {
+      margin: 0;
+      color: var(--text-dim);
+      font-size: 13.5px;
+      line-height: 1.65;
+    }
+
+    .subhead {
+      display: flex;
+      gap: 6px;
+      align-items: baseline;
+      flex-wrap: wrap;
+      margin: 42px 0 12px;
+      color: var(--heading);
+      font-family: var(--display);
+      font-size: clamp(16px, 2.6vw, 21px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .subhead .n {
+      color: var(--green);
+    }
+
+    .table-scroll {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      margin: 22px 0;
+    }
+
+    .opsec-table {
+      width: 100%;
+      min-width: 560px;
+      border-collapse: collapse;
+    }
+
+    .opsec-table th {
+      text-align: left;
+      padding: 10px 12px;
+      color: var(--text-dim);
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      border-bottom: 1px solid var(--border2);
+      white-space: nowrap;
+    }
+
+    .opsec-table td {
+      padding: 11px 12px;
+      border-bottom: 1px solid var(--border);
+      font-family: var(--mono);
+      font-size: 12px;
+      vertical-align: top;
+    }
+
+    .opsec-table tr:hover td {
+      background: var(--bg3);
+    }
+
+    .opsec-table td:first-child {
+      color: var(--cyan);
+      white-space: nowrap;
+    }
+
+    .opsec-table td:nth-child(2),
+    .opsec-table td:nth-child(3) {
+      color: var(--text-dim);
+    }
+
+    .report-preview {
+      margin-top: 24px;
+      background: var(--panel);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .preview-bar {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 10px 16px;
+      background: var(--bg4);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .preview-title {
+      margin-left: 4px;
+      color: var(--text-dim);
+      font-family: var(--mono);
+      font-size: 11px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .preview-body {
+      padding: 18px;
+    }
+
+    .preview-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .tab {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      color: var(--text-dim);
+      font-family: var(--mono);
+      font-size: 11px;
+      border: 1px solid transparent;
+      background: transparent;
+    }
+
+    .tab.active {
+      color: var(--green);
+      border-color: rgba(0,240,168,0.18);
+      background: rgba(0,240,168,0.06);
+    }
+
+    .badge {
+      font-size: 9px;
+      padding: 1px 5px;
+      border-radius: 999px;
+    }
+
+    .badge.red { background: rgba(255,77,77,0.14); color: var(--red); }
+    .badge.yellow { background: rgba(255,216,78,0.14); color: var(--yellow); }
+
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+
+    .stat-card {
+      background: var(--panel-2);
+      padding: 14px 12px;
+    }
+
+    .stat-val {
+      margin-bottom: 5px;
+      font-family: var(--display);
+      font-size: 26px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .stat-lbl {
+      color: var(--text-dim);
+      font-family: var(--mono);
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .sv-red { color: var(--red); }
+    .sv-orange { color: var(--orange); }
+    .sv-yellow { color: var(--yellow); }
+    .sv-cyan { color: var(--cyan); }
+    .sv-green { color: var(--green); }
+    .sv-purple { color: var(--purple); }
+
+    .mini-label {
+      margin: 14px 0 8px;
+      color: var(--text-dim);
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .path-card {
+      background: var(--panel-2);
+      border: 1px solid var(--border2);
+      border-radius: 8px;
+      margin: 8px 0;
+      overflow: hidden;
+    }
+
+    .path-head {
+      display: grid;
+      grid-template-columns: 28px minmax(0, 1fr) auto auto auto;
+      gap: 10px;
+      align-items: center;
+      padding: 12px 14px;
+      cursor: pointer;
+    }
+
+    .path-num {
+      color: var(--text-dim);
+      font-family: var(--mono);
+      font-size: 11px;
+    }
+
+    .path-chain {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      color: var(--heading);
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+
+    .hops-tag {
+      color: var(--cyan);
+      background: rgba(24,215,255,0.08);
+      border: 1px solid rgba(24,215,255,0.2);
+      border-radius: 5px;
+      padding: 4px 8px;
+      font-family: var(--mono);
+      font-size: 10px;
+      white-space: nowrap;
+    }
+
+    .noise {
+      display: flex;
+      gap: 2px;
+    }
+
+    .noise i {
+      display: block;
+      width: 4px;
+      height: 14px;
+      border-radius: 1px;
+      background: #34465a;
+    }
+
+    .noise i.on {
+      background: var(--green);
+    }
+
+    .chev {
+      color: var(--text-dim);
+      font-size: 11px;
+      transition: transform 0.2s ease;
+    }
+
+    .path-card.open .chev {
+      transform: rotate(90deg);
+    }
+
+    .path-body {
+      display: none;
+      padding: 0 14px 12px;
+      border-top: 1px solid var(--border);
+    }
+
+    .path-card.open .path-body {
+      display: block;
+    }
+
+    .hop-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px 8px;
+      align-items: baseline;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-family: var(--mono);
+      font-size: 12px;
+    }
+
+    .hop-row:last-child {
+      border-bottom: 0;
+    }
+
+    .hop-n { color: var(--text-dim); width: 18px; }
+    .hop-src { color: var(--yellow); }
+    .hop-rel {
+      color: var(--cyan);
+      background: rgba(24,215,255,0.07);
+      border: 1px solid rgba(24,215,255,0.18);
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .hop-arr { color: var(--text-dim); }
+    .hop-dst { color: var(--text); }
+    .hop-dst.t0 { color: var(--red); }
+    .hop-tip {
+      width: 100%;
+      padding-left: 26px;
+      color: var(--text-dim);
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    .footer {
+      max-width: var(--content-w);
+      margin: 70px auto 0;
+      padding: 28px var(--gutter) 46px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--text-dim);
+      font-family: var(--mono);
+      font-size: 11px;
+    }
+
+    .footer .logo {
+      color: var(--green);
+      font-family: var(--display);
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    @media (max-width: 980px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-title {
+        max-width: none;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .topbar-nav {
+        display: none;
+      }
+
+      .menu-btn {
+        display: inline-block;
+      }
+
+      .theme-label {
+        display: none;
+      }
+
+      .hero {
+        padding-top: 24px;
+      }
+
+      .hero-shell {
+        border-radius: 18px;
+      }
+
+      .hero-grid {
+        padding: 22px 18px;
+      }
+
+      .cmd-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .path-head {
+        grid-template-columns: 28px minmax(0, 1fr) auto;
+        align-items: start;
+      }
+
+      .path-chain {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+        line-height: 1.5;
+      }
+
+      .noise {
+        display: none;
+      }
+
+      .hops-tag {
+        margin-top: 2px;
+      }
+
+      .footer {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+
+    @media (max-width: 560px) {
+      body {
+        font-size: 14px;
+      }
+
+      .topbar-inner {
+        padding-left: 14px;
+        padding-right: 14px;
+      }
+
+      .hero,
+      .main {
+        padding-left: 14px;
+        padding-right: 14px;
+      }
+
+      .hero-title {
+        font-size: clamp(40px, 17vw, 66px);
+      }
+
+      .metric-value {
+        font-size: 24px;
+      }
+
+      .step {
+        gap: 12px;
+      }
+
+      .step-num {
+        width: 38px;
+        font-size: 30px;
+      }
+
+      .stat-row {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .opsec-table {
+        min-width: 520px;
+      }
+    }
+
+    @media print {
+      .topbar,
+      .mobile-nav,
+      body::before {
+        display: none !important;
+      }
+
+      body {
+        background: #fff;
+        color: #000;
+      }
+
+      .hero,
+      .main,
+      .footer {
+        max-width: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="site">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <a class="topbar-logo" href="#">
+          <span class="logo-mark">🩸</span>
+          <span class="logo-text">whippet</span>
+        </a>
+
+        <nav class="topbar-nav" aria-label="Primary navigation">
+          <a href="#getting-started">Install</a>
+          <a href="#commands">Commands</a>
+          <a href="#workflows">Workflows</a>
+          <a href="#opsec">OPSEC</a>
+          <a href="#report">Report</a>
+        </nav>
+
+        <div class="topbar-actions">
+          <button class="theme-btn" id="themeBtn" type="button" aria-label="Toggle light or dark mode" aria-pressed="false">
+            <span class="toggle-track" aria-hidden="true"><span class="toggle-knob"></span></span>
+            <span class="theme-label" id="themeLabel">Light mode</span>
+          </button>
+
+          <button class="menu-btn" id="menuBtn" type="button" aria-label="Open navigation" aria-expanded="false" aria-controls="mobileNav">
+            <span></span><span></span><span></span>
+          </button>
+        </div>
+      </div>
+
+      <div class="mobile-nav" id="mobileNav">
+        <a href="#getting-started">Install</a>
+        <a href="#commands">Commands</a>
+        <a href="#workflows">Workflows</a>
+        <a href="#opsec">OPSEC</a>
+        <a href="#report">Report</a>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="hero-shell">
+        <div class="hero-grid">
+          <div>
+            <div class="eyebrow">Technical Overview · v10.0.0</div>
+            <h1 class="hero-title">WHIP<span class="accent">PET</span></h1>
+            <p class="hero-desc">
+              A <strong>pure-Python</strong> BloodHound attack path synthesizer.
+              No GUI. No BloodHound server. Drop your collection files in and get
+              <strong>ranked attack paths, blast radius analysis</strong>, and a
+              self-contained HTML report — straight from your terminal.
+            </p>
+
+            <div class="hero-pills">
+              <span class="pill p-red">Active Directory</span>
+              <span class="pill p-green">SharpHound v5/v6</span>
+              <span class="pill p-cyan">AzureHound</span>
+              <span class="pill p-purple">ADCS · ESC1–ESC9</span>
+              <span class="pill p-yellow">BloodHound CE</span>
+              <span class="pill p-red">DCSync</span>
+              <span class="pill p-green">Kerberoast</span>
+              <span class="pill p-cyan">Blast Radius</span>
+            </div>
+          </div>
+
+          <div class="hero-side">
+            <div class="metric green">
+              <div class="metric-value">85</div>
+              <div class="metric-label">Relationship Types</div>
+            </div>
+            <div class="metric cyan">
+              <div class="metric-value">17</div>
+              <div class="metric-label">Commands</div>
+            </div>
+            <div class="metric red">
+              <div class="metric-value">0</div>
+              <div class="metric-label">Core Dependencies</div>
+            </div>
+            <div class="metric yellow">
+              <div class="metric-value">3</div>
+              <div class="metric-label">Platforms</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <main class="main">
+      <section class="section" id="getting-started">
+        <div class="section-tag">Getting Started</div>
+        <h2 class="section-title">Up and running in 30 seconds</h2>
+        <p class="section-lead">
+          Python 3.8 or later. No external package is required for core functionality.
+          One optional install unlocks network chokepoint analysis.
+        </p>
+
+        <div class="term">
+          <div class="term-bar">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+            <span class="term-title">bash</span>
+          </div>
+          <div class="term-body">
+<span class="t-cm"># Optional — enables the chokepoints command</span>
+<span class="t-pr">$</span> <span class="t-cmd">pip install networkx</span>
+
+<span class="t-cm"># Verify the install — runs against a built-in sample graph</span>
+<span class="t-pr">$</span> <span class="t-cmd">python3 whippet.py --cmd info</span>
+
+<span class="t-bold">╔══════════════════════════════════════════════════════════════════╗
+║ 🩸 whippet v10.0.0 — BloodHound Attack Path Synthesizer          ║
+║   Author: hanzotrip7                                             ║
+╚══════════════════════════════════════════════════════════════════╝</span>
+
+<span class="t-info">  ℹ  Demo mode — enterprise graph loaded</span>
+<span class="t-ok">  ✓  Graph ready — 13 nodes, 14 edges</span>
+          </div>
+        </div>
+
+        <p>
+          If you see the banner and a node count, you're ready. Now point it at your collection files.
+          whippet auto-detects the format — <strong>SharpHound v5/v6</strong>,
+          <strong>BloodHound CE exports</strong>, and <strong>AzureHound</strong>
+          all work without any flags or extra configuration.
+        </p>
+
+        <div class="term">
+          <div class="term-bar">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+            <span class="term-title">bash — loading your collection</span>
+          </div>
+          <div class="term-body">
+<span class="t-cm"># SharpHound — point at the whole directory</span>
+<span class="t-pr">$</span> <span class="t-cmd">python3 whippet.py -d /loot/collections/*.json --cmd info</span>
+
+<span class="t-info">  ℹ  Detected collection files — merging…</span>
+<span class="t-ok">  ✓  20231103_computers.json     →  412  Computer node(s)</span>
+<span class="t-ok">  ✓  20231103_users.json         →  2,841  User node(s)</span>
+<span class="t-ok">  ✓  20231103_groups.json        →  318  Group node(s)</span>
+<span class="t-ok">  ✓  20231103_domains.json       →  2  Domain node(s)</span>
+<span class="t-ok">  ✓  20231103_gpos.json          →  47  GPO node(s)</span>
+<span class="t-ok">  ✓  20231103_certtemplates.json →  22  CertTemplate node(s)</span>
+<span class="t-ok">  ✓  Merged 3,642 nodes, 21,847 edges from 6 file(s)</span>
+          </div>
+        </div>
+
+        <div class="callout yellow">
+          <strong>Common gotcha:</strong> Always include your <code>*_domains.json</code> file in the glob.
+          Domain nodes anchor Tier-0 detection. Without them, proximity scoring and several analysis commands return zero results.
+        </div>
+      </section>
+
+      <hr class="divider" />
+
+      <section class="section" id="commands">
+        <div class="section-tag">Command Reference</div>
+        <h2 class="section-title">17 commands. Every angle covered.</h2>
+        <p class="section-lead">
+          Every command prints directly to the terminal. Add <code>--format json --out file.json</code>
+          to any of them for structured output you can feed into other tooling.
+        </p>
+
+        <div class="cmd-grid">
+          <div class="cmd-card"><div class="cmd-name">info</div><div class="cmd-desc">Graph summary and primitive counts. Run this first on every engagement to validate your data.</div></div>
+          <div class="cmd-card"><div class="cmd-name">bulk</div><div class="cmd-desc">Every enabled user with a path to Tier-0, sorted by hop count for fast target prioritization.</div></div>
+          <div class="cmd-card"><div class="cmd-name">kerberoast</div><div class="cmd-desc">SPN-bearing accounts ranked by Tier-0 proximity so you know which hashes are worth the effort.</div></div>
+          <div class="cmd-card"><div class="cmd-name">asreproast</div><div class="cmd-desc">Accounts with pre-auth disabled. No initial credentials required to request the crackable material.</div></div>
+          <div class="cmd-card"><div class="cmd-name">dcsync</div><div class="cmd-desc">Direct and transitive replication rights up to six hops deep, with full privilege chains.</div></div>
+          <div class="cmd-card"><div class="cmd-name">laps</div><div class="cmd-desc">LAPS readers and the machines they can reach, including systems that path into Tier-0.</div></div>
+          <div class="cmd-card"><div class="cmd-name">acl</div><div class="cmd-desc">ACL abuse paths to Tier-0 across multiple relationship types and write-control primitives.</div></div>
+          <div class="cmd-card"><div class="cmd-name">delegation</div><div class="cmd-desc">Unconstrained, constrained, and RBCD delegation chains with practical exploitation notes.</div></div>
+          <div class="cmd-card"><div class="cmd-name">adcs</div><div class="cmd-desc">Certificate template abuse classified by ESC type from ESC1 through ESC9.</div></div>
+          <div class="cmd-card"><div class="cmd-name">azure</div><div class="cmd-desc">Azure / Entra attack paths across cloud privilege relationships and directory role escalation.</div></div>
+          <div class="cmd-card"><div class="cmd-name">paths</div><div class="cmd-desc">Top-K ranked attack paths between arbitrary nodes, including per-hop abuse hints.</div></div>
+          <div class="cmd-card"><div class="cmd-name">simulate</div><div class="cmd-desc">Narrative walk-through of the best route with noise awareness and suggested tradeoffs.</div></div>
+          <div class="cmd-card"><div class="cmd-name">owned</div><div class="cmd-desc">Tier-0 reachability from a single compromised node with full hop breakdown.</div></div>
+          <div class="cmd-card"><div class="cmd-name">blast</div><div class="cmd-desc">Blast radius from an owned node — reachable users, computers, sessions, and privileged paths.</div></div>
+          <div class="cmd-card"><div class="cmd-name">chokepoints</div><div class="cmd-desc">Betweenness centrality ranking to identify the accounts whose hardening removes the most paths.</div></div>
+          <div class="cmd-card"><div class="cmd-name">matrix</div><div class="cmd-desc">Reachability matrix showing every user versus every Tier-0 node with hop counts.</div></div>
+          <div class="cmd-card"><div class="cmd-name">htmlreport</div><div class="cmd-desc">Self-contained interactive HTML report ready for handoff, offline review, or client deliverables.</div></div>
+        </div>
+      </section>
+
+      <hr class="divider" />
+
+      <section class="section" id="workflows">
+        <div class="section-tag">Engagement Workflows</div>
+        <h2 class="section-title">From no creds to Domain Admin</h2>
+        <p class="section-lead">
+          The commands are meant to chain together. Each phase uses the output of the previous one to narrow focus and reduce wasted effort.
+        </p>
+
+        <ol class="steps">
+          <li class="step">
+            <div class="step-num">01</div>
+            <div class="step-body">
+              <strong>Orient the attack surface</strong>
+              <p>Run <code>info</code> first. Verify Tier-0 node count and primitive counts before you do anything else.</p>
+            </div>
+          </li>
+          <li class="step">
+            <div class="step-num">02</div>
+            <div class="step-body">
+              <strong>Build the target list</strong>
+              <p>Use <code>bulk</code> for broad reachability and <code>kerberoast</code> to prioritize crackable accounts that actually matter.</p>
+            </div>
+          </li>
+          <li class="step">
+            <div class="step-num">03</div>
+            <div class="step-body">
+              <strong>Assess a compromise</strong>
+              <p><code>owned</code> tells you if the account leads to Tier-0. <code>blast</code> tells you how much damage it can do.</p>
+            </div>
+          </li>
+          <li class="step">
+            <div class="step-num">04</div>
+            <div class="step-body">
+              <strong>Plan the route</strong>
+              <p><code>paths</code> ranks viable attack chains. <code>simulate</code> converts the best one into a practical execution narrative.</p>
+            </div>
+          </li>
+          <li class="step">
+            <div class="step-num">05</div>
+            <div class="step-body">
+              <strong>Generate the deliverable</strong>
+              <p><code>htmlreport</code> gives you a self-contained artifact, while JSON output feeds slides, automation, or downstream tooling.</p>
+            </div>
+          </li>
+        </ol>
+
+        <div class="subhead"><span class="n">01.</span> Graph overview — <code style="font-size:.8em">info</code></div>
+        <div class="term">
+          <div class="term-bar">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+            <span class="term-title">python3 whippet.py -d *.json --cmd info</span>
+          </div>
+          <div class="term-body">
+<span class="t-info"> ▸ Graph Intelligence</span>
+<span class="t-dim">──────────────────────────────────────────────────────────────</span>
+  Nodes:                          3,642
+  Edges:                          21,847
+  Unique Rel Types:               47
+  Tier-0 Nodes:                   <span class="t-red">18</span>
+  Kerberoastable:                 <span class="t-yw">14</span>
+  AS-REP Roastable:               <span class="t-yw">3</span>
+  DCSync Direct:                  <span class="t-red">2</span>
+  ACL Abuse Paths:                <span class="t-red">23</span>
+  Azure Paths:                    <span class="t-yw">4</span>
+  ADCS ESC Paths:                 <span class="t-bold">8</span>
+          </div>
+        </div>
+
+        <div class="subhead"><span class="n">02.</span> Build the target list — <code style="font-size:.8em">kerberoast</code></div>
+        <div class="term">
+          <div class="term-bar">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+            <span class="term-title">python3 whippet.py -d *.json --cmd kerberoast</span>
+          </div>
+          <div class="term-body">
+<span class="t-info"> ▸ Kerberoastable Accounts</span>
+<span class="t-dim">──────────────────────────────────────────────────────────────</span>
+  Hops   Risk   Account
+  1      <span class="t-red">7.6</span>   <span class="t-bold">svc_backup@CORP.LOCAL</span>
+  1      <span class="t-red">7.1</span>   <span class="t-bold">svc_sql@CORP.LOCAL</span>
+  2      <span class="t-yw">5.4</span>   <span class="t-bold">svc_exchange@CORP.LOCAL</span>
+  3      <span class="t-yw">4.9</span>   <span class="t-bold">svc_sccm@CORP.LOCAL</span>
+  ∞      2.1   svc_print@CORP.LOCAL
+          </div>
+        </div>
+
+        <div class="callout cyan">
+          <strong>Reading the output:</strong> The <code>∞</code> in the hops column means the account has no path to Tier-0. Prioritize 1–2 hop accounts first.
+        </div>
+      </section>
+
+      <hr class="divider" />
+
+      <section class="section" id="opsec">
+        <div class="section-tag">Operational Security</div>
+        <h2 class="section-title">Route around what’s off-limits</h2>
+        <p class="section-lead">
+          OPSEC flags filter the graph at the edge level. Any route that depends on a blocked technique is removed before pathfinding returns results.
+        </p>
+
+        <div class="table-scroll">
+          <table class="opsec-table">
+            <thead>
+              <tr>
+                <th>Flag</th>
+                <th>What it blocks</th>
+                <th>Use when</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>--stealth</td><td>All edges with high detection risk such as LSASS, DCSync, DCOM</td><td>MDI / strong telemetry is in place</td></tr>
+              <tr><td>--no-lsass</td><td>Session-based credential access</td><td>EDR blocks or heavily monitors LSASS</td></tr>
+              <tr><td>--no-dcsync</td><td>Replication abuse paths</td><td>Rules of engagement prohibit replication attacks</td></tr>
+              <tr><td>--no-rdp</td><td>Interactive RDP movement</td><td>Interactive login is out of scope</td></tr>
+              <tr><td>--no-acl</td><td>ACL abuse primitives</td><td>Write-control attacks are restricted</td></tr>
+              <tr><td>--no-exec</td><td>AdminTo, PSRemoting, DCOM, SQL admin</td><td>Execution is restricted by the engagement</td></tr>
+              <tr><td>--no-delegation</td><td>Delegation abuse chains</td><td>Delegation techniques are explicitly out of scope</td></tr>
+              <tr><td>--no-adcs</td><td>All ADCS certificate paths</td><td>PKI infrastructure is excluded</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="term">
+          <div class="term-bar">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+            <span class="term-title">bash — constrained pathfinding</span>
+          </div>
+          <div class="term-body">
+<span class="t-pr">$</span> <span class="t-cmd">python3 whippet.py -d *.json --cmd paths \
+  --from "john.doe@CORP.LOCAL" \
+  --to "Domain Admins@CORP.LOCAL" \
+  --stealth --no-lsass --no-dcsync --top 3</span>
+
+<span class="t-dim">Constraints: no_lsass, no_dcsync | Stealth: True</span>
+<span class="t-ok">Path #1 score=4.5 hops=3 noise=9</span>
+john.doe → helpdesk-admins → IT Admins → Domain Admins
+          </div>
+        </div>
+      </section>
+
+      <hr class="divider" />
+
+      <section class="section" id="report">
+        <div class="section-tag">Deliverables</div>
+        <h2 class="section-title">One command. A full report.</h2>
+        <p class="section-lead">
+          The HTML report runs the full analysis and compiles results into a single interactive file that works offline after generation.
+        </p>
+
+        <div class="term">
+          <div class="term-bar">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+            <span class="term-title">bash</span>
+          </div>
+          <div class="term-body">
+<span class="t-pr">$</span> <span class="t-cmd">python3 whippet.py -d *.json --cmd htmlreport --out report.html</span>
+
+<span class="t-info">  ℹ  Running full analysis — this may take a moment…</span>
+<span class="t-ok">  ✓  Report written → report.html (284 KB)</span>
+<span class="t-info">  ℹ  Open in any browser — fully self-contained, no internet required</span>
+          </div>
+        </div>
+
+        <div class="report-preview">
+          <div class="preview-bar">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+            <span class="preview-title">20231103_CORP_report.html — Chrome</span>
+          </div>
+
+          <div class="preview-body">
+            <div class="preview-tabs">
+              <div class="tab active">⚡ Attack Paths <span class="badge red">47</span></div>
+              <div class="tab">◈ Risk Nodes <span class="badge">30</span></div>
+              <div class="tab">🎟 Kerberoast <span class="badge red">14</span></div>
+              <div class="tab">💀 DCSync <span class="badge red">2</span></div>
+              <div class="tab">🏛 ADCS <span class="badge red">8</span></div>
+              <div class="tab">☁ Azure <span class="badge yellow">4</span></div>
+            </div>
+
+            <div class="stat-row">
+              <div class="stat-card"><div class="stat-val sv-red">14</div><div class="stat-lbl">Kerberoast</div></div>
+              <div class="stat-card"><div class="stat-val sv-yellow">3</div><div class="stat-lbl">AS-REP</div></div>
+              <div class="stat-card"><div class="stat-val sv-red">2</div><div class="stat-lbl">DCSync</div></div>
+              <div class="stat-card"><div class="stat-val sv-orange">23</div><div class="stat-lbl">ACL Paths</div></div>
+              <div class="stat-card"><div class="stat-val sv-orange">5</div><div class="stat-lbl">Delegation</div></div>
+              <div class="stat-card"><div class="stat-val sv-purple">8</div><div class="stat-lbl">ADCS ESC</div></div>
+              <div class="stat-card"><div class="stat-val sv-cyan">4</div><div class="stat-lbl">Azure</div></div>
+              <div class="stat-card"><div class="stat-val sv-green">47</div><div class="stat-lbl">Users→T0</div></div>
+            </div>
+
+            <div class="mini-label">Attack Paths — sorted by hop count</div>
+
+            <div class="path-card open">
+              <div class="path-head">
+                <div class="path-num">#1</div>
+                <div class="path-chain">john.doe@CORP.LOCAL → svc_backup@CORP.LOCAL → Domain Admins@CORP.LOCAL</div>
+                <div class="hops-tag">2 hops</div>
+                <div class="noise" aria-hidden="true">
+                  <i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i>
+                </div>
+                <div class="chev">▶</div>
+              </div>
+              <div class="path-body">
+                <div class="hop-row">
+                  <div class="hop-n">1.</div>
+                  <div class="hop-src">john.doe@CORP.LOCAL</div>
+                  <div class="hop-rel">GenericWrite</div>
+                  <div class="hop-arr">→</div>
+                  <div class="hop-dst">svc_backup@CORP.LOCAL</div>
+                  <div class="hop-tip">Write any attribute → set SPN or abuse delegation-related attributes.</div>
+                </div>
+                <div class="hop-row">
+                  <div class="hop-n">2.</div>
+                  <div class="hop-src">svc_backup@CORP.LOCAL</div>
+                  <div class="hop-rel">MemberOf</div>
+                  <div class="hop-arr">→</div>
+                  <div class="hop-dst t0">Domain Admins@CORP.LOCAL</div>
+                  <div class="hop-tip">Inherited group membership grants Tier-0 privileges.</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="path-card">
+              <div class="path-head">
+                <div class="path-num">#2</div>
+                <div class="path-chain">helpdesk@CORP.LOCAL → SRV-EXCH01.CORP.LOCAL → Domain Admins@CORP.LOCAL</div>
+                <div class="hops-tag">3 hops</div>
+                <div class="noise" aria-hidden="true">
+                  <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i>
+                </div>
+                <div class="chev">▶</div>
+              </div>
+              <div class="path-body">
+                <div class="hop-row">
+                  <div class="hop-n">1.</div>
+                  <div class="hop-src">helpdesk@CORP.LOCAL</div>
+                  <div class="hop-rel">ForceChangePassword</div>
+                  <div class="hop-arr">→</div>
+                  <div class="hop-dst">svc_exch@CORP.LOCAL</div>
+                  <div class="hop-tip">Reset the target account password without the current secret.</div>
+                </div>
+                <div class="hop-row">
+                  <div class="hop-n">2.</div>
+                  <div class="hop-src">svc_exch@CORP.LOCAL</div>
+                  <div class="hop-rel">AdminTo</div>
+                  <div class="hop-arr">→</div>
+                  <div class="hop-dst">SRV-EXCH01.CORP.LOCAL</div>
+                  <div class="hop-tip">Administrative access enables lateral movement and credential capture.</div>
+                </div>
+                <div class="hop-row">
+                  <div class="hop-n">3.</div>
+                  <div class="hop-src">SRV-EXCH01.CORP.LOCAL</div>
+                  <div class="hop-rel">HasSession</div>
+                  <div class="hop-arr">→</div>
+                  <div class="hop-dst t0">Domain Admins@CORP.LOCAL</div>
+                  <div class="hop-tip">Active privileged session exposes credentials or tokens for Tier-0 escalation.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p style="margin-top:18px;">
+          The report includes a dark/light toggle, interactive path sections, and works as a single portable HTML file suitable for client delivery or internal review.
+        </p>
+      </section>
+
+      <hr class="divider" />
+
+      <section class="section" style="padding-bottom:0">
+        <div class="callout red" style="margin-top:0;">
+          <strong>Authorized use only.</strong> whippet is built for penetration testers and red teams operating under signed engagement agreements. Use it only on systems you have explicit written permission to test.
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="logo">🩸 whippet</div>
+      <div>v10.0.0 · MIT License · Python 3.8+</div>
+      <div>by hanzotrip7 · authorized use only</div>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      const root = document.documentElement;
+      const themeBtn = document.getElementById("themeBtn");
+      const themeLabel = document.getElementById("themeLabel");
+      const menuBtn = document.getElementById("menuBtn");
+      const mobileNav = document.getElementById("mobileNav");
+      const storageKey = "whippet-theme";
+
+      function applyTheme(theme) {
+        root.setAttribute("data-theme", theme);
+        const isLight = theme === "light";
+        themeLabel.textContent = isLight ? "Dark mode" : "Light mode";
+        themeBtn.setAttribute("aria-pressed", String(isLight));
+      }
+
+      const savedTheme = localStorage.getItem(storageKey);
+      if (savedTheme === "light" || savedTheme === "dark") {
+        applyTheme(savedTheme);
+      } else {
+        applyTheme(window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+      }
+
+      themeBtn.addEventListener("click", function () {
+        const next = root.getAttribute("data-theme") === "light" ? "dark" : "light";
+        localStorage.setItem(storageKey, next);
+        applyTheme(next);
+      });
+
+      function closeMobileNav() {
+        mobileNav.classList.remove("open");
+        menuBtn.classList.remove("open");
+        menuBtn.setAttribute("aria-expanded", "false");
+      }
+
+      menuBtn.addEventListener("click", function () {
+        const open = mobileNav.classList.toggle("open");
+        menuBtn.classList.toggle("open", open);
+        menuBtn.setAttribute("aria-expanded", String(open));
+      });
+
+      document.querySelectorAll(".mobile-nav a").forEach((a) => {
+        a.addEventListener("click", closeMobileNav);
+      });
+
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") closeMobileNav();
+      });
+
+      window.addEventListener("resize", function () {
+        if (window.innerWidth > 760) closeMobileNav();
+      });
+
+      document.querySelectorAll(".path-card").forEach((card) => {
+        const head = card.querySelector(".path-head");
+        if (!head) return;
+
+        head.setAttribute("tabindex", "0");
+        head.setAttribute("role", "button");
+        head.setAttribute("aria-expanded", card.classList.contains("open") ? "true" : "false");
+
+        const toggle = function () {
+          card.classList.toggle("open");
+          head.setAttribute("aria-expanded", card.classList.contains("open") ? "true" : "false");
+        };
+
+        head.addEventListener("click", toggle);
+        head.addEventListener("keydown", function (e) {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            toggle();
+          }
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
