@@ -1,6 +1,6 @@
 ```
 > whoami
-hanzotrip7.github.io/index.html
+hanzotrip7.github.io
 About me and some stories
 ```
 
