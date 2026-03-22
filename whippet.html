@@ -6,7 +6,7 @@
   <title>whippet — BloodHound Attack Path Synthesizer</title>
   <meta
     name="description"
-    content="whippet is a pure-Python BloodHound attack path synthesizer for ranked attack paths, blast radius analysis, and self-contained HTML reporting."
+    content="whippet is a pure-Python BloodHound attack path synthesizer for ranked attack paths, blast radius analysis and self-contained HTML reporting."
   />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link
@@ -1168,18 +1168,18 @@
     <section class="hero">
       <div class="hero-shell">
         <div class="hero-inner">
-          <div class="eyebrow">Technical Overview · v10.0.0</div>
-          <h1 class="hero-title">WHIP<span class="accent">PET</span></h1>
+          <div class="eyebrow">Technical Overview</div>
+          <h1 class="hero-title"><span class="accent">WHIPPET</span></h1>
           <p class="hero-desc">
             A <strong>pure-Python</strong> BloodHound attack path synthesizer.
-            No GUI. No BloodHound server. Drop your collection files in and get
-            <strong>ranked attack paths, blast radius analysis</strong>, and a self-contained
-            HTML report — straight from your terminal.
+            Drop your collection files in and get
+            <strong>ranked attack paths, blast radius analysis</strong> and a self-contained
+            HTML report straight from your terminal.
           </p>
 
           <div class="hero-pills">
             <span class="pill red">Active Directory</span>
-            <span class="pill green">SharpHound v5/v6</span>
+            <span class="pill green">SharpHound</span>
             <span class="pill cyan">AzureHound</span>
             <span class="pill purple">ADCS · ESC1–ESC9</span>
             <span class="pill yellow">BloodHound CE</span>
@@ -1233,10 +1233,11 @@
 <span class="t-cm"># Verify the install — runs against a built-in sample graph</span>
 <span class="t-pr">$</span> <span class="t-cmd">python3 whippet.py --cmd info</span>
 
-<span class="t-bold">╔══════════════════════════════════════════════════════════════════╗
-║ 🩸 whippet v10.0.0 — BloodHound Attack Path Synthesizer          ║
-║   Author: hanzotrip7                                             ║
-╚══════════════════════════════════════════════════════════════════╝</span>
+<span class="t-bold">
+╔════════════════════════════════════════════════════════╗
+  🩸 whippet — BloodHound Attack Path Synthesizer          
+     Author: hanzotrip7                                             
+╚════════════════════════════════════════════════════════╝</span>
 
 <span class="t-info">  ℹ  Demo mode — enterprise graph loaded</span>
 <span class="t-ok">  ✓  Graph ready — 13 nodes, 14 edges</span>
@@ -1245,8 +1246,8 @@
 
         <p>
           If you see the banner and a node count, you're ready. Now point it at your collection files.
-          whippet auto-detects the format — <strong>SharpHound v5/v6</strong>,
-          <strong>BloodHound CE exports</strong>, and <strong>AzureHound</strong>
+          whippet auto-detects the format — <strong>SharpHound</strong>,
+          <strong>BloodHound CE exports</strong> and <strong>AzureHound</strong>
           all work without any flags or extra configuration.
         </p>
 
@@ -1274,7 +1275,7 @@
           <div class="cmd-card"><div class="cmd-name">dcsync</div><div class="cmd-desc">Direct and transitive replication rights with full privilege chains.</div></div>
           <div class="cmd-card"><div class="cmd-name">laps</div><div class="cmd-desc">LAPS readers and the machines they can reach.</div></div>
           <div class="cmd-card"><div class="cmd-name">acl</div><div class="cmd-desc">ACL abuse paths across write-control and delegation primitives.</div></div>
-          <div class="cmd-card"><div class="cmd-name">delegation</div><div class="cmd-desc">Unconstrained, constrained, and RBCD abuse chains.</div></div>
+          <div class="cmd-card"><div class="cmd-name">delegation</div><div class="cmd-desc">Unconstrained, constrained and RBCD abuse chains.</div></div>
           <div class="cmd-card"><div class="cmd-name">adcs</div><div class="cmd-desc">Certificate template abuse classified by ESC type.</div></div>
           <div class="cmd-card"><div class="cmd-name">azure</div><div class="cmd-desc">Azure / Entra privilege paths and cloud-side escalation.</div></div>
           <div class="cmd-card"><div class="cmd-name">paths</div><div class="cmd-desc">Top-K ranked attack paths between arbitrary nodes.</div></div>
@@ -1486,7 +1487,7 @@
     <footer class="footer">
       <div class="logo">🩸 whippet</div>
       <div>v10.0.0 · MIT License · Python 3.8+</div>
-      <div>by hanzotrip7 · authorized use only</div>
+      <div>by hanzotrip7 · For educational purposes only</div>
     </footer>
   </div>
 
