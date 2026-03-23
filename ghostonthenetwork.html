@@ -213,7 +213,7 @@
       gap: 0.55rem;
       margin-bottom: 1.25rem;
       padding: 0.45rem 0.8rem;
-      border: 1px solid rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(248, 81, 73, 0.55);
       border-radius: 999px;
       background: rgba(255, 255, 255, 0.05);
       color: #d4d4d4;
@@ -229,13 +229,17 @@
       background: rgba(0, 0, 0, 0.04);
     }
 
+    .tag-red {
+      color: #f85149;
+    }
+
     .series-tag::before {
       content: "";
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      box-shadow: 0 0 12px rgba(255, 255, 255, 0.28);
+      background: #f85149;
+      box-shadow: 0 0 12px rgba(248, 81, 73, 0.45);
     }
 
     .hero h1 {
@@ -332,7 +336,7 @@
       height: 3px;
       margin-bottom: 0.85rem;
       border-radius: 999px;
-      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      background: linear-gradient(90deg, #f85149, #c0392b);
     }
 
     h3 {
@@ -489,8 +493,8 @@
       border-radius: 50%;
       display: grid;
       place-items: center;
-      background: rgba(255, 255, 255, 0.08);
-      color: var(--accent);
+      background: rgba(248, 81, 73, 0.15);
+      color: #f85149;
       font-family: "IBM Plex Mono", monospace;
       font-size: 0.72rem;
       font-weight: 700;
@@ -569,7 +573,7 @@
     .sign-off {
       margin-top: 2.7rem;
       text-align: center;
-      color: #d4d4d4;
+      color: #f85149;
       font-family: "IBM Plex Mono", monospace;
       font-size: 0.86rem;
       letter-spacing: 0.12em;
@@ -598,7 +602,7 @@
     .next-label {
       display: block;
       margin-bottom: 0.35rem;
-      color: var(--text-muted);
+      color: #f85149;
       font-family: "IBM Plex Mono", monospace;
       font-size: 0.68rem;
       letter-spacing: 0.16em;
@@ -621,8 +625,8 @@
       border-radius: 50%;
       display: grid;
       place-items: center;
-      background: rgba(255, 255, 255, 0.08);
-      color: var(--accent);
+      background: rgba(248, 81, 73, 0.12);
+      color: #f85149;
       font-size: 1.2rem;
       transition: transform 0.18s ease, background 0.18s ease;
     }
@@ -746,13 +750,13 @@
   <article>
     <header class="hero">
       <div class="hero-inner fade-in">
-        <span class="series-tag">Trip7 · Entry 001</span>
+        <span class="series-tag"><span class="tag-red">Trip7</span> · Entry <span class="tag-red">001</span></span>
         <h1>A Quiet <em>Network</em>,<br />A Loud Lesson.</h1>
         <p class="hero-subtitle">
           My first penetration test and everything I thought I knew about being ready.
         </p>
         <div class="meta-row" aria-label="Article metadata">
-          <span>8 min read</span>
+          <span style="color:#f85149;">8 min read</span>
         </div>
       </div>
     </header>
@@ -922,7 +926,7 @@
 
       <h2 class="fade-in">What That Experience Gave Me</h2>
 
-      <h3 class="fade-in">1. My First Cheat Sheet</h3>
+      <h3 class="fade-in"><span style="color:#f85149;">1.</span> <span style="color:var(--heading);">My First Cheat Sheet</span></h3>
 
       <p class="fade-in">
         After that assessment, I built something I wish I had from day one, a cheat sheet.
@@ -945,7 +949,7 @@
 
       <p class="fade-in">Because consistency is what separates guessing from testing.</p>
 
-      <h3 class="fade-in">2. The “Try Harder” Trap</h3>
+      <h3 class="fade-in"><span style="color:#f85149;">2.</span> <span style="color:var(--heading);">The &quot;Try Harder&quot; Trap</span></h3>
 
       <p class="fade-in"><em>You just need to try harder.</em></p>
 
@@ -969,7 +973,7 @@
         The drive to never feel underprepared again pushed me hard.
       </p>
 
-      <h3 class="fade-in">3. Redefining What “Winning” Means</h3>
+      <h3 class="fade-in"><span style="color:#f85149;">3.</span> <span style="color:var(--heading);">Redefining What &quot;Winning&quot; Means</span></h3>
 
       <p class="fade-in">
         That first test felt like a loss but over time I learned something important.
