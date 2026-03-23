@@ -20,9 +20,17 @@
       --text-strong: #f0f6fc;
       --text-muted: #9aa4af;
       --text-faint: #7d8590;
-      --accent: #dc2626;
-      --accent-soft: rgba(220, 38, 38, 0.1);
-      --accent-border: rgba(220, 38, 38, 0.28);
+
+      /* keep normal accent text neutral */
+      --accent: #8b949e;
+      --accent-soft: rgba(139, 148, 158, 0.1);
+      --accent-border: rgba(139, 148, 158, 0.22);
+
+      /* boxed accents only */
+      --box-accent: #dc2626;
+      --box-accent-soft: rgba(220, 38, 38, 0.12);
+      --box-accent-border: rgba(220, 38, 38, 0.45);
+
       --success: #dc2626;
       --radius: 12px;
       --radius-sm: 8px;
@@ -42,9 +50,17 @@
       --text-strong: #0f172a;
       --text-muted: #5f6c7b;
       --text-faint: #7a8794;
-      --accent: #dc2626;
-      --accent-soft: rgba(220, 38, 38, 0.08);
-      --accent-border: rgba(220, 38, 38, 0.22);
+
+      /* keep normal accent text neutral */
+      --accent: #4b5563;
+      --accent-soft: rgba(75, 85, 99, 0.08);
+      --accent-border: rgba(75, 85, 99, 0.18);
+
+      /* boxed accents only */
+      --box-accent: #dc2626;
+      --box-accent-soft: rgba(220, 38, 38, 0.08);
+      --box-accent-border: rgba(220, 38, 38, 0.28);
+
       --success: #b91c1c;
       --shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
       color-scheme: light;
@@ -165,11 +181,12 @@
 
     .eyebrow::before {
       content: "";
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-      background: var(--accent);
-      box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.14);
+      width: 10px;
+      height: 14px;
+      border: 1px solid var(--box-accent);
+      background: transparent;
+      border-radius: 1px;
+      box-shadow: 0 0 0 1px rgba(220, 38, 38, 0.08);
       flex-shrink: 0;
     }
 
@@ -211,12 +228,14 @@
 
     h2::before {
       content: "";
-      width: 4px;
+      width: 10px;
       height: 14px;
-      background: var(--accent);
-      border-radius: 999px;
+      border: 1px solid var(--box-accent);
+      background: transparent;
+      border-radius: 1px;
       display: inline-block;
       flex-shrink: 0;
+      box-shadow: 0 0 0 1px rgba(220, 38, 38, 0.08);
     }
 
     .about-section {
@@ -286,9 +305,11 @@
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       font-size: 0.76rem;
       font-weight: 800;
-      color: var(--text-faint);
+      color: #fca5a5;
       padding-top: 0.24rem;
       min-width: 2rem;
+      border-left: 2px solid var(--box-accent);
+      padding-left: 0.45rem;
     }
 
     .toc-body {
@@ -520,7 +541,7 @@
                 <span class="toc-tag tag-live">Published</span>
               </div>
             </a>
-            
+
             <div class="toc-item placeholder" aria-disabled="true">
               <div class="toc-num">03</div>
               <div class="toc-body">
@@ -533,7 +554,7 @@
                 <span class="toc-tag tag-soon">Coming Soon</span>
               </div>
             </div>
-            
+
             <div class="toc-item placeholder" aria-disabled="true">
               <div class="toc-num">04</div>
               <div class="toc-body">
