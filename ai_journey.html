@@ -1,0 +1,157 @@
+# From Penetration Testing to AI Security: What I Learned Along the Way
+
+I didn't get interested in AI security because I wanted to leave traditional penetration testing behind. I got interested because AI started showing up in the same places I was already testing.
+
+For several years, most of my work centered on external, internal, assumed-breach and some web application penetration testing. A large part of that work involved Active Directory, identifying excessive permissions, following privilege relationships, validating attack paths and determining whether that can actually lead somewhere risky. Finding a vulnerability matters but proving what an attacker could do with it matters more.
+
+That mindset shaped how I approached AI and LLM security.
+
+At first, AI security looked like a new specialization, prompt injection, retrieval-augmented generation, system prompts and model supply chains so on and so forth...
+
+The more I worked with them, however, the more familiar the underlying security problems became. An AI app still accepts untrusted input. It still processes sensitive information. It still depends on authentication and authorization. It still communicates with databases and third-party services. It still makes decisions across trust boundaries. The difference is that a language model now sits somewhere in the middle.
+
+## Learning to Attack the Application, Not Just the Model
+
+One of the first things I wanted to understand was what an AI penetration test actually looked like.
+
+I started pursuing practical AI penetration-testing training that approached the problem as an assessment rather than a collection of jailbreak tricks. The training covered areas such as prompt injection, jailbreaking, sensitive-information disclosure, RAG attacks, system-prompt leakage, improper output handling and reconnaissance of AI applications. 
+
+Coming from consulting, I was less interested in proving that I could convince a chatbot to say something unusual. I wanted to know whether manipulating the model could cross a meaningful security boundary.
+
+- Could I access another user's information?
+- Could retrieved documents expose credentials?
+- Could model output cause an application to perform an unauthorized action?
+- Could an AI component send sensitive information somewhere it should not go?
+
+Those questions started moving my thinking away from "Can I break the chatbot?" and toward "What can I make the surrounding application do?" That's a much more useful question for a penetration tester.
+
+## Prompt Injection Made More Sense Once I Treated It as a Trust Problem
+
+Working through intentionally vulnerable AI apps helped make prompt injection more concrete.
+
+OWASP PromptMe, for example, intentionally exposes vulnerabilities associated with the OWASP Top 10 for LLM applications in a controlled environment. It includes practical attack scenarios involving issues such as prompt injection and insecure output handling.
+
+An application may retrieve a webpage, document, email or knowledge-base entry because the model needs that information to complete a legitimate task. From the application's perspective, that content may simply be data. From the model's perspective, however, the same content can also look like instructions.
+
+OWASP describes indirect prompt injection as a situation where malicious instructions reside inside external content that an LLM later processes. That creates a trust-boundary problem.
+
+If I can influence information entering the model's context, I need to determine what else the model can access and what authority the application gives it. The prompt itself is only the beginning of the attack path.
+
+## Building an AI/LLM Assessment Methodology
+
+As I spent more time with these concepts, I started organizing them the same way I would any other penetration test.
+
+My current AI/LLM assessment methodology focuses on:
+
+* Prompt injection, including instructions delivered directly by a user or indirectly through external content.
+* Sensitive-information disclosure involving customer information, credentials, system prompts or internal data.
+* Access control and data isolation between users, sessions and customers.
+* Unsafe handling of model-generated output.
+* Third-party models and other AI supply-chain components.
+* Response integrity where fabricated information could create business risk.
+* Safe validation of actual impact.
+
+What I like about this approach is that it keeps the model in context without making the model the entire assessment.
+
+- Authentication still matters.
+- Authorization still matters.
+- Data isolation still matters.
+- Least privilege still matters.
+- Third-party risk still matters.
+
+The model introduces new ways to reach those weaknesses but organizations still need application controls that work independently of whether a model follows its instructions correctly.
+
+## Then I Started Looking at AI From the Other Side
+
+At the same time that I was learning how to attack AI-enabled applications, I became interested in using AI during offensive-security work.
+
+That turned out to be a different problem.
+
+Training focused on offensive cyber ops with AI, covering areas such as AI-assisted reconnaissance, threat modeling, Active Directory pathfinding, post-exploitation analysis and different approaches to human oversight of agentic workflows. Then came the question:
+
+**Can an AI agent make an experienced penetration tester more consistent without taking control away from the tester?**
+
+I decided to experiment with that directly.
+
+## Project #1: Building an AI Operator for an Active Directory Assessment
+
+I created a Claude Code agent for an authorized Active Directory penetration test and evaluated it in an isolated lab. I didn't design it to become a fully autonomous penetration-testing platform. I wanted an operator assistant that could follow a methodology, keep track of evidence, recommend next steps and stop when it needed human direction. I deliberately gave it boundaries.
+
+It needed to understand scope before doing anything. It needed to know which systems were excluded, whether credential attacks were permitted, whether sensitive systems existed and whether defensive controls could create operational problems. I also explicitly instructed it not to invent missing context and not to interact with out-of-scope systems.
+
+Those restrictions were not there because they made for an interesting AI experiment. They were there because those are normal responsibilities during a professional penetration test.
+
+During the lab, the agent confirmed the target and expected services, checked for the tools it needed, collected Active Directory relationship information and began developing an attack path.
+
+It eventually identified a multi-step path involving delegated directory permissions and access to a managed local administrator credential. It explained the path and kept the tester involved as the chain progressed.
+
+The agent could maintain context across several steps, correlate relationships and help organize evidence. It also had weaknesses. I observed delays when expected tooling was unavailable, occasional drift from the primary objective and a tendency to investigate artifacts that were interesting but not necessarily important to the engagement.
+
+That experience changed how I think about AI-assisted penetration testing. I don't want an autonomous pentester. I want a good operator assistant.
+
+## The Tester Still Owns the Test
+
+A penetration tester makes decisions that require context the model doesn't naturally have.
+
+- Is this attack necessary to demonstrate the risk?
+- Could this action disrupt the client's environment?
+- Does the rules of engagement allow it?
+- Is the evidence sufficient or do I need another validation step?
+- Does this vulnerability matter to the business?
+- Should I stop because I have already demonstrated impact?
+
+Those decisions remain the tester's responsibility.
+
+My own use of AI during security work follows the same principle. I use AI-assisted research and analysis to investigate technologies, evaluate potential attack paths and improve reporting but I manually reproduce and verify conclusions before treating them as findings.
+
+## Whippet: Taking the Attack-Path Idea Further
+
+My second project grew from the same experimentation. Whippet is still a work in progress.
+
+The goal is to build a standalone Active Directory attack-path synthesizer that can work from directory-enumeration data, identify and prioritize risky DACL and privilege relationships, support controlled validation and turn those relationships into evidence backed findings suitable for reporting.
+
+A major design goal is reducing dependence on the BloodHound application for attack-path analysis.
+
+BloodHound has been extremely useful to Active Directory security and I have used it extensively. I see Whippet as supplemental to tools like BloodHound, not as a replacement.
+
+The question I'm exploring is whether I can take the enumeration data collected during an assessment and independently reason through the privilege relationships I care about, synthesize practical attack paths and preserve the evidence behind those decisions.
+
+Attack-path analysis ultimately requires understanding why each relationship matters. If one principal controls another object, what does that actually permit?
+
+- What preconditions exist?
+- What does the next hop require?
+- Can the path be safely validated?
+- What evidence supports the final finding?
+- What is the business impact?
+
+Building a tool around those questions forces me to understand the path rather than simply accepting a graph as the answer. It also gives me another place to explore where AI helps and where deterministic security logic should remain deterministic.
+
+## AI Security Has Made Me More Interested in Fundamentals, Not Less
+
+One unexpected result of this journey is that working with AI has made me care more about traditional security controls.
+
+- A prompt-injection vulnerability becomes significantly more dangerous when the affected model can access sensitive data.
+- An AI agent becomes more dangerous when an application gives it excessive permissions.
+- Unsafe model output becomes more dangerous when another component automatically executes it.
+- A compromised or untrusted model becomes more dangerous when outbound network access has no meaningful restrictions.
+- A hallucination becomes more serious when the organization presents the response as authoritative and customers make decisions based on it.
+
+Organizations still need access control, data minimization, segmentation, secure software design, monitoring, supply-chain governance and independent enforcement of business rules.
+
+## Where I Am Now
+
+I still consider this a journey rather than a finished specialization.
+
+I'm continuing to study AI application security, agentic systems and AI-assisted offensive workflows while building projects that force me to test the ideas instead of only reading about them.
+
+The biggest change has been how I frame the subject. I no longer see "AI security" as a completely separate branch of penetration testing.
+
+I see an AI-enabled app as another system with users, data, permissions, integrations and trust boundaries. The model introduces behaviors we haven't traditionally had to account for but the penetration tester's job remains the same:
+
+- Understand the system.
+- Identify what it trusts.
+- Find where those assumptions fail.
+- Develop a realistic attack path.
+- Validate the impact.
+- Explain the risk clearly.
+- And know when to stop.
