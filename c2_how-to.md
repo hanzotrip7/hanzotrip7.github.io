@@ -1,11 +1,11 @@
 final final c2 how2
 
-# Building Your First C2 & Pivoting Lab: A Complete Step-by-Step Guide
+# Building Your First C2 & Pivoting Lab: A Step-by-Step Guide
 ## Sliver + Tailscale + Chisel + Ligolo-ng
 
-Red teaming and penetration testing rely on Command and Control (C2) frameworks to manage authorized access to test endpoints. Catching a shell is only the first step. In realistic lab environments, high-value targets may sit behind internal networks, segmented subnets, and restrictive firewalls.
+Red teaming and penetration testing rely on Command and Control (C2) frameworks to manage authorized access to test endpoints. Catching a shell is only the first step. In real-world environments, high-value targets may sit behind internal networks, segmented subnets, and restrictive firewalls.
 
-This guide builds a free, open-source C2 and pivoting pipeline from scratch using:
+This guide builds a free, open-source C2 and pivoting pipeline using:
 
 - **Sliver** – Open-source C2 with sessions, implants, native port forwarding, SOCKS5, and Armory
 - **Tailscale** – Secure WireGuard mesh for *your own* operator infrastructure
